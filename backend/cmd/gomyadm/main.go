@@ -31,7 +31,7 @@ func main() {
 	r.Post("/api/connections/{id}/disconnect", connectionHandler.Disconnect)
 	r.Get("/api/connections", connectionHandler.List)
 	r.Get("/api/connections/{id}/tables", schemaHandler.ListTables)
-
+	r.Get("/api/connections/{id}/tables/{table}", schemaHandler.DescribeTable)
 
 	port := ":8181"
 	log.Println("server running at http://localhost" + port)
