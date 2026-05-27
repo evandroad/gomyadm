@@ -1,8 +1,8 @@
-#!/usr/bin/bash
+#!/usr/bin/sh
 
 source "$(dirname "$0")/common.sh"
 
-echo "Testing health endpoint..."
+echo "Testing GET /health"
 
 curl \
   --silent \

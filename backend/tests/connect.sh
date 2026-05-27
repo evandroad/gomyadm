@@ -2,6 +2,8 @@
 
 . "$(dirname "$0")/common.sh"
 
+echo "Testing POST /api/connections/local/connect"
+
 curl \
   --request POST \
   --header "Content-Type: application/json" \
@@ -15,6 +17,6 @@ curl \
     "password": "evandro",
     "database": "2804618_contas"
   }' \
-  "$BASE_URL/api/connections/test"
+  "$BASE_URL/api/connections/connect"
 
 echo ""

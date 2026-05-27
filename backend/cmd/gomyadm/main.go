@@ -15,18 +15,23 @@ func main() {
 
 	manager := db.NewConnectionManager()
 	
-	handler := &api.Handler{
-		Manager: manager,
+	connectionHandler := &api.ConnectionHandler{
+		Connections: manager,
+	}
+	schemaHandler := &api.SchemaHandler{
+		Connections: manager,
 	}
 
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("ok"))
 	})
 
-	r.Post("/api/connections/test", handler.TestConnection)
+	r.Post("/api/connections/connect", connectionHandler.Connect)
+	r.Post("/api/connections/{id}/disconnect", connectionHandler.Disconnect)
+	r.Get("/api/connections/{id}/tables", schemaHandler.ListTables)
 
 	port := ":8181"
-	log.Println("server running at " + port)
+	log.Println("server running at http://localhost" + port)
 
 	err := http.ListenAndServe(port, r)
 	if err != nil {
