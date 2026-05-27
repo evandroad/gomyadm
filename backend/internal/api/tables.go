@@ -1,10 +1,10 @@
 package api
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/evandroad/gomyadm/internal/db"
+	. "github.com/evandroad/gomyadm/internal/respond"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -15,15 +15,15 @@ type SchemaHandler struct {
 func (h *SchemaHandler) ListTables(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
-	db, err := h.Connections.Get(id)
+	conn, err := h.Connections.Get(id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		Error(w, http.StatusNotFound, "Connection not found", nil)
 		return
 	}
 
-	rows, err := db.Query("SHOW TABLES")
+	rows, err := conn.DB.Query("SHOW TABLES")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		Error(w, http.StatusInternalServerError, "Failed to query tables", nil)
 		return
 	}
 	defer rows.Close()
@@ -35,13 +35,12 @@ func (h *SchemaHandler) ListTables(w http.ResponseWriter, r *http.Request) {
 
 		err := rows.Scan(&table)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			Error(w, http.StatusInternalServerError, "Failed to scan table", nil)
 			return
 		}
 
 		tables = append(tables, table)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(tables)
+	JSON(w, http.StatusOK, tables)
 }

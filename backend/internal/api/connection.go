@@ -5,43 +5,49 @@ import (
 	"net/http"
 
 	"github.com/evandroad/gomyadm/internal/db"
+	"github.com/evandroad/gomyadm/internal/models"
+	. "github.com/evandroad/gomyadm/internal/respond"
 	"github.com/go-chi/chi/v5"
+	"github.com/rs/xid"
 )
 
 type ConnectionHandler struct {
 	Connections *db.ConnectionManager
 }
 
-func (h *ConnectionHandler) Connect(w http.ResponseWriter, r *http.Request) {
-	var cfg db.ConnectionConfig
+func (ch *ConnectionHandler) Connect(w http.ResponseWriter, r *http.Request) {
+	var cfg models.ConnectionConfig
 
 	err := json.NewDecoder(r.Body).Decode(&cfg)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		Error(w, http.StatusBadRequest, "Invalid request body", nil)
 		return
 	}
 
-	err = h.Connections.Connect(cfg)
+	cfg.ID = xid.New().String()
+
+	var data models.ConnectionResponse
+	data, err = ch.Connections.Connect(cfg)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		Error(w, http.StatusBadRequest, "Failed to connect", nil)
 		return
 	}
 
-	w.Write([]byte(`{"success":true}`))
+	JSON(w, http.StatusOK, data)
 }
 
-func (h *ConnectionHandler) Disconnect(w http.ResponseWriter, r *http.Request) {
+func (ch *ConnectionHandler) Disconnect(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
-	err := h.Connections.Disconnect(id)
+	err := ch.Connections.Disconnect(id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		Error(w, http.StatusNotFound, "Connection not found", nil)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	Success(w, http.StatusOK, nil)
+}
 
-	json.NewEncoder(w).Encode(map[string]any{
-		"success": true,
-	})
+func (ch *ConnectionHandler) List(w http.ResponseWriter, r *http.Request) {
+	JSON(w, http.StatusOK, ch.Connections.List())
 }

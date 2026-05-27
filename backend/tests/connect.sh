@@ -2,13 +2,10 @@
 
 . "$(dirname "$0")/common.sh"
 
-echo "Testing POST /api/connections/local/connect"
-
 curl \
   --request POST \
   --header "Content-Type: application/json" \
   --data '{
-    "id": "local",
     "name": "Local MySQL",
     "driver": "mysql",
     "host": "127.0.0.1",

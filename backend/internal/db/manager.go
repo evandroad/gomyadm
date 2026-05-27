@@ -6,40 +6,47 @@ import (
 	"sync"
 	"time"
 
+	"github.com/evandroad/gomyadm/internal/drivers"
+	"github.com/evandroad/gomyadm/internal/models"
+
 	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
+
+type Connection struct {
+	Config models.ConnectionConfig
+	DB     *sql.DB
+}
 
 type ConnectionManager struct {
 	mu    sync.RWMutex
-	pools map[string]*sql.DB
+	pools map[string]*Connection
 }
 
 func NewConnectionManager() *ConnectionManager {
 	return &ConnectionManager{
-		pools: make(map[string]*sql.DB),
+		pools: make(map[string]*Connection),
 	}
 }
 
-func (m *ConnectionManager) Connect(cfg ConnectionConfig) error {
+func (m *ConnectionManager) Connect(cfg models.ConnectionConfig) (models.ConnectionResponse, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
 	if _, exists := m.pools[cfg.ID]; exists {
-    return fmt.Errorf("connection already exists")
+    return models.ConnectionResponse{}, fmt.Errorf("connection already exists")
 	}
 
-	dsn := fmt.Sprintf(
-		"%s:%s@tcp(%s:%d)/%s?parseTime=true&multiStatements=true",
-		cfg.Username,
-		cfg.Password,
-		cfg.Host,
-		cfg.Port,
-		cfg.Database,
-	)
+	driver, ok := drivers.GetDriver(cfg.Driver)
+	if !ok {
+		return models.ConnectionResponse{}, fmt.Errorf("unsupported driver")
+	}
 
-	db, err := sql.Open("mysql", dsn)
+	dsn := driver.BuildDSN(cfg)
+
+	db, err := sql.Open(cfg.Driver, dsn)
 	if err != nil {
-		return err
+		return models.ConnectionResponse{}, err
 	}
 
 	db.SetConnMaxLifetime(time.Hour)
@@ -48,24 +55,34 @@ func (m *ConnectionManager) Connect(cfg ConnectionConfig) error {
 
 	err = db.Ping()
 	if err != nil {
-		return err
+		return models.ConnectionResponse{}, err
 	}
 
-	m.pools[cfg.ID] = db
+	m.pools[cfg.ID] = &Connection{
+		Config: cfg,
+		DB:     db,
+	}
 
-	return nil
+	return models.ConnectionResponse{
+		ID:       cfg.ID,
+		Name:     cfg.Name,
+		Driver:   cfg.Driver,
+		Host:     cfg.Host,
+		Port:     cfg.Port,
+		Database: cfg.Database,
+	}, nil
 }
 
 func (m *ConnectionManager) Disconnect(id string) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	db, ok := m.pools[id]
+	conn, ok := m.pools[id]
 	if !ok {
 		return fmt.Errorf("connection not found")
 	}
 
-	err := db.Close()
+	err := conn.DB.Close()
 	if err != nil {
 		return err
 	}
@@ -75,14 +92,34 @@ func (m *ConnectionManager) Disconnect(id string) error {
 	return nil
 }
 
-func (m *ConnectionManager) Get(id string) (*sql.DB, error) {
+func (m *ConnectionManager) Get(id string) (*Connection, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 
-	db, ok := m.pools[id]
+	conn, ok := m.pools[id]
 	if !ok {
 		return nil, fmt.Errorf("connection not found")
 	}
 
-	return db, nil
+	return conn, nil
+}
+
+func (m *ConnectionManager) List() []models.ConnectionResponse {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	connections:= []models.ConnectionResponse{}
+
+	for _, conn := range m.pools {
+		connections = append(connections, models.ConnectionResponse{
+			ID:       conn.Config.ID,
+			Name:     conn.Config.Name,
+			Driver:   conn.Config.Driver,
+			Host:     conn.Config.Host,
+			Port:     conn.Config.Port,
+			Database: conn.Config.Database,
+		})
+	}
+
+	return connections
 }
