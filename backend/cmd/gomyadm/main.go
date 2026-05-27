@@ -9,10 +9,13 @@ import (
 	"github.com/evandroad/gomyadm/internal/api"
 	"github.com/evandroad/gomyadm/internal/db"
 	. "github.com/evandroad/gomyadm/internal/respond"
+	"github.com/evandroad/gomyadm/internal/router"
 )
 
 func main() {
 	r := chi.NewRouter()
+	r.Use(router.Recovery)
+	r.Use(router.Logger)
 
 	manager := db.NewConnectionManager()
 	
