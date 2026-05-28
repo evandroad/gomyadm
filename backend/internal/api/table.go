@@ -10,13 +10,11 @@ import (
 )
 
 type SchemaHandler struct {
-	Connections *db.ConnectionManager
+	Connection *db.ConnectionManager
 }
 
 func (h *SchemaHandler) ListTables(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
-
-	conn, err := h.Connections.Get(id)
+	conn, err := h.Connection.Get()
 	if err != nil {
 		Error(w, http.StatusNotFound, "Connection not found", nil)
 		return
@@ -38,10 +36,9 @@ func (h *SchemaHandler) ListTables(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *SchemaHandler) DescribeTable(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
 	table := chi.URLParam(r, "table")
 
-	conn, err := h.Connections.Get(id)
+	conn, err := h.Connection.Get()
 	if err != nil {
 		Error(w, http.StatusNotFound, err.Error(), nil)
 		return
@@ -53,10 +50,7 @@ func (h *SchemaHandler) DescribeTable(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	schema, err := driver.DescribeTable(
-		conn.DB,
-		table,
-	)
+	schema, err := driver.DescribeTable(conn.DB, table)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "Failed to describe table", nil)
 		return

@@ -52,39 +52,16 @@ func Logger(next http.Handler) http.Handler {
 		inSize := max(r.ContentLength, 0)
 		sw := &statusWriter{ResponseWriter: w, status: 200}
 
-		isStream := r.Header.Get("Accept") == "text/event-stream" ||
-			r.URL.Path == "/api/events" ||
-			r.URL.Path == "/api/containers/stats"
-		if isStream {
-			fmt.Printf("[DKM] %s | %s%s%s from %s - %sSTREAM OPEN%s\n",
-				time.Now().Format("06/01/02 15:04:05.000"),
-				cyan, r.Method+" "+r.URL.String(), reset,
-				r.RemoteAddr,
-				green, reset,
-			)
-		}
-
 		next.ServeHTTP(sw, r)
 		statusColor := green
+		if sw.status >= 400 { statusColor = yellow }
+		if sw.status >= 500 { statusColor = red }
 
-		if sw.status >= 400 {
-			statusColor = yellow
-		}
-
-		if sw.status >= 500 {
-			statusColor = red
-		}
-
-		label := ""
-		if isStream {
-			label = "STREAM CLOSED "
-		}
-
-		fmt.Printf("[DKM] %s | %s%s%s from %s - %s%s%d%s %s↓%s ↑%s%s in %s%s%s\n",
+		fmt.Printf("[DKM] %s | %s%s%s from %s - %s%d%s %s↓%s ↑%s%s in %s%s%s\n",
 			time.Now().Format("06/01/02 15:04:05.000"),
-			cyan, r.Method+" "+r.URL.String(), reset,
+			cyan, r.Method + " " + r.URL.String(), reset,
 			r.RemoteAddr,
-			statusColor, label, sw.status, reset,
+			statusColor, sw.status, reset,
 			blue, formatSize(int(inSize)), formatSize(sw.size), reset,
 			green, time.Since(start), reset,
 		)

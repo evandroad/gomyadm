@@ -5,6 +5,6 @@
 curl \
   --silent \
   --show-error \
-  "$BASE_URL/api/connections"
+  "$BASE_URL/api/connection"
 
 echo ""

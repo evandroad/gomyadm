@@ -20,22 +20,16 @@ func main() {
 
 	manager := db.NewConnectionManager()
 	
-	connectionHandler := &api.ConnectionHandler{
-		Connections: manager,
-	}
-	schemaHandler := &api.SchemaHandler{
-		Connections: manager,
-	}
+	connectionHandler := &api.ConnectionHandler{ Connection: manager }
+	schemaHandler := &api.SchemaHandler{ Connection: manager }
 
-	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
-		Success(w, http.StatusOK, nil)
-	})
-
-	r.Post("/api/connections/connect", connectionHandler.Connect)
-	r.Post("/api/connections/{id}/disconnect", connectionHandler.Disconnect)
-	r.Get("/api/connections", connectionHandler.List)
-	r.Get("/api/connections/{id}/tables", schemaHandler.ListTables)
-	r.Get("/api/connections/{id}/tables/{table}", schemaHandler.DescribeTable)
+	r.Get("/health", health)
+	r.Post("/api/connection/connect", connectionHandler.Connect)
+	r.Post("/api/connection/disconnect", connectionHandler.Disconnect)
+	r.Get("/api/connection", connectionHandler.Active)
+	r.Get("/api/connection/tables", schemaHandler.ListTables)
+	r.Get("/api/connection/tables/{table}", schemaHandler.DescribeTable)
+	r.NotFound(func(w http.ResponseWriter, r *http.Request) { notFound(w, r) })
 
 	port := ":8181"
 	log.Println("server running at http://localhost" + port)
@@ -44,4 +38,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func health(w http.ResponseWriter, r *http.Request) {
+	Success(w, http.StatusOK, nil)
+}
+
+func notFound(w http.ResponseWriter, r *http.Request) {
+	Error(w, http.StatusNotFound, "rota não encontrada", H{ "path": r.URL.Path })
 }

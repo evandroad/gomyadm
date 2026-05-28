@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"sync"
 	"time"
 
@@ -19,13 +20,13 @@ type Connection struct {
 }
 
 type ConnectionManager struct {
-	mu    sync.RWMutex
-	pools map[string]*Connection
+	mu         sync.RWMutex
+	connection *Connection
 }
 
 func NewConnectionManager() *ConnectionManager {
 	return &ConnectionManager{
-		pools: make(map[string]*Connection),
+		connection: nil,
 	}
 }
 
@@ -33,8 +34,8 @@ func (m *ConnectionManager) Connect(cfg models.ConnectionConfig) (models.Connect
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	if _, exists := m.pools[cfg.ID]; exists {
-    return models.ConnectionResponse{}, fmt.Errorf("connection already exists")
+	if m.connection != nil {
+		return models.ConnectionResponse{}, fmt.Errorf("connection already exists")
 	}
 
 	driver, ok := drivers.GetDriver(cfg.Driver)
@@ -46,6 +47,7 @@ func (m *ConnectionManager) Connect(cfg models.ConnectionConfig) (models.Connect
 
 	db, err := sql.Open(cfg.Driver, dsn)
 	if err != nil {
+		log.Printf("Failed to open database connection: %v", err)
 		return models.ConnectionResponse{}, err
 	}
 
@@ -55,71 +57,65 @@ func (m *ConnectionManager) Connect(cfg models.ConnectionConfig) (models.Connect
 
 	err = db.Ping()
 	if err != nil {
+		log.Printf("Failed to ping database: %v", err)
 		return models.ConnectionResponse{}, err
 	}
 
-	m.pools[cfg.ID] = &Connection{
+	m.connection = &Connection{
 		Config: cfg,
 		DB:     db,
 	}
 
-	return models.ConnectionResponse{
-		ID:       cfg.ID,
-		Name:     cfg.Name,
-		Driver:   cfg.Driver,
-		Host:     cfg.Host,
-		Port:     cfg.Port,
-		Database: cfg.Database,
-	}, nil
+	return m.getConnection(), nil
 }
 
-func (m *ConnectionManager) Disconnect(id string) error {
+func (m *ConnectionManager) Disconnect() error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	conn, ok := m.pools[id]
-	if !ok {
-		return fmt.Errorf("connection not found")
+	if m.connection == nil {
+		return fmt.Errorf("no active connection")
 	}
 
-	err := conn.DB.Close()
+	err := m.connection.DB.Close()
 	if err != nil {
+		log.Printf("Failed to close database connection: %v", err)
 		return err
 	}
 
-	delete(m.pools, id)
-
+	m.connection = nil
 	return nil
 }
 
-func (m *ConnectionManager) Get(id string) (*Connection, error) {
+func (m *ConnectionManager) Get() (*Connection, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 
-	conn, ok := m.pools[id]
-	if !ok {
-		return nil, fmt.Errorf("connection not found")
+	if m.connection == nil {
+		return nil, fmt.Errorf("no active connection")
 	}
 
-	return conn, nil
+	return m.connection, nil
 }
 
-func (m *ConnectionManager) List() []models.ConnectionResponse {
+func (m *ConnectionManager) Active() (models.ConnectionResponse, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 
-	connections:= []models.ConnectionResponse{}
-
-	for _, conn := range m.pools {
-		connections = append(connections, models.ConnectionResponse{
-			ID:       conn.Config.ID,
-			Name:     conn.Config.Name,
-			Driver:   conn.Config.Driver,
-			Host:     conn.Config.Host,
-			Port:     conn.Config.Port,
-			Database: conn.Config.Database,
-		})
+	if m.connection == nil {
+		return models.ConnectionResponse{}, fmt.Errorf("no active connection")
 	}
 
-	return connections
+	return m.getConnection(), nil
+}
+
+func (m *ConnectionManager) getConnection() models.ConnectionResponse {
+	return models.ConnectionResponse{
+		ID:       m.connection.Config.ID,
+		Name:     m.connection.Config.Name,
+		Driver:   m.connection.Config.Driver,
+		Host:     m.connection.Config.Host,
+		Port:     m.connection.Config.Port,
+		Database: m.connection.Config.Database,
+	}
 }

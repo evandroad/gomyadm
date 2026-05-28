@@ -14,6 +14,6 @@ curl \
     "password": "evandro",
     "database": "2804618_contas"
   }' \
-  "$BASE_URL/api/connections/connect"
+  "$BASE_URL/api/connection/connect"
 
 echo ""
