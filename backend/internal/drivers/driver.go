@@ -10,4 +10,5 @@ type Driver interface {
 	BuildDSN(cfg models.ConnectionConfig) string
 	ListTables(db *sql.DB) ([]string, error)
 	DescribeTable(db *sql.DB, table string) (*models.TableSchema, error)
+	ListDatabases(db *sql.DB) ([]string, error)
 }

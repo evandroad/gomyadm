@@ -58,3 +58,26 @@ func (ch *ConnectionHandler) Active(w http.ResponseWriter, r *http.Request) {
 
 	JSON(w, http.StatusOK, conn)
 }
+
+func (ch *ConnectionHandler) SelectDatabase(w http.ResponseWriter, r *http.Request) {
+	type Request struct {
+		Database string `json:"database"`
+	}
+
+	var req Request
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		log.Printf("Failed to decode request body: %v", err)
+		Error(w, http.StatusBadRequest, "Invalid request body", nil)
+		return
+	}
+	
+	err = ch.Connection.SelectDatabase(req.Database)
+	if err != nil {
+		log.Printf("Failed to select database: %v", err)
+		Error(w, http.StatusBadRequest, "Failed to select database", nil)
+		return
+	}
+
+	Success(w, http.StatusOK, H{ "message": "Database " + req.Database + " selected successfully" })
+}

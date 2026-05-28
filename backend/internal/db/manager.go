@@ -14,11 +14,6 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-type Connection struct {
-	Config models.ConnectionConfig
-	DB     *sql.DB
-}
-
 type ConnectionManager struct {
 	mu         sync.RWMutex
 	connection *Connection
@@ -35,35 +30,20 @@ func (m *ConnectionManager) Connect(cfg models.ConnectionConfig) (models.Connect
 	defer m.mu.Unlock()
 
 	if m.connection != nil {
-		return models.ConnectionResponse{}, fmt.Errorf("connection already exists")
+		if m.connection.Matches(cfg) {
+			return m.getConnection(), nil
+		}
+
+		if err := m.connection.DB.Close(); err != nil {
+			return models.ConnectionResponse{}, err
+		}
+
+		m.connection = nil
 	}
 
-	driver, ok := drivers.GetDriver(cfg.Driver)
-	if !ok {
-		return models.ConnectionResponse{}, fmt.Errorf("unsupported driver")
-	}
-
-	dsn := driver.BuildDSN(cfg)
-
-	db, err := sql.Open(cfg.Driver, dsn)
+	err := m.createConnection(cfg)
 	if err != nil {
-		log.Printf("Failed to open database connection: %v", err)
 		return models.ConnectionResponse{}, err
-	}
-
-	db.SetConnMaxLifetime(time.Hour)
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(5)
-
-	err = db.Ping()
-	if err != nil {
-		log.Printf("Failed to ping database: %v", err)
-		return models.ConnectionResponse{}, err
-	}
-
-	m.connection = &Connection{
-		Config: cfg,
-		DB:     db,
 	}
 
 	return m.getConnection(), nil
@@ -109,13 +89,74 @@ func (m *ConnectionManager) Active() (models.ConnectionResponse, error) {
 	return m.getConnection(), nil
 }
 
+func (m *ConnectionManager) SelectDatabase(name string) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	if m.connection == nil {
+		return fmt.Errorf("no active connection")
+	}
+
+	err := m.connection.DB.Close()
+	if err != nil {
+		log.Printf("Failed to close database connection: %v", err)
+		return err
+	}
+
+	m.connection.Config.Database = name
+
+	err = m.createConnection(m.connection.Config)
+	if err != nil {
+		log.Printf("Failed to connect to selected database: %v", err)
+		return err
+	}
+
+	return nil
+}
+
+func (m *ConnectionManager) createConnection(cfg models.ConnectionConfig) error {
+	driver, ok := drivers.GetDriver(cfg.Driver)
+	if !ok {
+		return fmt.Errorf("unsupported driver")
+	}
+
+	dsn := driver.BuildDSN(cfg)
+
+	db, err := sql.Open(cfg.Driver, dsn)
+	if err != nil {
+		return fmt.Errorf("failed to open database connection: %w", err)
+	}
+
+	db.SetConnMaxLifetime(time.Hour)
+	db.SetMaxOpenConns(10)
+	db.SetMaxIdleConns(5)
+
+	if err := db.Ping(); err != nil {
+		return fmt.Errorf("failed to ping database: %w", err)
+	}
+
+	databases, err := driver.ListDatabases(db)
+	if err != nil {
+		return fmt.Errorf("failed to list databases: %w", err)
+	}
+
+	m.connection = &Connection{
+		Config: cfg,
+		DB:     db,
+		DBs:    databases,
+	}
+
+	return nil
+}
+
 func (m *ConnectionManager) getConnection() models.ConnectionResponse {
 	return models.ConnectionResponse{
-		ID:       m.connection.Config.ID,
-		Name:     m.connection.Config.Name,
-		Driver:   m.connection.Config.Driver,
-		Host:     m.connection.Config.Host,
-		Port:     m.connection.Config.Port,
-		Database: m.connection.Config.Database,
+		ID:        m.connection.Config.ID,
+		Name:      m.connection.Config.Name,
+		Driver:    m.connection.Config.Driver,
+		Host:      m.connection.Config.Host,
+		Port:      m.connection.Config.Port,
+		Database:  m.connection.Config.Database,
+		Databases: m.connection.DBs,
 	}
 }

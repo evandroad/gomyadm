@@ -84,3 +84,25 @@ func (d MySQLDriver) DescribeTable(db *sql.DB, table string) (*models.TableSchem
 
 	return schema, nil
 }
+
+func (d MySQLDriver) ListDatabases(db *sql.DB) ([]string, error) {
+	rows, err := db.Query(`SHOW DATABASES`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var databases []string
+
+	for rows.Next() {
+		var name string
+
+		if err := rows.Scan(&name); err != nil {
+			return nil, err
+		}
+
+		databases = append(databases, name)
+	}
+
+	return databases, nil
+}

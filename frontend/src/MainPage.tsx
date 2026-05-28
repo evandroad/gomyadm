@@ -1,29 +1,34 @@
 import { useEffect, useState } from "react"
 import TablePreview from "./TablePreview"
 import { API_URL } from "./api"
+import { useNavigate } from "react-router-dom"
 
 type Connection = {
   id: string
-  name?: string
+  name: string
+  database: string
+  databases: string[]
 }
 
 export default function MainPage() {
-  const [connections, setConnections] = useState<Connection[]>([])
-  const [activeConnection, setActiveConnection] = useState<string | null>(null)
+  const [connection, setConnection] = useState<Connection | null>(null)
   const [tables, setTables] = useState<string[]>([])
   const [selectedTable, setSelectedTable] = useState<string | null>(null)
+  const [selectedDatabase, setSelectedDatabase] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const navigate = useNavigate()
 
   useEffect(() => {
     async function loadConnections() {
       try {
-        const res = await fetch(`${API_URL}/api/connections`)
+        const res = await fetch(`${API_URL}/api/connection`)
         const data = await res.json()
-
-        setConnections(data)
-
-        if (data.length > 0) {
-          setActiveConnection(data[0].id)
+        
+        if (data) {
+          setConnection(data)
+          if (data.database != '') {
+            setSelectedDatabase(data.database)
+          }
         }
       } finally {
         setLoading(false)
@@ -34,20 +39,52 @@ export default function MainPage() {
   }, [])
 
   useEffect(() => {
-    if (!activeConnection) return
-
-    async function loadTables() {
-      const res = await fetch(
-        `${API_URL}/api/connections/${activeConnection}/tables`
-      )
-      const data = await res.json()
-
-      setTables(data)
+    if (!connection) {
       setSelectedTable(null)
+      setTables([])
+      return
     }
 
-    loadTables()
-  }, [activeConnection])
+    async function switchDatabase() {
+      setLoading(true)
+      const res = await fetch(`${API_URL}/api/connection/database/select`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ database: selectedDatabase }),
+      })
+
+      if (res.ok) {
+        setSelectedTable(null)
+        setTables([])
+        loadTables()
+      }
+
+      setLoading(false)
+    }
+
+    switchDatabase()
+  }, [selectedDatabase])
+
+  async function loadTables() {
+    if (!connection || !selectedDatabase) return
+
+    const res = await fetch(`${API_URL}/api/connection/tables`)
+    const data = await res.json()
+    setTables(data)
+    setSelectedTable(null)
+  }
+
+  async function disconnect() {
+    const res = await fetch(`${API_URL}/api/connection/disconnect`, { method: "POST" })
+
+    if (res.ok) {
+      setConnection(null)
+      setTables([])
+      navigate("/connect", { replace: true })
+    }
+  }
 
   if (loading) {
     return (
@@ -58,92 +95,55 @@ export default function MainPage() {
   }
 
   return (
-    <div className="h-screen flex bg-zinc-950 text-white">
-
-      {/* SIDEBAR */}
-      <aside className="w-64 bg-zinc-900 border-r border-zinc-800 flex flex-col">
-        
+    <div className="min-h-screen flex bg-zinc-950 text-white">
+      <aside className="w-64 bg-zinc-900 border-r border-zinc-800 flex flex-col">        
         <div className="p-3 font-bold border-b border-zinc-800">
           Gomyadm
         </div>
 
-        {/* connections */}
-        <div className="p-2 text-xs text-zinc-400">
-          CONEXÕES
+        <div className="p-3 text-zinc-400 border-b border-zinc-800">
+          { connection?.name || 'Conexão 1' }
         </div>
 
-        <div className="flex-1 overflow-auto">
-          {connections.map((conn) => (
-            <button
-              key={conn.id}
-              onClick={() => setActiveConnection(conn.id)}
-              className={`w-full text-left px-3 py-2 hover:bg-zinc-800 ${
-                activeConnection === conn.id ? "bg-zinc-800" : ""
-              }`}
-            >
-              { conn.name || conn.id }
-            </button>
-          ))}
+        <div className="p-3 font-bold border-b border-zinc-800">
+          Banco de dados
+          <div className="space-y-4 mt-2">
+            <select className="w-full bg-zinc-800 p-2 rounded-md cursor-pointer" value={selectedDatabase || ''} onChange={(e) => setSelectedDatabase(e.target.value)}>
+              <option value="">Selecione</option>
+              {connection?.databases.map((db) => (
+                <option key={db} value={db}>{db}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        {activeConnection && (
-          <button
-            onClick={async () => {
-              const res = await fetch(
-                `${API_URL}/api/connections/${activeConnection}/disconnect`,
-                { method: "POST" }
-              )
+        <div className="border-r border-zinc-800">
+          <div className="overflow-auto">
+            {tables.length > 0 ? (
+              tables.map((table) => (
+                <button key={table} onClick={() => setSelectedTable(table)} className={`w-full text-left px-3 py-2 hover:bg-zinc-950 cursor-pointer ${selectedTable === table ? "bg-zinc-900" : ""}`}>{ table }</button>
+              ))
+            ) : (
+              <div className="p-3 text-zinc-500 text-sm">Nenhuma tabela encontrada</div>
+            )}
+          </div>
+        </div>
 
-              if (res.ok) {
-                setActiveConnection(null)
-                setTables([])
-              }
-            }}
-            className="p-3 bg-red-600 hover:bg-red-700"
-          >
+        {connection && (
+          <button onClick={() => disconnect()} className="mt-auto p-3 bg-red-600 hover:bg-red-700">
             Desconectar
           </button>
         )}
       </aside>
 
-      {/* MAIN */}
       <main className="flex-1 flex">
-
-        {/* TABLE LIST */}
-        <div className="w-72 border-r border-zinc-800 bg-zinc-950">
-          <div className="p-3 border-b border-zinc-800 text-sm">
-            Tabelas
-          </div>
-
-          <div className="overflow-auto">
-            {tables.map((table) => (
-              <button
-                key={table}
-                onClick={() => setSelectedTable(table)}
-                className={`w-full text-left px-3 py-2 hover:bg-zinc-900 ${
-                  selectedTable === table ? "bg-zinc-900" : ""
-                }`}
-              >
-                {table}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* CONTENT */}
         <div className="flex-1 p-4">
           {!selectedTable ? (
-            <div className="text-zinc-500">
-              Selecione uma tabela
-            </div>
+            <div className="text-zinc-500">Selecione uma tabela</div>
           ) : (
-            <TablePreview
-              connectionId={activeConnection!}
-              table={selectedTable}
-            />
+            <TablePreview table={selectedTable}/>
           )}
         </div>
-
       </main>
     </div>
   )

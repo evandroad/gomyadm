@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react"
 import { API_URL } from "./api";
 
-export default function TablePreview({ connectionId, table }: { connectionId: string; table: string }) {
+export default function TablePreview({ table }: { table: string }) {
   const [schema, setSchema] = useState<any>(null)
 
   useEffect(() => {
     async function load() {
       const res = await fetch(
-        `${API_URL}/api/connections/${connectionId}/tables/${table}`
+        `${API_URL}/api/connection/tables/${table}`
       )
 
       const data = await res.json()
@@ -15,7 +15,7 @@ export default function TablePreview({ connectionId, table }: { connectionId: st
     }
 
     load()
-  }, [connectionId, table])
+  }, [table])
 
   if (!schema) {
     return <div className="text-zinc-500">Carregando schema...</div>

@@ -14,6 +14,9 @@ func init() {
 }
 
 func (d PostgresDriver) BuildDSN(cfg models.ConnectionConfig) string {
+	if cfg.Database == "" {
+		cfg.Database = "postgres"
+	}
 	return fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		cfg.Host,
@@ -83,4 +86,30 @@ func (d PostgresDriver) DescribeTable(db *sql.DB, table string) (*models.TableSc
 	}
 
 	return schema, nil
+}
+
+func (d PostgresDriver) ListDatabases(db *sql.DB) ([]string, error) {
+	rows, err := db.Query(`
+		SELECT datname
+		FROM pg_database
+		WHERE datistemplate = false
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var databases []string
+
+	for rows.Next() {
+		var name string
+
+		if err := rows.Scan(&name); err != nil {
+			return nil, err
+		}
+
+		databases = append(databases, name)
+	}
+
+	return databases, nil
 }

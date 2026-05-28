@@ -12,10 +12,11 @@ type ConnectionConfig struct {
 }
 
 type ConnectionResponse struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Driver   string `json:"driver"`
-	Host     string `json:"host"`
-	Port     int    `json:"port"`
-	Database string `json:"database"`
+	ID       string    `json:"id"`
+	Name     string    `json:"name"`
+	Driver   string    `json:"driver"`
+	Host     string 	 `json:"host"`
+	Port     int    	 `json:"port"`
+	Database string    `json:"database"`
+	Databases []string `json:"databases"`
 }

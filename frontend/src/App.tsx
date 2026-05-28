@@ -2,21 +2,21 @@ import DatabaseConnectionPage from "./DatabaseConnectionPage"
 import MainPage from "./MainPage"
 import { Navigate, Route, Routes } from "react-router-dom"
 import ConnectionGuard from "./ConnectionGuard"
+import GuestGuard from "./GuestGuard"
 
 export default function App() {
-   return (
+  return (
     <Routes>
-      <Route path="/" element={<Navigate to="/app" replace />} />
-      <Route path="/connect" element={<DatabaseConnectionPage />} />
+      {/* rotas públicas somente sem conexão */}
+      <Route element={<GuestGuard />}>
+        <Route path="/connect" element={<DatabaseConnectionPage />} />
+      </Route>
 
-      <Route
-        path="/app"
-        element={
-          <ConnectionGuard>
-            <MainPage />
-          </ConnectionGuard>
-        }
-      />
+      {/* rotas protegidas */}
+      <Route element={<ConnectionGuard />}>
+        <Route path="/" element={<Navigate to="/app" replace />} />
+        <Route path="/app" element={<MainPage />} />
+      </Route>
     </Routes>
   )
 }

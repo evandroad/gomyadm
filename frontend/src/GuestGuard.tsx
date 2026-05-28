@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { Navigate, Outlet } from "react-router-dom"
 import { API_URL } from "./api"
 
-export default function ConnectionGuard() {
+export default function GuestGuard() {
   const [loading, setLoading] = useState(true)
   const [connected, setConnected] = useState(false)
 
@@ -31,14 +31,14 @@ export default function ConnectionGuard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-white">
-        Conectando...
+      <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-white">
+        Carregando...
       </div>
     )
   }
 
-  if (!connected) {
-    return <Navigate to="/connect" replace />
+  if (connected) {
+    return <Navigate to="/app" replace />
   }
 
   return <Outlet />

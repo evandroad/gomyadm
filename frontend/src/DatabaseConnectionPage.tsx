@@ -8,15 +8,24 @@ import { useNavigate } from "react-router-dom"
 
 type Driver = "mysql" | "postgres"
 
+type ConnectionRequest = {
+  driver: Driver
+  host: string
+  port: number
+  username: string
+  password: string
+}
+
 export default function DatabaseConnectionPage() {
-  const [driver, setDriver] = useState<Driver>("mysql")
-  const [host, setHost] = useState("localhost")
-  const [port, setPort] = useState("")
-  const [name, setName] = useState("")
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
-  const [database, setDatabase] = useState("")
+  const [connection, setConnection] = useState<ConnectionRequest>({
+    driver: "mysql",
+    host: "",
+    port: 0,
+    username: "",
+    password: ""
+  })
   const [loading, setLoading] = useState(false)
+  const [port, setPort] = useState<string>("")
   const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
 
@@ -25,12 +34,13 @@ export default function DatabaseConnectionPage() {
     setError(null)
 
     try {
-      const res = await fetch( API_URL + "/api/connections/connect", {
+      connection.port = parseInt(port, 0)
+      const res = await fetch( API_URL + "/api/connection/connect", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name, driver, host, port: Number(port), username, password, database }),
+        body: JSON.stringify(connection),
       })
 
       if (!res.ok) {
@@ -54,20 +64,16 @@ export default function DatabaseConnectionPage() {
         </CardHeader>
 
         <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <Label>Nome</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nome da conexão" />
-          </div>
           <div className="space-y-4">
             <Label>Banco de dados</Label>
-            <select className="w-full bg-zinc-800 p-2 rounded-md" value={driver} onChange={(e) => setDriver(e.target.value as Driver)}>
+            <select className="w-full bg-zinc-800 p-2 rounded-md" value={connection.driver} onChange={(e) => setConnection({...connection, driver: e.target.value as Driver})}>
               <option value="mysql">MySQL</option>
               <option value="postgres">PostgreSQL</option>
             </select>
           </div>
           <div className="space-y-2">
             <Label>Host</Label>
-            <Input value={host} onChange={(e) => setHost(e.target.value)} placeholder="localhost" />
+            <Input value={connection.host} onChange={(e) => setConnection({...connection, host: e.target.value})} placeholder="localhost" />
           </div>
           <div className="space-y-2">
             <Label>Porta</Label>
@@ -75,15 +81,11 @@ export default function DatabaseConnectionPage() {
           </div>
           <div className="space-y-2">
             <Label>Usuário</Label>
-            <Input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="postgres / root" />
+            <Input value={connection.username} onChange={(e) => setConnection({...connection, username: e.target.value})} placeholder="postgres / root" />
           </div>
           <div className="space-y-2">
             <Label>Senha</Label>
-            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          </div>
-          <div className="space-y-2">
-            <Label>Database</Label>
-            <Input value={database} onChange={(e) => setDatabase(e.target.value)} placeholder="nome_do_banco" />
+            <Input type="password" value={connection.password} onChange={(e) => setConnection({...connection, password: e.target.value})} />
           </div>
 
           {error && (
