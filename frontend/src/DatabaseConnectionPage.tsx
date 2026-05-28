@@ -3,11 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
+import { API_URL } from "./api"
+import { useNavigate } from "react-router-dom"
 
 type Driver = "mysql" | "postgres"
 
 export default function DatabaseConnectionPage() {
-  const [driver, setDriver] = useState<Driver>("postgres")
+  const [driver, setDriver] = useState<Driver>("mysql")
   const [host, setHost] = useState("localhost")
   const [port, setPort] = useState("")
   const [name, setName] = useState("")
@@ -16,13 +18,14 @@ export default function DatabaseConnectionPage() {
   const [database, setDatabase] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const navigate = useNavigate()
 
   async function handleConnect() {
     setLoading(true)
     setError(null)
 
     try {
-      const res = await fetch("http://localhost:8181/api/connections/connect", {
+      const res = await fetch( API_URL + "/api/connections/connect", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -35,9 +38,7 @@ export default function DatabaseConnectionPage() {
         throw new Error(data.message || "Falha ao conectar")
       }
 
-      const data = await res.json()
-      console.log("Conectado:", data)
-
+      navigate("/app", { replace: true })
     } catch (err: any) {
       setError(err.message)
     } finally {
