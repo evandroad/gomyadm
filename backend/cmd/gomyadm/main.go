@@ -14,6 +14,7 @@ import (
 
 func main() {
 	r := chi.NewRouter()
+	r.Use(router.CORS)
 	r.Use(router.Recovery)
 	r.Use(router.Logger)
 
