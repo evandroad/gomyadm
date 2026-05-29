@@ -8,11 +8,18 @@ import (
 
 	"github.com/evandroad/gomyadm/internal/api"
 	"github.com/evandroad/gomyadm/internal/db"
+	"github.com/evandroad/gomyadm/internal/storage"
 	. "github.com/evandroad/gomyadm/internal/respond"
 	"github.com/evandroad/gomyadm/internal/router"
 )
 
 func main() {
+	store := storage.GetConnectionsStore()
+	err := store.Init()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	r := chi.NewRouter()
 	r.Use(router.CORS)
 	r.Use(router.Recovery)
@@ -26,6 +33,8 @@ func main() {
 	r.Get("/health", health)
 	r.Post("/api/connection/connect", connectionHandler.Connect)
 	r.Post("/api/connection/disconnect", connectionHandler.Disconnect)
+	r.Post("/api/connection/save", connectionHandler.SaveConnection)
+	r.Get("/api/connection/list", connectionHandler.ListConnections)
 	r.Get("/api/connection", connectionHandler.Active)
 	r.Post("/api/connection/database/select", connectionHandler.SelectDatabase)
 	r.Get("/api/connection/tables", schemaHandler.ListTables)
@@ -35,7 +44,7 @@ func main() {
 	port := ":8181"
 	log.Println("server running at http://localhost" + port)
 
-	err := http.ListenAndServe(port, r)
+	err = http.ListenAndServe(port, r)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -1,0 +1,12 @@
+[
+  {
+    "id": "",
+    "name": "super-api",
+    "driver": "mysql",
+    "host": "localhost",
+    "port": 9906,
+    "username": "evandro",
+    "password": "evandro",
+    "database": "2804618_contas"
+  }
+]

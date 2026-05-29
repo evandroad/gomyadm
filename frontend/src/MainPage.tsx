@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import TablePreview from "./TablePreview"
 import { API_URL } from "./api"
 import { useNavigate } from "react-router-dom"
+import SidebarConnection from "./SaveConnection"
 
 type Connection = {
   id: string
@@ -19,22 +20,6 @@ export default function MainPage() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    async function loadConnections() {
-      try {
-        const res = await fetch(`${API_URL}/api/connection`)
-        const data = await res.json()
-        
-        if (data) {
-          setConnection(data)
-          if (data.database != '') {
-            setSelectedDatabase(data.database)
-          }
-        }
-      } finally {
-        setLoading(false)
-      }
-    }
-
     loadConnections()
   }, [])
 
@@ -45,27 +30,41 @@ export default function MainPage() {
       return
     }
 
-    async function switchDatabase() {
-      setLoading(true)
-      const res = await fetch(`${API_URL}/api/connection/database/select`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ database: selectedDatabase }),
-      })
-
-      if (res.ok) {
-        setSelectedTable(null)
-        setTables([])
-        loadTables()
-      }
-
-      setLoading(false)
-    }
-
     switchDatabase()
   }, [selectedDatabase])
+
+  async function loadConnections() {
+    try {
+      const res = await fetch(`${API_URL}/api/connection`)
+      const data = await res.json()
+      
+      if (data) {
+        setConnection(data)
+        if (data.database != '') {
+          setSelectedDatabase(data.database)
+        }
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function switchDatabase() {
+    setLoading(true)
+    const res = await fetch(`${API_URL}/api/connection/database/select`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ database: selectedDatabase }),
+    })
+
+    if (res.ok) {
+      setSelectedTable(null)
+      setTables([])
+      loadTables()
+    }
+
+    setLoading(false)
+  }
 
   async function loadTables() {
     if (!connection || !selectedDatabase) return
@@ -101,9 +100,7 @@ export default function MainPage() {
           Gomyadm
         </div>
 
-        <div className="p-3 text-zinc-400 border-b border-zinc-800">
-          { connection?.name || 'Conexão 1' }
-        </div>
+        <SidebarConnection />
 
         <div className="p-3 font-bold border-b border-zinc-800">
           Banco de dados
