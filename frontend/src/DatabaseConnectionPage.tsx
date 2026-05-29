@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
 import { API_URL } from "./api"
 import { useNavigate } from "react-router-dom"
+import { Button } from "./components/button"
+import { Card, CardContent, CardHeader, CardTitle } from "./components/card"
+import { Label } from "./components/label"
+import { Input } from "./components/input"
 
 type Driver = "mysql" | "postgres"
 
@@ -90,20 +90,18 @@ export default function DatabaseConnectionPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-zinc-950 p-2">
-      <Card className="w-full max-w-md bg-zinc-900 border-zinc-800 text-white mt-6">
+      <Card className="w-full max-w-md bg-zinc-900 border-zinc-800 mt-6">
         { connections.length > 0 && (
           <CardContent className="space-y-4">
             <CardTitle className="text-lg">Conexões salvas</CardTitle>
 
             <div className="space-y-2">
               {connections.map((conn, index) => (
-                <div key={index} className="p-2 bg-zinc-800 rounded-md flex justify-between items-center">
+                <div key={index} className="p-2 bg-zinc-950 rounded-md flex justify-between items-center">
                   <span>
                     <strong className="text-base">{conn.name}</strong> - {conn.host}:{conn.port} - {conn.driver.toUpperCase()}
                   </span>
-                  <button className="ml-4 bg-zinc-700 hover:bg-zinc-600 px-2 py-1 text-sm" onClick={() => connectFromSaved(conn)}>
-                    Conectar
-                  </button>
+                  <Button onClick={() => connectFromSaved(conn)}>Conectar</Button>
                 </div>
               ))}
             </div>
@@ -116,30 +114,24 @@ export default function DatabaseConnectionPage() {
           <CardTitle className="text-xl">Conectar ao banco de dados</CardTitle>
         </CardHeader>
 
-        <CardContent className="space-y-6">
-          <div className="space-y-4">
-            <Label>Banco de dados</Label>
-            <select className="w-full bg-zinc-800 p-2 rounded-md" value={connection.driver} onChange={(e) => setConnection({...connection, driver: e.target.value as Driver})}>
-              <option value="mysql">MySQL</option>
-              <option value="postgres">PostgreSQL</option>
-            </select>
-          </div>
-          <div className="space-y-2">
-            <Label>Host</Label>
-            <Input value={connection.host} onChange={(e) => setConnection({...connection, host: e.target.value})} />
-          </div>
-          <div className="space-y-2">
-            <Label>Porta</Label>
-            <Input value={port} onChange={(e) => setPort(e.target.value)} />
-          </div>
-          <div className="space-y-2">
-            <Label>Usuário</Label>
-            <Input value={connection.username} onChange={(e) => setConnection({...connection, username: e.target.value})} />
-          </div>
-          <div className="space-y-2">
-            <Label>Senha</Label>
-            <Input type="password" value={connection.password} onChange={(e) => setConnection({...connection, password: e.target.value})} />
-          </div>
+        <CardContent>
+          <Label>Banco de dados</Label>
+          <select className="w-full bg-zinc-800 p-2 rounded-md" value={connection.driver} onChange={(e) => setConnection({...connection, driver: e.target.value as Driver})}>
+            <option value="mysql">MySQL</option>
+            <option value="postgres">PostgreSQL</option>
+          </select>
+
+          <Label>Host</Label>
+          <Input value={connection.host} onChange={(e) => setConnection({...connection, host: e.target.value})} />
+
+          <Label>Porta</Label>
+          <Input value={port} onChange={(e) => setPort(e.target.value)} />
+
+          <Label>Usuário</Label>
+          <Input value={connection.username} onChange={(e) => setConnection({...connection, username: e.target.value})} />
+
+          <Label>Senha</Label>
+          <Input type="password" value={connection.password} onChange={(e) => setConnection({...connection, password: e.target.value})} />
 
           {error && (
             <div className="text-red-400 text-sm bg-red-950 p-2 rounded-md">

@@ -22,7 +22,7 @@ export default function ModalBase({ open = true, onClose, children, className = 
 
   return (
     <div className={`fixed inset-0 ${zindex} flex items-center justify-center bg-zinc-600/30`} onClick={onClose}>
-      <div className={`bg-zinc-800 rounded-lg ${className}`} onClick={(e) => e.stopPropagation()}>
+      <div className={`bg-zinc-900 rounded-lg ${className}`} onClick={(e) => e.stopPropagation()}>
         {children}
       </div>
     </div>
