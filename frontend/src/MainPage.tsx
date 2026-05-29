@@ -2,29 +2,21 @@ import { useEffect, useState } from "react"
 import TablePreview from "./TablePreview"
 import { API_URL } from "./api"
 import { useNavigate } from "react-router-dom"
-import SidebarConnection from "./SaveConnection"
-
-type Connection = {
-  id: string
-  name: string
-  database: string
-  databases: string[]
-}
+import SidebarConnection from "./SidebarConnection"
+import { Button } from "./components/button"
+import { Select } from "./components/select"
+import { useConnection } from "./contexts/ConnectionProvider"
 
 export default function MainPage() {
-  const [connection, setConnection] = useState<Connection | null>(null)
   const [tables, setTables] = useState<string[]>([])
   const [selectedTable, setSelectedTable] = useState<string | null>(null)
   const [selectedDatabase, setSelectedDatabase] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
+  const { activeConnection, setActiveConnection } = useConnection()
 
   useEffect(() => {
-    loadConnections()
-  }, [])
-
-  useEffect(() => {
-    if (!connection) {
+    if (!activeConnection) {
       setSelectedTable(null)
       setTables([])
       return
@@ -32,22 +24,6 @@ export default function MainPage() {
 
     switchDatabase()
   }, [selectedDatabase])
-
-  async function loadConnections() {
-    try {
-      const res = await fetch(`${API_URL}/api/connection`)
-      const data = await res.json()
-      
-      if (data) {
-        setConnection(data)
-        if (data.database != '') {
-          setSelectedDatabase(data.database)
-        }
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
 
   async function switchDatabase() {
     setLoading(true)
@@ -67,7 +43,7 @@ export default function MainPage() {
   }
 
   async function loadTables() {
-    if (!connection || !selectedDatabase) return
+    if (!activeConnection || !selectedDatabase) return
 
     const res = await fetch(`${API_URL}/api/connection/tables`)
     const data = await res.json()
@@ -79,7 +55,7 @@ export default function MainPage() {
     const res = await fetch(`${API_URL}/api/connection/disconnect`, { method: "POST" })
 
     if (res.ok) {
-      setConnection(null)
+      setActiveConnection(null)
       setTables([])
       navigate("/connect", { replace: true })
     }
@@ -105,12 +81,7 @@ export default function MainPage() {
         <div className="p-3 font-bold border-b border-zinc-800">
           Banco de dados
           <div className="space-y-4 mt-2">
-            <select className="w-full bg-zinc-800 p-2 rounded-md cursor-pointer" value={selectedDatabase || ''} onChange={(e) => setSelectedDatabase(e.target.value)}>
-              <option value="">Selecione</option>
-              {connection?.databases.map((db) => (
-                <option key={db} value={db}>{db}</option>
-              ))}
-            </select>
+            <Select value={selectedDatabase || ''} onChange={(e) => setSelectedDatabase(e.target.value)} options={activeConnection?.databases || []}/>
           </div>
         </div>
 
@@ -126,20 +97,12 @@ export default function MainPage() {
           </div>
         </div>
 
-        {connection && (
-          <button onClick={() => disconnect()} className="mt-auto p-3 bg-red-600 hover:bg-red-700">
-            Desconectar
-          </button>
-        )}
+        {activeConnection && <Button onClick={() => disconnect()} className="mt-auto mb-2 mx-8" variant="danger">Desconectar</Button>}
       </aside>
 
       <main className="flex-1 flex">
         <div className="flex-1 p-4">
-          {!selectedTable ? (
-            <div className="text-zinc-500">Selecione uma tabela</div>
-          ) : (
-            <TablePreview table={selectedTable}/>
-          )}
+          {!selectedTable ? <div className="text-zinc-500">Selecione uma tabela</div> : <TablePreview table={selectedTable}/>}
         </div>
       </main>
     </div>

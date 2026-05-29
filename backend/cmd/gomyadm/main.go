@@ -33,12 +33,15 @@ func main() {
 	r.Get("/health", health)
 	r.Post("/api/connection/connect", connectionHandler.Connect)
 	r.Post("/api/connection/disconnect", connectionHandler.Disconnect)
+	r.Get("/api/connection/active", connectionHandler.Active)
+
 	r.Post("/api/connection/save", connectionHandler.SaveConnection)
 	r.Get("/api/connection/list", connectionHandler.ListConnections)
-	r.Get("/api/connection", connectionHandler.Active)
+
 	r.Post("/api/connection/database/select", connectionHandler.SelectDatabase)
 	r.Get("/api/connection/tables", schemaHandler.ListTables)
 	r.Get("/api/connection/tables/{table}", schemaHandler.DescribeTable)
+
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) { notFound(w, r) })
 
 	port := ":8181"

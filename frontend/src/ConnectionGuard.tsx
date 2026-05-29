@@ -1,33 +1,8 @@
-import { useEffect, useState } from "react"
 import { Navigate, Outlet } from "react-router-dom"
-import { API_URL } from "./api"
+import { useConnection } from "./contexts/ConnectionProvider"
 
 export default function ConnectionGuard() {
-  const [loading, setLoading] = useState(true)
-  const [connected, setConnected] = useState(false)
-
-  useEffect(() => {
-    async function checkConnection() {
-      try {
-        const res = await fetch(`${API_URL}/api/connection`)
-
-        if (!res.ok) {
-          setConnected(false)
-          return
-        }
-
-        const data = await res.json()
-        const conected = data && data != undefined ? true : false
-        setConnected(conected)
-      } catch {
-        setConnected(false)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    checkConnection()
-  }, [])
+  const { activeConnection, loading } = useConnection()
 
   if (loading) {
     return (
@@ -37,7 +12,7 @@ export default function ConnectionGuard() {
     )
   }
 
-  if (!connected) {
+  if (!activeConnection) {
     return <Navigate to="/connect" replace />
   }
 

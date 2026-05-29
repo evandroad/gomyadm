@@ -53,7 +53,7 @@ func (ch *ConnectionHandler) Active(w http.ResponseWriter, r *http.Request) {
 	conn, err := ch.Connection.Active()
 	if err != nil {
 		log.Printf("Failed to get active connection: %v", err)
-		Error(w, http.StatusNotFound, "Connection not found", nil)
+		Error(w, http.StatusNotFound, "No active connection", nil)
 		return
 	}
 

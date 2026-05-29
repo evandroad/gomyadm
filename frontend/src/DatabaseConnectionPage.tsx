@@ -2,35 +2,26 @@ import { useEffect, useState } from "react"
 import { API_URL } from "./api"
 import { useNavigate } from "react-router-dom"
 import { Button } from "./components/button"
-import { Card, CardContent, CardHeader, CardTitle } from "./components/card"
+import { Card, CardContent, CardTitle } from "./components/card"
 import { Label } from "./components/label"
 import { Input } from "./components/input"
+import { Select } from "./components/select"
+import { createConnection, type Connection } from "./models"
+import { useConnection } from "./contexts/ConnectionProvider"
 
-type Driver = "mysql" | "postgres"
-
-type ConnectionRequest = {
-  driver: Driver
-  host: string
-  port: number
-  username: string
-  password: string
-  name: string
-}
+const DB_DRIVERS = [
+  { value: "mysql", text: "MySQL" },
+  { value: "postgres", text: "PostgreSQL" },
+  { value: "sqlite", text: "SQLite" }
+]
 
 export default function DatabaseConnectionPage() {
-  const [connection, setConnection] = useState<ConnectionRequest>({
-    driver: "mysql",
-    host: "",
-    port: 0,
-    username: "",
-    password: "",
-    name: ""
-  })
-  const [connections, setConnections] = useState<ConnectionRequest[]>([])
+  const [connection, setConnection] = useState<Connection>(createConnection())
+  const [connections, setConnections] = useState<Connection[]>([])
   const [loading, setLoading] = useState(false)
-  const [port, setPort] = useState<string>("")
   const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
+  const { setActiveConnection } = useConnection()
 
   useEffect(() => {
     loadConnections()
@@ -41,25 +32,20 @@ export default function DatabaseConnectionPage() {
       const res = await fetch(`${API_URL}/api/connection/list`)
       const data = await res.json()
       
-      if (data) {
-        setConnections(data)
-        if (data.port) {
-          setPort(data.port.toString())
-        }
-      }
+      if (data) setConnections(data)
     } catch (err) {
       console.error(err)
     }
   }
 
-  async function handleConnect(connArg?: ConnectionRequest) {
+  async function handleConnect(connArg?: Connection) {
     setLoading(true)
     setError(null)
 
     try {
       const conn = connArg || {
         ...connection,
-        port: parseInt(port, 10),
+        port: parseInt(connection.port as string, 10),
       }
       const res = await fetch( API_URL + "/api/connection/connect", {
         method: "POST",
@@ -69,11 +55,13 @@ export default function DatabaseConnectionPage() {
         body: JSON.stringify(conn),
       })
 
+      const data = await res.json()
+
       if (!res.ok) {
-        const data = await res.json()
         throw new Error(data.message || "Falha ao conectar")
       }
 
+      setActiveConnection(data)
       navigate("/app", { replace: true })
     } catch (err: any) {
       setError(err.message)
@@ -82,16 +70,15 @@ export default function DatabaseConnectionPage() {
     }
   }
 
-  function connectFromSaved(conn: ConnectionRequest) {
+  function connectFromSaved(conn: Connection) {
     setConnection(conn)
-    setPort(conn.port.toString())
     handleConnect(conn)
   }
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-zinc-950 p-2">
       <Card className="w-full max-w-md bg-zinc-900 border-zinc-800 mt-6">
-        { connections.length > 0 && (
+        {connections.length > 0 ? (
           <CardContent className="space-y-4">
             <CardTitle className="text-lg">Conexões salvas</CardTitle>
 
@@ -106,42 +93,34 @@ export default function DatabaseConnectionPage() {
               ))}
             </div>
           </CardContent>
+        ) : (
+          <CardContent>
+            <CardTitle className="text-lg">Nenhuma conexão salva</CardTitle>
+            <p className="text-zinc-500">Configure uma nova conexão abaixo</p>
+          </CardContent>
         )}
       </Card>
 
-      <Card className="w-full max-w-md bg-zinc-900 border-zinc-800 text-white mt-6">
-        <CardHeader>
-          <CardTitle className="text-xl">Conectar ao banco de dados</CardTitle>
-        </CardHeader>
-
+      <Card className="w-full max-w-md bg-zinc-900 border-zinc-800 text-white mt-6" title="Conectar ao banco de dados" collapsible>
         <CardContent>
           <Label>Banco de dados</Label>
-          <select className="w-full bg-zinc-800 p-2 rounded-md" value={connection.driver} onChange={(e) => setConnection({...connection, driver: e.target.value as Driver})}>
-            <option value="mysql">MySQL</option>
-            <option value="postgres">PostgreSQL</option>
-          </select>
+          <Select value={connection.driver} onChange={(e) => setConnection({...connection, driver: e.target.value})} options={DB_DRIVERS}/>
 
           <Label>Host</Label>
           <Input value={connection.host} onChange={(e) => setConnection({...connection, host: e.target.value})} />
 
           <Label>Porta</Label>
-          <Input value={port} onChange={(e) => setPort(e.target.value)} />
+          <Input value={connection.port} onChange={(e) => setConnection({...connection, port: e.target.value})} />
 
           <Label>Usuário</Label>
           <Input value={connection.username} onChange={(e) => setConnection({...connection, username: e.target.value})} />
 
           <Label>Senha</Label>
-          <Input type="password" value={connection.password} onChange={(e) => setConnection({...connection, password: e.target.value})} />
+          <Input value={connection.password} onChange={(e) => setConnection({...connection, password: e.target.value})} type="password" />
 
-          {error && (
-            <div className="text-red-400 text-sm bg-red-950 p-2 rounded-md">
-              {error}
-            </div>
-          )}
+          {error && <div className="text-red-400 text-sm bg-red-950 p-2 rounded-md">{error}</div>}
 
-          <Button className="w-full" onClick={() => handleConnect()} disabled={loading} >
-            {loading ? "Conectando..." : "Conectar"}
-          </Button>
+          <Button className="w-full" onClick={() => handleConnect()} disabled={loading}>{loading ? "Conectando..." : "Conectar"}</Button>
         </CardContent>
       </Card>
     </div>
