@@ -42,7 +42,8 @@ func main() {
 
 	r.Post("/api/connection/database/select", connectionHandler.SelectDatabase)
 	r.Get("/api/connection/tables", schemaHandler.ListTables)
-	r.Get("/api/connection/tables/{table}", schemaHandler.DescribeTable)
+	r.Get("/api/connection/tables/{table}", schemaHandler.SelectTable)
+	r.Get("/api/connection/tables/struct/{table}", schemaHandler.DescribeTable)
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) { notFound(w, r) })
 

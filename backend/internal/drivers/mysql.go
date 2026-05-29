@@ -3,6 +3,7 @@ package drivers
 import (
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/evandroad/gomyadm/internal/models"
 )
@@ -83,6 +84,61 @@ func (d MySQLDriver) DescribeTable(db *sql.DB, table string) (*models.TableSchem
 	}
 
 	return schema, nil
+}
+
+func (d MySQLDriver) SelectTable(db *sql.DB, table string) (*models.TableData, error) {
+	query := fmt.Sprintf("SELECT * FROM %s LIMIT 100", table)
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return nil, err
+	}
+
+	results := make([]map[string]any, 0)
+
+	for rows.Next() {
+		values := make([]any, len(columns))
+		valuePtrs := make([]any, len(columns))
+
+		for i := range columns {
+			valuePtrs[i] = &values[i]
+		}
+
+		if err := rows.Scan(valuePtrs...); err != nil {
+			return nil, err
+		}
+
+		rowMap := make(map[string]any)
+
+		for i, col := range columns {
+			val := values[i]
+
+			switch v := val.(type) {
+				case []byte:
+					rowMap[col] = string(v)
+				case time.Time:
+					rowMap[col] = v.Format("2006-01-02 15:04:05")
+				default:
+					rowMap[col] = v
+			}
+		}
+
+		results = append(results, rowMap)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return &models.TableData{
+		Columns: columns,
+		Rows:    results,
+	}, nil
 }
 
 func (d MySQLDriver) ListDatabases(db *sql.DB) ([]string, error) {
