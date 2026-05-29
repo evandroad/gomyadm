@@ -2,12 +2,14 @@ package api
 
 import (
 	"encoding/json"
-	"net/http"
 	"log"
+	"net/http"
+
 	"github.com/evandroad/gomyadm/internal/db"
 	"github.com/evandroad/gomyadm/internal/models"
-	"github.com/evandroad/gomyadm/internal/storage"
 	. "github.com/evandroad/gomyadm/internal/respond"
+	"github.com/evandroad/gomyadm/internal/storage"
+	"github.com/go-chi/chi/v5"
 	"github.com/rs/xid"
 )
 
@@ -25,7 +27,9 @@ func (ch *ConnectionHandler) Connect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	cfg.ID = xid.New().String()
+	if cfg.ID == "" {
+		cfg.ID = xid.New().String()
+	}
 
 	var data models.ConnectionResponse
 	data, err = ch.Connection.Connect(cfg)
@@ -83,12 +87,12 @@ func (ch *ConnectionHandler) SelectDatabase(w http.ResponseWriter, r *http.Reque
 	Success(w, http.StatusOK, H{ "message": "Database " + req.Database + " selected successfully" })
 }
 
-func (ch *ConnectionHandler) ListConnections(w http.ResponseWriter, r *http.Request) {
+func (ch *ConnectionHandler) GetAllConnections(w http.ResponseWriter, r *http.Request) {
 	connections := storage.GetConnectionsStore().List()
 	JSON(w, http.StatusOK, connections)
 }
 
-func (ch *ConnectionHandler) SaveConnection(w http.ResponseWriter, r *http.Request) {
+func (ch *ConnectionHandler) InsertConnection(w http.ResponseWriter, r *http.Request) {
 	var cfg models.ConnectionConfig
 
 	err := json.NewDecoder(r.Body).Decode(&cfg)
@@ -109,4 +113,37 @@ func (ch *ConnectionHandler) SaveConnection(w http.ResponseWriter, r *http.Reque
 	JSON(w, http.StatusCreated, map[string]any{
 		"message": "connection saved",
 	})
+}
+
+func (ch *ConnectionHandler) UpdateConnection(w http.ResponseWriter, r *http.Request) {
+	var cfg models.ConnectionConfig
+
+	err := json.NewDecoder(r.Body).Decode(&cfg)
+	if err != nil {
+		log.Printf("Failed to decode request body: %v", err)
+		Error(w, http.StatusBadRequest, "Invalid request body", nil)
+		return
+	}
+
+	err = storage.GetConnectionsStore().Update(cfg.ID, cfg)
+	if err != nil {
+		log.Printf("Failed to update connection: %v", err)
+		Error(w, http.StatusInternalServerError, "Failed to update connection", nil)
+		return
+	}
+
+	JSON(w, http.StatusOK, map[string]any{"message": "connection updated"})
+}
+
+func (ch *ConnectionHandler) DeleteConnection(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+
+	err := storage.GetConnectionsStore().Delete(id)
+	if err != nil {
+		log.Printf("Failed to delete connection: %v", err)
+		Error(w, http.StatusInternalServerError, "Failed to delete connection", nil)
+		return
+	}
+
+	Success(w, http.StatusOK, H{ "message": "connection deleted" })
 }

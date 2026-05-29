@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { API_URL } from "./api"
 import { useNavigate } from "react-router-dom"
 import { Button } from "./components/button"
@@ -8,6 +8,7 @@ import { Input } from "./components/input"
 import { Select } from "./components/select"
 import { createConnection, type Connection } from "./models"
 import { useConnection } from "./contexts/ConnectionProvider"
+import { useConnections } from "./contexts/ConnectionsProvider"
 
 const DB_DRIVERS = [
   { value: "mysql", text: "MySQL" },
@@ -17,26 +18,11 @@ const DB_DRIVERS = [
 
 export default function DatabaseConnectionPage() {
   const [connection, setConnection] = useState<Connection>(createConnection())
-  const [connections, setConnections] = useState<Connection[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
   const { setActiveConnection } = useConnection()
-
-  useEffect(() => {
-    loadConnections()
-  }, [])
-
-  async function loadConnections() {
-    try {
-      const res = await fetch(`${API_URL}/api/connection/list`)
-      const data = await res.json()
-      
-      if (data) setConnections(data)
-    } catch (err) {
-      console.error(err)
-    }
-  }
+  const { connections } = useConnections()
 
   async function handleConnect(connArg?: Connection) {
     setLoading(true)

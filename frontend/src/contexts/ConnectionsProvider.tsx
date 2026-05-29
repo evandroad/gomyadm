@@ -5,7 +5,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 type ConnectionsContextType = {
   connections: Connection[]
   loading: boolean
-  addConnection: (connection: Connection) => void
+  insertConnection: (connection: Connection) => void
   updateConnection: (id: string, connection: Partial<Connection>) => void
   removeConnection: (id: string) => void
   getConnectionById: (id: string) => Connection | undefined
@@ -20,7 +20,7 @@ export function ConnectionsProvider({ children }: { children: ReactNode }) {
 
   async function loadConnections() {
     try {
-      const res = await fetch(`${API_URL}/api/connection/list`)
+      const res = await fetch(`${API_URL}/api/connection`)
 
       if (!res.ok) {
         setConnections([])
@@ -40,7 +40,7 @@ export function ConnectionsProvider({ children }: { children: ReactNode }) {
     loadConnections()
   }, [])
 
-  function addConnection(connection: Connection) {
+  function insertConnection(connection: Connection) {
     setConnections((prev) => {
       const exists = prev.some(c => c.id === connection.id)
       if (exists) return prev
@@ -65,7 +65,7 @@ export function ConnectionsProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <ConnectionsContext.Provider value={{ connections, loading, addConnection, updateConnection, removeConnection, getConnectionById, clearConnections }}>
+    <ConnectionsContext.Provider value={{ connections, loading, insertConnection, updateConnection, removeConnection, getConnectionById, clearConnections }}>
       {children}
     </ConnectionsContext.Provider>
   )

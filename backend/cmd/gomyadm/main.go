@@ -35,8 +35,10 @@ func main() {
 	r.Post("/api/connection/disconnect", connectionHandler.Disconnect)
 	r.Get("/api/connection/active", connectionHandler.Active)
 
-	r.Post("/api/connection/save", connectionHandler.SaveConnection)
-	r.Get("/api/connection/list", connectionHandler.ListConnections)
+	r.Get("/api/connection", connectionHandler.GetAllConnections)
+	r.Post("/api/connection", connectionHandler.InsertConnection)
+	r.Put("/api/connection", connectionHandler.UpdateConnection)
+	r.Delete("/api/connection/{id}", connectionHandler.DeleteConnection)
 
 	r.Post("/api/connection/database/select", connectionHandler.SelectDatabase)
 	r.Get("/api/connection/tables", schemaHandler.ListTables)

@@ -1,7 +1,7 @@
 [
   {
-    "id": "d8con8o1h5a1b2envtq0",
-    "name": "super-api",
+    "id": "d8ctj081h5a8vvc9ibr0",
+    "name": "Super API",
     "driver": "mysql",
     "host": "localhost",
     "port": 9906,
