@@ -111,10 +111,25 @@ func (d PostgresDriver) SelectTable(db *sql.DB, table string) (*models.TableData
 
 func (d PostgresDriver) DescribeTable(db *sql.DB, table string) (*models.TableSchema, error) {
 	query := `
-		SELECT column_name, data_type, is_nullable
-		FROM information_schema.columns
-		WHERE table_name = $1
-		ORDER BY ordinal_position
+		SELECT
+    c.column_name,
+    c.data_type,
+    c.is_nullable,
+    c.column_default,
+    CASE
+        WHEN tc.constraint_type = 'PRIMARY KEY' THEN 'PRI'
+        WHEN tc.constraint_type = 'UNIQUE' THEN 'UNI'
+        ELSE ''
+    END AS column_key
+		FROM information_schema.columns c
+		LEFT JOIN information_schema.key_column_usage kcu
+				ON c.table_name = kcu.table_name
+			AND c.column_name = kcu.column_name
+		LEFT JOIN information_schema.table_constraints tc
+				ON kcu.constraint_name = tc.constraint_name
+		WHERE c.table_schema = 'public'
+			AND c.table_name = $1
+		ORDER BY c.ordinal_position;
 	`
 
 	rows, err := db.Query(query, table)
@@ -130,13 +145,17 @@ func (d PostgresDriver) DescribeTable(db *sql.DB, table string) (*models.TableSc
 	for rows.Next() {
 		var col models.TableColumn
 		var nullable string
+		var defaultValue sql.NullString
 
-		err := rows.Scan(&col.Name, &col.Type, &nullable)
+		err := rows.Scan(&col.Name, &col.Type, &nullable, &col.Key, &defaultValue)
 		if err != nil {
 			return nil, err
 		}
 
 		col.Nullable = nullable == "YES"
+		if defaultValue.Valid {
+			col.Default = defaultValue.String
+		}
 
 		schema.Columns = append(schema.Columns, col)
 	}

@@ -7,11 +7,13 @@ const variants = {
 
 type ButtonProps = React.ComponentProps<"button"> & {
   variant?: "default" | "success" | "danger" | "primary"
+  sm?: boolean
+  bg?: string
 }
 
-export function Button({ children, className = "", variant = "default", ...props }: ButtonProps) {
+export function Button({ children, className = "", variant = "default", sm = false, bg = "", ...props }: ButtonProps) {
   return (
-    <button {...props} className={`px-3 py-2 text-sm rounded-md cursor-pointer ${variants[variant]} ${className}`}>
+    <button {...props} className={`rounded-md cursor-pointer ${bg ? bg : variants[variant]} ${sm ? 'p-1 text-xs' : 'p-2 text-sm'} ${className}`}>
       {children}
     </button>
   )

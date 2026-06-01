@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react"
-import { API_URL } from "./api";
+import { API_URL } from "../api";
 
 export default function TablePreview({ table }: { table: string }) {
   const [schema, setSchema] = useState<any>(null)
 
-  useEffect(() => {
-    load()
-  }, [table])
+  useEffect(() => {load()}, [table])
     
   async function load() {
     const res = await fetch(`${API_URL}/api/connection/tables/${table}`)
@@ -30,9 +28,7 @@ export default function TablePreview({ table }: { table: string }) {
         <thead className="bg-zinc-900 border-b border-zinc-800">
           <tr>
             {schema.columns.map((column: string) => (
-                <th key={column} className="px-4 py-3 font-medium text-zinc-300 whitespace-nowrap">
-                  {column}
-                </th>
+                <th key={column} className="px-4 py-3 font-medium text-zinc-300 text-base whitespace-nowrap">{column}</th>
               ))}
           </tr>
         </thead>
@@ -41,9 +37,7 @@ export default function TablePreview({ table }: { table: string }) {
           {schema.rows.map((row: Record<string, any>, index: number) => (
               <tr key={index} className="border-b border-zinc-800 hover:bg-zinc-900/50">
                 {schema.columns.map((column: string) => (
-                  <td key={column} className="px-4 py-3 whitespace-nowrap">
-                    {String(row[column])}
-                  </td>
+                  <td key={column} className="px-4 py-3 whitespace-nowrap">{String(row[column])}</td>
                 ))}
               </tr>
           ))}

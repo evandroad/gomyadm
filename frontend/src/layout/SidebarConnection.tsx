@@ -1,11 +1,11 @@
 import { useState } from "react"
-import { Button } from "./components/button"
-import { useConnection } from "./contexts/ConnectionProvider"
-import { useConnections } from "./contexts/ConnectionsProvider"
+import { Button } from "../components/button"
+import { useConnection } from "../contexts/ConnectionProvider"
+import { useConnections } from "../contexts/ConnectionsProvider"
 import { Pencil, Trash } from "lucide-react"
-import { ModalFormConnection } from "./layout/modalFormConnection"
-import { ModalDeleteConnection } from "./layout/modalDeleteConnection"
-import { createConnection } from "./models"
+import { ModalFormConnection } from "./modalFormConnection"
+import { ModalDeleteConnection } from "./modalDeleteConnection"
+import { createConnection } from "../models"
 
 export default function SidebarConnection() {
   const { activeConnection } = useConnection()
@@ -24,8 +24,8 @@ export default function SidebarConnection() {
         <div className="text-zinc-400">{activeConnection?.name || "Nova Conexão"}</div>
         {alreadySaved ?
           <div className="space-x-2">
-            <Button onClick={() => setOpenForm(true)} variant="primary"><Pencil size={16} /></Button>
-            <Button onClick={() => setOpenDelete(true)} variant="danger"><Trash size={16} /></Button>
+            <Button onClick={() => setOpenForm(true)} variant="primary" sm><Pencil size={16} /></Button>
+            <Button onClick={() => setOpenDelete(true)} variant="danger" sm><Trash size={16} /></Button>
           </div> :
           <Button onClick={() => setOpenForm(true)}>Salvar</Button>
         }

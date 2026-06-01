@@ -49,7 +49,7 @@ func (d MySQLDriver) ListTables(db *sql.DB) ([]string, error) {
 
 func (d MySQLDriver) DescribeTable(db *sql.DB, table string) (*models.TableSchema, error) {
 	query := `
-		SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_KEY
+		SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_KEY, COLUMN_DEFAULT, EXTRA
 		FROM information_schema.columns
 		WHERE table_schema = DATABASE()
 		AND table_name = ?
@@ -70,15 +70,17 @@ func (d MySQLDriver) DescribeTable(db *sql.DB, table string) (*models.TableSchem
 		var col models.TableColumn
 
 		var nullable string
-		var key string
+		var defaultValue sql.NullString
 
-		err := rows.Scan(&col.Name, &col.Type, &nullable, &key)
+		err := rows.Scan(&col.Name, &col.Type, &nullable, &col.Key, &defaultValue, &col.Extra)
 		if err != nil {
 			return nil, err
 		}
 
 		col.Nullable = nullable == "YES"
-		col.PrimaryKey = key == "PRI"
+		if defaultValue.Valid {
+			col.Default = defaultValue.String
+		}
 
 		schema.Columns = append(schema.Columns, col)
 	}

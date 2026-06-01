@@ -15,6 +15,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   async function checkActiveConnection() {
+    setLoading(true)
     try {
       const res = await fetch(`${API_URL}/api/connection/active`)
 

@@ -4,7 +4,9 @@ type TableColumn struct {
 	Name       string `json:"name"`
 	Type       string `json:"type"`
 	Nullable   bool   `json:"nullable"`
-	PrimaryKey bool   `json:"primaryKey"`
+	Key        string `json:"key"`
+	Default    string `json:"default"`
+	Extra      string `json:"extra"`
 }
 
 type TableSchema struct {

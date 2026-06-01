@@ -1,19 +1,24 @@
 import { useEffect, useState } from "react"
-import TablePreview from "./TablePreview"
+import TablePreview from "./layout/TablePreview"
 import { API_URL } from "./api"
 import { useNavigate } from "react-router-dom"
-import SidebarConnection from "./SidebarConnection"
+import SidebarConnection from "./layout/SidebarConnection"
 import { Button } from "./components/button"
-import { Select } from "./components/select"
 import { useConnection } from "./contexts/ConnectionProvider"
+import { SidebarDatabase } from "./layout/SidebarDatabase"
+import { useDatabase } from "./contexts/DatabaseProvider"
+import { SidebarTables } from "./layout/SidebarTables"
+import { Toolbar } from "./layout/Toolbar"
+import TableStructure from "./layout/TableStructure"
 
 export default function MainPage() {
+  const navigate = useNavigate()
+  const { activeConnection, setActiveConnection, loading } = useConnection()
+  const { activeDatabase } = useDatabase()
+  
   const [tables, setTables] = useState<string[]>([])
   const [selectedTable, setSelectedTable] = useState<string | null>(null)
-  const [selectedDatabase, setSelectedDatabase] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
-  const navigate = useNavigate()
-  const { activeConnection, setActiveConnection } = useConnection()
+  const [view, setView] = useState<"data" | "structure">("data")
 
   useEffect(() => {
     if (!activeConnection) {
@@ -22,28 +27,11 @@ export default function MainPage() {
       return
     }
 
-    switchDatabase()
-  }, [selectedDatabase])
-
-  async function switchDatabase() {
-    setLoading(true)
-    const res = await fetch(`${API_URL}/api/connection/database/select`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ database: selectedDatabase }),
-    })
-
-    if (res.ok) {
-      setSelectedTable(null)
-      setTables([])
-      loadTables()
-    }
-
-    setLoading(false)
-  }
+    loadTables()
+  }, [activeDatabase])
 
   async function loadTables() {
-    if (!activeConnection || !selectedDatabase) return
+    if (!activeConnection || !activeDatabase) return
 
     const res = await fetch(`${API_URL}/api/connection/tables`)
     const data = await res.json()
@@ -69,40 +57,44 @@ export default function MainPage() {
     )
   }
 
+  function renderView() {
+    if (!selectedTable) {
+      return (
+        <div className="text-zinc-500">Selecione uma tabela</div>
+      )
+    }
+
+    switch (view) {
+      case "data":
+        return <TablePreview table={selectedTable} />
+      case "structure":
+        return <TableStructure table={selectedTable} />
+      default:
+        return null
+    }
+  }
+
   return (
     <div className="min-h-screen flex bg-zinc-950 text-white">
       <aside className="w-64 bg-zinc-900 border-r border-zinc-800 flex flex-col">        
-        <div className="p-3 font-bold border-b border-zinc-800">
-          Gomyadm
-        </div>
-
+        <div className="p-3 font-bold border-b border-zinc-800">Gomyadm</div>
         <SidebarConnection />
-
-        <div className="p-3 font-bold border-b border-zinc-800">
-          Banco de dados
-          <div className="space-y-4 mt-2">
-            <Select value={selectedDatabase || ''} onChange={(e) => setSelectedDatabase(e.target.value)} options={activeConnection?.databases || []}/>
-          </div>
-        </div>
-
-        <div className="border-r border-zinc-800">
-          <div className="overflow-auto">
-            {tables.length > 0 ? (
-              tables.map((table) => (
-                <button key={table} onClick={() => setSelectedTable(table)} className={`w-full text-left px-3 py-2 hover:bg-zinc-950 cursor-pointer ${selectedTable === table ? "bg-zinc-900" : ""}`}>{ table }</button>
-              ))
-            ) : (
-              <div className="p-3 text-zinc-500 text-sm">Nenhuma tabela encontrada</div>
-            )}
-          </div>
-        </div>
+        <SidebarDatabase />
+        <SidebarTables tables={tables} selectedTable={selectedTable} setSelectedTable={setSelectedTable}/>
 
         {activeConnection && <Button onClick={() => disconnect()} className="mt-auto mb-2 mx-8" variant="danger">Desconectar</Button>}
       </aside>
 
-      <main className="flex-1 flex">
+      <main className="flex-1 flex flex-col">
+        <Toolbar>
+          <h1 className="text-lg font-semibold">{selectedTable || "Visão geral"}</h1>
+          <div className="space-x-2">
+            <Button onClick={() => setView("data")} bg={view === "data" ? "bg-zinc-800" : "bg-zinc-900"}>Dados</Button>
+            <Button onClick={() => setView("structure")} bg={view === "structure" ? "bg-zinc-800" : "bg-zinc-900"}>Estrutura</Button>
+          </div>
+        </Toolbar>
         <div className="flex-1 p-4">
-          {!selectedTable ? <div className="text-zinc-500">Selecione uma tabela</div> : <TablePreview table={selectedTable}/>}
+          { renderView() }
         </div>
       </main>
     </div>
