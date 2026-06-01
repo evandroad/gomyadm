@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react"
 import { API_URL } from "../api";
+import { useDatabase } from "@/contexts/DatabaseProvider";
 
 export default function TablePreview({ table }: { table: string }) {
   const [schema, setSchema] = useState<any>(null)
+  const { activeDatabase } = useDatabase()
 
   useEffect(() => {load()}, [table])
-    
+  useEffect(() => {setSchema(null)}, [activeDatabase])
+
   async function load() {
+    if (!activeDatabase) return
     const res = await fetch(`${API_URL}/api/connection/tables/${table}`)
     if (!res.ok) {
       setSchema(null)
@@ -17,13 +21,11 @@ export default function TablePreview({ table }: { table: string }) {
   }
 
   if (!schema) {
-    return <div className="text-zinc-500">Carregando schema...</div>
+    return <div className="text-zinc-500">{ activeDatabase ? 'Carregando schema...' : 'Selecione uma base de dados' }</div>
   }
 
   return (
     <div>
-      <h2 className="text-lg font-bold mb-4">{table}</h2>
-
       <table className="w-full text-sm text-left">
         <thead className="bg-zinc-900 border-b border-zinc-800">
           <tr>

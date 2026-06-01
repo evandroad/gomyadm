@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react"
 import { API_URL } from "../api";
+import { useDatabase } from "@/contexts/DatabaseProvider";
 
 export default function TableStructure({ table }: { table: string }) {
   const [schema, setSchema] = useState<any>(null)
+  const { activeDatabase } = useDatabase()
 
   useEffect(() => {load()}, [table])
+  useEffect(() => {setSchema(null)}, [activeDatabase])
 
   const COLUMNS_LABEL = ['Nome', 'Tipo', 'Nulo', 'Chave', 'Padrão', 'Extra']
   const COLUMNS = ['name', 'type', 'nullable', 'key', 'default', 'extra']
 
   async function load() {
+    if (!activeDatabase) return
     const res = await fetch(`${API_URL}/api/connection/tables/struct/${table}`)
     if (!res.ok) {
       setSchema(null)
@@ -20,7 +24,7 @@ export default function TableStructure({ table }: { table: string }) {
   }
 
   if (!schema) {
-    return <div className="text-zinc-500">Carregando schema...</div>
+    return <div className="text-zinc-500">{ activeDatabase ? 'Carregando schema...' : 'Selecione uma base de dados' }</div>
   }
 
   return (
