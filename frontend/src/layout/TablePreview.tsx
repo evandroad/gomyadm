@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
 import { API_URL } from "../api";
 import { useDatabase } from "@/contexts/DatabaseProvider";
+import { Th } from "@/components/th";
+import { Td } from "@/components/td";
 
 export default function TablePreview({ table }: { table: string }) {
   const [schema, setSchema] = useState<any>(null)
@@ -29,18 +31,14 @@ export default function TablePreview({ table }: { table: string }) {
       <table className="w-full text-sm text-left">
         <thead className="bg-zinc-900 border-b border-zinc-800">
           <tr>
-            {schema.columns.map((column: string) => (
-                <th key={column} className="px-4 py-3 font-medium text-zinc-300 text-base whitespace-nowrap">{column}</th>
-              ))}
+            {schema.columns.map((column: string) => <Th key={column}>{column}</Th>)}
           </tr>
         </thead>
 
         <tbody>
           {schema.rows.map((row: Record<string, any>, index: number) => (
               <tr key={index} className="border-b border-zinc-800 hover:bg-zinc-900/50">
-                {schema.columns.map((column: string) => (
-                  <td key={column} className="px-4 py-3 whitespace-nowrap">{String(row[column])}</td>
-                ))}
+                {schema.columns.map((column: string) => <Td key={column}>{String(row[column])}</Td>)}
               </tr>
           ))}
         </tbody>

@@ -40,6 +40,12 @@ export default function MainPage() {
     }
   }
 
+  function getTabClass(tab: string) {
+    return `px-4 py-2 text-sm border-b-2 cursor-pointer ${
+      view === tab ? "border-blue-500 text-blue-400" : "border-transparent text-zinc-400 hover:text-zinc-200"
+    }`
+  }
+
   return (
     <div className="min-h-screen flex bg-zinc-950 text-white">
       <aside className="w-64 bg-zinc-900 border-r border-zinc-800 flex flex-col">        
@@ -52,7 +58,14 @@ export default function MainPage() {
 
       <main className="flex-1 flex flex-col">
         <Toolbar selectedTable={selectedTable} view={view} setView={setView} />
-        <div className="flex-1 p-4">{ renderView() }</div>
+        {activeDatabase && (
+          <div className="flex flex-col h-full p-2">
+            <div className="flex w-fit border-b border-zinc-800">
+              <button onClick={() => setView("data")} className={getTabClass("data")}>Dados</button>
+              <button onClick={() => setView("structure")} className={getTabClass("structure")}>Estrutura</button>
+            </div>
+            <div className="flex-1 py-2">{ renderView() }</div>
+          </div>)}
       </main>
     </div>
   )
