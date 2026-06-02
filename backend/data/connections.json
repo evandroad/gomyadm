@@ -8,5 +8,15 @@
     "username": "evandro",
     "password": "evandro",
     "database": ""
+  },
+  {
+    "id": "d8fce501h5a3aftm9chg",
+    "name": "Postgres Teste",
+    "driver": "postgres",
+    "host": "localhost",
+    "port": 5432,
+    "username": "admin",
+    "password": "senha123",
+    "database": ""
   }
 ]

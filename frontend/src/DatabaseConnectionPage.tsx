@@ -46,7 +46,9 @@ export default function DatabaseConnectionPage() {
       if (!res.ok) {
         throw new Error(data.message || "Falha ao conectar")
       }
-
+      
+      data.username = conn.username
+      data.password = conn.password
       setActiveConnection(data)
       navigate("/app", { replace: true })
     } catch (err: any) {

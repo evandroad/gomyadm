@@ -1,7 +1,7 @@
 package drivers
 
 var registry = map[string]Driver{
-	"mysql":   MySQLDriver{},
+	"mysql": MySQLDriver{},
 	"postgres": PostgresDriver{},
 }
 

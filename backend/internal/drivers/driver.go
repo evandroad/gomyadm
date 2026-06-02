@@ -7,6 +7,7 @@ import (
 )
 
 type Driver interface {
+	DriverName() string
 	BuildDSN(cfg models.ConnectionConfig) string
 	ListTables(db *sql.DB) ([]string, error)
 	DescribeTable(db *sql.DB, table string) (*models.TableSchema, error)

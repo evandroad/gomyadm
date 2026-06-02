@@ -14,6 +14,10 @@ func init() {
 	Register("postgres", PostgresDriver{})
 }
 
+func (d PostgresDriver) DriverName() string {
+	return "pgx"
+}
+
 func (d PostgresDriver) BuildDSN(cfg models.ConnectionConfig) string {
 	if cfg.Database == "" {
 		cfg.Database = "postgres"

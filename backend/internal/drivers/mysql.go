@@ -14,6 +14,10 @@ func init() {
 	Register("mysql", MySQLDriver{})
 }
 
+func (d MySQLDriver) DriverName() string {
+	return "mysql"
+}
+
 func (d MySQLDriver) BuildDSN(cfg models.ConnectionConfig) string {
 	return fmt.Sprintf(
 		"%s:%s@tcp(%s:%d)/%s?parseTime=true&multiStatements=true",

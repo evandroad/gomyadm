@@ -3,12 +3,12 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"sync"
 	"time"
 
 	"github.com/evandroad/gomyadm/internal/drivers"
 	"github.com/evandroad/gomyadm/internal/models"
+	"github.com/evandroad/gomyadm/internal/logger"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -59,7 +59,7 @@ func (m *ConnectionManager) Disconnect() error {
 
 	err := m.connection.DB.Close()
 	if err != nil {
-		log.Printf("Failed to close database connection: %v", err)
+		logger.Error("Failed to close database connection: %v", err)
 		return err
 	}
 
@@ -99,7 +99,7 @@ func (m *ConnectionManager) SelectDatabase(name string) error {
 
 	err := m.connection.DB.Close()
 	if err != nil {
-		log.Printf("Failed to close database connection: %v", err)
+		logger.Error("Failed to close database connection: %v", err)
 		return err
 	}
 
@@ -107,7 +107,7 @@ func (m *ConnectionManager) SelectDatabase(name string) error {
 
 	err = m.createConnection(m.connection.Config)
 	if err != nil {
-		log.Printf("Failed to connect to selected database: %v", err)
+		logger.Error("Failed to connect to selected database: %v", err)
 		return err
 	}
 
@@ -122,7 +122,7 @@ func (m *ConnectionManager) createConnection(cfg models.ConnectionConfig) error 
 
 	dsn := driver.BuildDSN(cfg)
 
-	db, err := sql.Open(cfg.Driver, dsn)
+	db, err := sql.Open(driver.DriverName(), dsn)
 	if err != nil {
 		return fmt.Errorf("failed to open database connection: %w", err)
 	}

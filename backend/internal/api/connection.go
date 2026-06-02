@@ -2,10 +2,10 @@ package api
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/evandroad/gomyadm/internal/db"
+	"github.com/evandroad/gomyadm/internal/logger"
 	"github.com/evandroad/gomyadm/internal/models"
 	. "github.com/evandroad/gomyadm/internal/respond"
 	"github.com/evandroad/gomyadm/internal/storage"
@@ -22,7 +22,7 @@ func (ch *ConnectionHandler) Connect(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&cfg)
 	if err != nil {
-		log.Printf("Failed to decode request body: %v", err)
+		logger.Error("Failed to decode request body: %v", err)
 		Error(w, http.StatusBadRequest, "Invalid request body", nil)
 		return
 	}
@@ -34,7 +34,7 @@ func (ch *ConnectionHandler) Connect(w http.ResponseWriter, r *http.Request) {
 	var data models.ConnectionResponse
 	data, err = ch.Connection.Connect(cfg)
 	if err != nil {
-		log.Printf("Failed to connect: %v", err)
+		logger.Error("Failed to connect: %v", err)
 		Error(w, http.StatusBadRequest, "Failed to connect", nil)
 		return
 	}
@@ -45,7 +45,7 @@ func (ch *ConnectionHandler) Connect(w http.ResponseWriter, r *http.Request) {
 func (ch *ConnectionHandler) Disconnect(w http.ResponseWriter, r *http.Request) {
 	err := ch.Connection.Disconnect()
 	if err != nil {
-		log.Printf("Failed to disconnect: %v", err)
+		logger.Error("Failed to disconnect: %v", err)
 		Error(w, http.StatusNotFound, "Connection not found", nil)
 		return
 	}
@@ -56,7 +56,7 @@ func (ch *ConnectionHandler) Disconnect(w http.ResponseWriter, r *http.Request) 
 func (ch *ConnectionHandler) Active(w http.ResponseWriter, r *http.Request) {
 	conn, err := ch.Connection.Active()
 	if err != nil {
-		log.Printf("Failed to get active connection: %v", err)
+		logger.Error("Failed to get active connection: %v", err)
 		Error(w, http.StatusNotFound, "No active connection", nil)
 		return
 	}
@@ -72,14 +72,14 @@ func (ch *ConnectionHandler) SelectDatabase(w http.ResponseWriter, r *http.Reque
 	var req Request
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		log.Printf("Failed to decode request body: %v", err)
+		logger.Error("Failed to decode request body: %v", err)
 		Error(w, http.StatusBadRequest, "Invalid request body", nil)
 		return
 	}
 	
 	err = ch.Connection.SelectDatabase(req.Database)
 	if err != nil {
-		log.Printf("Failed to select database: %v", err)
+		logger.Error("Failed to select database: %v", err)
 		Error(w, http.StatusBadRequest, "Failed to select database", nil)
 		return
 	}
@@ -97,15 +97,14 @@ func (ch *ConnectionHandler) InsertConnection(w http.ResponseWriter, r *http.Req
 
 	err := json.NewDecoder(r.Body).Decode(&cfg)
 	if err != nil {
-		log.Printf("Failed to decode request body: %v", err)
-
+		logger.Error("Failed to decode request body: %v", err)
 		Error(w, http.StatusBadRequest, "Invalid request body", nil)
 		return
 	}
 
 	err = storage.GetConnectionsStore().Create(cfg)
 	if err != nil {
-		log.Printf("Failed to save connection: %v", err)
+		logger.Error("Failed to save connection: %v", err)
 		Error(w, http.StatusInternalServerError, "Failed to save connection", nil)
 		return
 	}
@@ -120,14 +119,14 @@ func (ch *ConnectionHandler) UpdateConnection(w http.ResponseWriter, r *http.Req
 
 	err := json.NewDecoder(r.Body).Decode(&cfg)
 	if err != nil {
-		log.Printf("Failed to decode request body: %v", err)
+		logger.Error("Failed to decode request body: %v", err)
 		Error(w, http.StatusBadRequest, "Invalid request body", nil)
 		return
 	}
 
 	err = storage.GetConnectionsStore().Update(cfg.ID, cfg)
 	if err != nil {
-		log.Printf("Failed to update connection: %v", err)
+		logger.Error("Failed to update connection: %v", err)
 		Error(w, http.StatusInternalServerError, "Failed to update connection", nil)
 		return
 	}
@@ -140,7 +139,7 @@ func (ch *ConnectionHandler) DeleteConnection(w http.ResponseWriter, r *http.Req
 
 	err := storage.GetConnectionsStore().Delete(id)
 	if err != nil {
-		log.Printf("Failed to delete connection: %v", err)
+		logger.Error("Failed to delete connection: %v", err)
 		Error(w, http.StatusInternalServerError, "Failed to delete connection", nil)
 		return
 	}
