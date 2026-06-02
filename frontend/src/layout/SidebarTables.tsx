@@ -1,14 +1,16 @@
 import { API_URL } from "@/api"
 import { useConnection } from "@/contexts/ConnectionProvider"
 import { useDatabase } from "@/contexts/DatabaseProvider"
+import type { View } from "@/MainPage"
 import { useEffect, useState } from "react"
 
 type Props = {
   selectedTable: string | null
   setSelectedTable: (table: string | null) => void
+  setView: (view: View) => void
 }
 
-export function SidebarTables({ selectedTable, setSelectedTable }: Props) {
+export function SidebarTables({ selectedTable, setSelectedTable, setView }: Props) {
   const { activeDatabase } = useDatabase()
   const { activeConnection } = useConnection()
   const [tables, setTables] = useState<string[]>([])
@@ -39,7 +41,7 @@ export function SidebarTables({ selectedTable, setSelectedTable }: Props) {
           tables.map((table) => (
             <button
               key={table}
-              onClick={() => setSelectedTable(table)}
+              onClick={() => { setSelectedTable(table); setView("data") }}
               className={`w-full text-left px-3 py-2 hover:bg-zinc-950 cursor-pointer ${selectedTable === table ? "bg-zinc-900" : ""}`}
             >
               {table}

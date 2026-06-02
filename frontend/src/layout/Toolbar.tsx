@@ -1,22 +1,22 @@
 import { Button } from "@/components/button"
 import { useDatabase } from "@/contexts/DatabaseProvider"
+import type { View } from "@/MainPage"
 
 type Props = {
-  selectedTable: string | null
-  view: "data" | "structure"
-  setView: (view: "data" | "structure") => void
+  view: View
+  setView: (view: View) => void
+  setSelectedTable: (table: string | null) => void
 }
 
-export function Toolbar({ selectedTable, view, setView }: Props) {
+export function Toolbar({ view, setView, setSelectedTable }: Props) {
   const { activeDatabase } = useDatabase()
 
   return (
     <div className="flex items-center justify-between w-full h-16 px-4 bg-zinc-900 text-white">
-      <h1 className="text-lg font-semibold">{(selectedTable && activeDatabase) ? selectedTable : "Visão geral"}</h1>
-        {selectedTable && activeDatabase && (
+      <h1 className="text-lg font-semibold">{activeDatabase ?? "Visão geral"}</h1>
+        {activeDatabase && (
           <div className="space-x-2">
-            <Button onClick={() => setView("data")} bg={view === "data" ? "bg-zinc-800" : "bg-zinc-900"}>Dados</Button>
-            <Button onClick={() => setView("structure")} bg={view === "structure" ? "bg-zinc-800" : "bg-zinc-900"}>Estrutura</Button>
+            <Button onClick={() => {setSelectedTable(null); setView("sql")}} bg={view === "sql" ? "bg-zinc-800" : "bg-zinc-900 underline underline-offset-4"}>SQL</Button>
           </div>
         )}
     </div>

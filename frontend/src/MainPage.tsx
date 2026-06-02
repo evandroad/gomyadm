@@ -8,12 +8,15 @@ import { Toolbar } from "./layout/Toolbar"
 import TableStructure from "./layout/TableStructure"
 import { SidebarDisconnect } from "./layout/SidebarDisconnect"
 import { useDatabase } from "./contexts/DatabaseProvider"
+import { ContentSQL } from "./layout/ContentSQL"
+
+export type View = "data" | "structure" | "sql"
 
 export default function MainPage() {
   const { loading } = useConnection()
   const { activeDatabase } = useDatabase()
   const [selectedTable, setSelectedTable] = useState<string | null>(null)
-  const [view, setView] = useState<"data" | "structure">("data")
+  const [view, setView] = useState<View>("data")
 
   if (loading) {
     return (
@@ -24,17 +27,41 @@ export default function MainPage() {
   }
 
   function renderView() {
-    if (!selectedTable) {
-      return (
-        <div className="text-zinc-500">{!activeDatabase ? 'Selecione uma base de dados' : 'Selecione uma tabela'}</div>
-      )
+    switch (view) {
+      case "data":
+      case "structure":
+        if (!selectedTable) {
+          return (
+            <div className="text-zinc-500">{!activeDatabase ? 'Selecione uma base de dados' : 'Selecione uma tabela'}</div>
+          )
+        }
+        return renderTab()
+      case "sql":
+        return <ContentSQL />
+      default:
+        return null
     }
+  }
+
+  function renderTab() {
+    if (!selectedTable) return null
+
+    const tabs = (<div className="flex w-fit border-b border-zinc-800">
+      <button onClick={() => setView("data")} className={getTabClass("data")}>Dados</button>
+      <button onClick={() => setView("structure")} className={getTabClass("structure")}>Estrutura</button>
+    </div>)
 
     switch (view) {
       case "data":
-        return <TablePreview table={selectedTable} />
+        return (<>
+          {tabs}
+          <TablePreview table={selectedTable} />
+        </>)
       case "structure":
-        return <TableStructure table={selectedTable} />
+        return (<>
+          {tabs}
+          <TableStructure table={selectedTable} />
+        </>)
       default:
         return null
     }
@@ -52,20 +79,17 @@ export default function MainPage() {
         <div className="p-3 font-bold border-b border-zinc-800">Gomyadm</div>
         <SidebarConnection />
         <SidebarDatabase />
-        <SidebarTables selectedTable={selectedTable} setSelectedTable={setSelectedTable} />
+        <SidebarTables selectedTable={selectedTable} setSelectedTable={setSelectedTable} setView={setView} />
         <SidebarDisconnect />
       </aside>
 
       <main className="flex-1 flex flex-col">
-        <Toolbar selectedTable={selectedTable} view={view} setView={setView} />
+        <Toolbar view={view} setView={setView} setSelectedTable={setSelectedTable} />
         {activeDatabase && (
           <div className="flex flex-col h-full p-2">
-            <div className="flex w-fit border-b border-zinc-800">
-              <button onClick={() => setView("data")} className={getTabClass("data")}>Dados</button>
-              <button onClick={() => setView("structure")} className={getTabClass("structure")}>Estrutura</button>
-            </div>
-            <div className="flex-1 py-2">{ renderView() }</div>
-          </div>)}
+            { renderView() }
+          </div>
+        )}
       </main>
     </div>
   )
