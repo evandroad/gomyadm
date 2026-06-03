@@ -29,6 +29,7 @@ func main() {
 	
 	connectionHandler := &api.ConnectionHandler{ Connection: manager }
 	schemaHandler := &api.SchemaHandler{ Connection: manager }
+	queryHandler := &api.QueryHandler{ Connection: manager }
 
 	r.Get("/health", health)
 	r.Post("/api/connection/connect", connectionHandler.Connect)
@@ -44,6 +45,8 @@ func main() {
 	r.Get("/api/connection/tables", schemaHandler.ListTables)
 	r.Get("/api/connection/tables/{table}", schemaHandler.SelectTable)
 	r.Get("/api/connection/tables/struct/{table}", schemaHandler.DescribeTable)
+
+	r.Post("/api/query", queryHandler.ExecuteQuery)
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) { notFound(w, r) })
 

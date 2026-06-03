@@ -5,7 +5,7 @@
 curl \
   --request POST \
   --header "Content-Type: application/json" \
-  --data '{"database": "2804618_contas"}' \
+  --data '{"database": "my_system"}' \
   "$BASE_URL/api/connection/database/select"
 
 echo ""

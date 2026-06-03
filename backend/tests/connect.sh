@@ -6,13 +6,11 @@ curl \
   --request POST \
   --header "Content-Type: application/json" \
   --data '{
-    "name": "Local MySQL",
     "driver": "mysql",
     "host": "127.0.0.1",
-    "port": 9906,
-    "username": "evandro",
-    "password": "evandro",
-    "database": "2804618_contas"
+    "port": 3306,
+    "username": "admin",
+    "password": "senha123"
   }' \
   "$BASE_URL/api/connection/connect"
 

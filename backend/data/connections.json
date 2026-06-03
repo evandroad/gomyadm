@@ -1,20 +1,20 @@
 [
   {
-    "id": "d8ctj081h5a8vvc9ibr0",
-    "name": "Super API",
-    "driver": "mysql",
-    "host": "localhost",
-    "port": 9906,
-    "username": "evandro",
-    "password": "evandro",
-    "database": ""
-  },
-  {
     "id": "d8fce501h5a3aftm9chg",
     "name": "Postgres Teste",
     "driver": "postgres",
     "host": "localhost",
     "port": 5432,
+    "username": "admin",
+    "password": "senha123",
+    "database": ""
+  },
+  {
+    "id": "d8g18eo1h5a14k965ngg",
+    "name": "Mysql Teste",
+    "driver": "mysql",
+    "host": "localhost",
+    "port": 3306,
     "username": "admin",
     "password": "senha123",
     "database": ""

@@ -21,6 +21,6 @@ export function createConnection(data?: Partial<Connection>): Connection {
     password: "",
     database: "",
     databases: [],
-    ...data,
+    ...data
   }
 }
