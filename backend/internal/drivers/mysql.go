@@ -3,6 +3,7 @@ package drivers
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/evandroad/gomyadm/internal/models"
@@ -167,4 +168,26 @@ func (d MySQLDriver) ListDatabases(db *sql.DB) ([]string, error) {
 	}
 
 	return databases, nil
+}
+
+func (d MySQLDriver) InsertValue(db *sql.DB, table string, data map[string]any) error {
+	columns := make([]string, 0, len(data))
+	placeholders := make([]string, 0, len(data))
+	values := make([]any, 0, len(data))
+
+	for col, val := range data {
+		columns = append(columns, col)
+		placeholders = append(placeholders, "?")
+		values = append(values, val)
+	}
+
+	query := fmt.Sprintf(
+		"INSERT INTO %s (%s) VALUES (%s)",
+		table,
+		strings.Join(columns, ", "),
+		strings.Join(placeholders, ", "),
+	)
+
+	_, err := db.Exec(query, values...)
+	return err
 }

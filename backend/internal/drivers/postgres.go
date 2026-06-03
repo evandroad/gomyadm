@@ -3,6 +3,7 @@ package drivers
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/evandroad/gomyadm/internal/models"
@@ -191,4 +192,28 @@ func (d PostgresDriver) ListDatabases(db *sql.DB) ([]string, error) {
 	}
 
 	return databases, nil
+}
+
+func (d PostgresDriver) InsertValue(db *sql.DB, table string, data map[string]any) error {
+	columns := make([]string, 0, len(data))
+	values := make([]any, 0, len(data))
+	placeholders := make([]string, 0, len(data))
+
+	i := 1
+	for col, val := range data {
+		columns = append(columns, fmt.Sprintf(`"%s"`, col))
+		values = append(values, val)
+		placeholders = append(placeholders, fmt.Sprintf("$%d", i))
+		i++
+	}
+
+	query := fmt.Sprintf(
+		`INSERT INTO "%s" (%s) VALUES (%s)`,
+		table,
+		strings.Join(columns, ", "),
+		strings.Join(placeholders, ", "),
+	)
+
+	_, err := db.Exec(query, values...)
+	return err
 }

@@ -1,14 +1,14 @@
 import { useState } from "react"
-import { API_URL } from "./api"
+import { API_URL } from "@/api"
 import { useNavigate } from "react-router-dom"
-import { Button } from "./components/button"
-import { Card, CardContent, CardTitle } from "./components/card"
-import { Label } from "./components/label"
-import { Input } from "./components/input"
-import { Select } from "./components/select"
-import { createConnection, type Connection } from "./models"
-import { useConnection } from "./contexts/ConnectionProvider"
-import { useConnections } from "./contexts/ConnectionsProvider"
+import { Button } from "@/components/button"
+import { Card, CardContent, CardTitle } from "@/components/card"
+import { Label } from "@/components/label"
+import { Input } from "@/components/input"
+import { Select } from "@/components/select"
+import { createConnection, type Connection } from "@/models"
+import { useConnection } from "@/contexts/ConnectionProvider"
+import { useConnections } from "@/contexts/ConnectionsProvider"
 
 const DB_DRIVERS = [
   { value: "mysql", text: "MySQL" },

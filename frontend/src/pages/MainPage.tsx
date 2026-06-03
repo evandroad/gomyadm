@@ -1,16 +1,17 @@
 import { useState } from "react"
-import TablePreview from "./layout/TablePreview"
-import SidebarConnection from "./layout/SidebarConnection"
-import { useConnection } from "./contexts/ConnectionProvider"
-import { SidebarDatabase } from "./layout/SidebarDatabase"
-import { SidebarTables } from "./layout/SidebarTables"
-import { Toolbar } from "./layout/Toolbar"
-import TableStructure from "./layout/TableStructure"
-import { SidebarDisconnect } from "./layout/SidebarDisconnect"
-import { useDatabase } from "./contexts/DatabaseProvider"
-import { ContentSQL } from "./layout/ContentSQL"
+import TablePreview from "@/layout/TablePreview"
+import SidebarConnection from "@/layout/SidebarConnection"
+import { useConnection } from "@/contexts/ConnectionProvider"
+import { SidebarDatabase } from "@/layout/SidebarDatabase"
+import { SidebarTables } from "@/layout/SidebarTables"
+import { Toolbar } from "@/layout/Toolbar"
+import TableStructure from "@/layout/TableStructure"
+import { SidebarDisconnect } from "@/layout/SidebarDisconnect"
+import { useDatabase } from "@/contexts/DatabaseProvider"
+import { ContentSQL } from "@/layout/ContentSQL"
+import TableForm from "@/layout/TableForm"
 
-export type View = "data" | "structure" | "sql"
+export type View = "data" | "structure" | "form" | "sql"
 
 export default function MainPage() {
   const { loading } = useConnection()
@@ -30,6 +31,7 @@ export default function MainPage() {
     switch (view) {
       case "data":
       case "structure":
+      case "form":
         if (!selectedTable) {
           return (
             <div className="text-zinc-500">{!activeDatabase ? 'Selecione uma base de dados' : 'Selecione uma tabela'}</div>
@@ -46,9 +48,10 @@ export default function MainPage() {
   function renderTab() {
     if (!selectedTable) return null
 
-    const tabs = (<div className="flex w-fit border-b border-zinc-800">
+    const tabs = (<div className="flex w-fit border-b border-zinc-800 mb-2">
       <button onClick={() => setView("data")} className={getTabClass("data")}>Dados</button>
       <button onClick={() => setView("structure")} className={getTabClass("structure")}>Estrutura</button>
+      <button onClick={() => setView("form")} className={getTabClass("form")}>Formulário</button>
     </div>)
 
     switch (view) {
@@ -61,6 +64,11 @@ export default function MainPage() {
         return (<>
           {tabs}
           <TableStructure table={selectedTable} />
+        </>)
+      case "form":
+        return (<>
+          {tabs}
+          <TableForm table={selectedTable} />
         </>)
       default:
         return null

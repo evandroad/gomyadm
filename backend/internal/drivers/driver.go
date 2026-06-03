@@ -13,4 +13,5 @@ type Driver interface {
 	DescribeTable(db *sql.DB, table string) (*models.TableSchema, error)
 	SelectTable(db *sql.DB, table string) (*models.TableData, error)
 	ListDatabases(db *sql.DB) ([]string, error)
+	InsertValue(db *sql.DB, table string, data map[string]any) error
 }

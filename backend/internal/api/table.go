@@ -1,6 +1,8 @@
 package api
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/evandroad/gomyadm/internal/db"
@@ -15,16 +17,10 @@ type SchemaHandler struct {
 }
 
 func (h *SchemaHandler) ListTables(w http.ResponseWriter, r *http.Request) {
-	conn, err := h.Connection.Get()
+	driver, conn, err := getDriverAndConnection(h.Connection)
 	if err != nil {
-		logger.Error("Failed to get active connection: %v", err)
-		Error(w, http.StatusNotFound, "Connection not found", nil)
-		return
-	}
-
-	driver, ok := drivers.GetDriver(conn.Config.Driver)
-	if !ok {
-		Error(w, http.StatusBadRequest, "unsupported driver", nil)
+		logger.Error("Failed to get driver and connection: %v", err)
+		Error(w, http.StatusInternalServerError, "Failed to get driver and connection", nil)
 		return
 	}
 
@@ -41,17 +37,10 @@ func (h *SchemaHandler) ListTables(w http.ResponseWriter, r *http.Request) {
 func (h *SchemaHandler) SelectTable(w http.ResponseWriter, r *http.Request) {
 	table := chi.URLParam(r, "table")
 
-	conn, err := h.Connection.Get()
+	driver, conn, err := getDriverAndConnection(h.Connection)
 	if err != nil {
-		logger.Error("Failed to get active connection: %v", err)
-		Error(w, http.StatusNotFound, "Connection not found", nil)
-		return
-	}
-
-	driver, ok := drivers.GetDriver(conn.Config.Driver)
-	if !ok {
-		logger.Error("Unsupported driver: %s", conn.Config.Driver)
-		Error(w, http.StatusBadRequest, "unsupported driver", nil)
+		logger.Error("Failed to get driver and connection: %v", err)
+		Error(w, http.StatusInternalServerError, "Failed to get driver and connection", nil)
 		return
 	}
 
@@ -68,17 +57,10 @@ func (h *SchemaHandler) SelectTable(w http.ResponseWriter, r *http.Request) {
 func (h *SchemaHandler) DescribeTable(w http.ResponseWriter, r *http.Request) {
 	table := chi.URLParam(r, "table")
 
-	conn, err := h.Connection.Get()
+	driver, conn, err := getDriverAndConnection(h.Connection)
 	if err != nil {
-		logger.Error("Failed to get active connection: %v", err)
-		Error(w, http.StatusNotFound, err.Error(), nil)
-		return
-	}
-
-	driver, ok := drivers.GetDriver(conn.Config.Driver)
-	if !ok {
-		logger.Error("Unsupported driver: %s", conn.Config.Driver)
-		Error(w, http.StatusBadRequest, "unsupported driver", nil)
+		logger.Error("Failed to get driver and connection: %v", err)
+		Error(w, http.StatusInternalServerError, "Failed to get driver and connection", nil)
 		return
 	}
 
@@ -90,4 +72,49 @@ func (h *SchemaHandler) DescribeTable(w http.ResponseWriter, r *http.Request) {
 	}
 
 	JSON(w, http.StatusOK, schema)
+}
+
+func (h *SchemaHandler) InsertValue(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		Table  string         `json:"table"`
+		Values map[string]any `json:"values"`
+	}
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		logger.Error("Failed to decode request body: %v", err)
+		Error(w, http.StatusBadRequest, "Invalid request body", nil)
+		return
+	}
+
+	driver, conn, err := getDriverAndConnection(h.Connection)
+	if err != nil {
+		logger.Error("Failed to get driver and connection: %v", err)
+		Error(w, http.StatusInternalServerError, "Failed to get driver and connection", nil)
+		return
+	}
+
+	err = driver.InsertValue(conn.DB, req.Table, req.Values)
+	if err != nil {
+		logger.Error("Failed to insert data: %v", err)
+		Error(w, http.StatusInternalServerError, "Failed to insert data", nil)
+		return
+	}
+
+	Success(w, http.StatusOK, nil)
+}
+
+func getDriverAndConnection(cm *db.ConnectionManager) (drivers.Driver, *db.Connection, error) {
+	conn, err := cm.Get()
+	if err != nil {
+		logger.Error("Failed to get active connection: %v", err)
+		return nil, nil, err
+	}
+
+	driver, ok := drivers.GetDriver(conn.Config.Driver)
+	if !ok {
+		return nil, nil, fmt.Errorf("unsupported driver: %s", conn.Config.Driver)
+	}
+
+	return driver, conn, nil
 }

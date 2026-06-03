@@ -1,5 +1,5 @@
-import DatabaseConnectionPage from "./DatabaseConnectionPage"
-import MainPage from "./MainPage"
+import DatabaseConnectionPage from "./pages/DatabaseConnectionPage"
+import MainPage from "./pages/MainPage"
 import { Navigate, Route, Routes } from "react-router-dom"
 import ConnectionGuard from "./ConnectionGuard"
 import GuestGuard from "./GuestGuard"
