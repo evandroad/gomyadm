@@ -16,7 +16,7 @@ export function Toolbar({ view, setView, setSelectedTable }: Props) {
       <h1 className="text-lg font-semibold">{activeDatabase ?? "Visão geral"}</h1>
         {activeDatabase && (
           <div className="space-x-2">
-            <Button onClick={() => {setSelectedTable(null); setView("sql")}} bg={view === "sql" ? "bg-zinc-800" : "bg-zinc-900 underline underline-offset-4"}>SQL</Button>
+            <Button onClick={() => {setSelectedTable(null); setView("sql")}} bg={view === "sql" ? "bg-zinc-800" : "outline"}>SQL</Button>
           </div>
         )}
     </div>
