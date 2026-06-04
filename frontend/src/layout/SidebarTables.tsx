@@ -1,7 +1,7 @@
 import { API_URL } from "@/api"
 import { useConnection } from "@/contexts/ConnectionProvider"
 import { useDatabase } from "@/contexts/DatabaseProvider"
-import type { View } from "@/MainPage"
+import type { View } from "@/pages/MainPage"
 import { useEffect, useState } from "react"
 
 type Props = {

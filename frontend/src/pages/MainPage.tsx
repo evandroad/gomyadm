@@ -18,6 +18,7 @@ export default function MainPage() {
   const { activeDatabase } = useDatabase()
   const [selectedTable, setSelectedTable] = useState<string | null>(null)
   const [view, setView] = useState<View>("data")
+  const [sidebarWidth, setSidebarWidth] = useState(256)
 
   if (loading) {
     return (
@@ -81,14 +82,36 @@ export default function MainPage() {
     }`
   }
 
+  const startResize = (e: React.MouseEvent) => {
+    const startX = e.clientX
+    const startWidth = sidebarWidth
+
+    const onMouseMove = (e: MouseEvent) => {
+      const newWidth = startWidth + (e.clientX - startX)
+      setSidebarWidth(Math.min(Math.max(newWidth, 150), 800))
+    }
+
+    const onMouseUp = () => {
+      document.removeEventListener("mousemove", onMouseMove)
+      document.removeEventListener("mouseup", onMouseUp)
+    }
+
+    document.addEventListener("mousemove", onMouseMove)
+    document.addEventListener("mouseup", onMouseUp)
+  }
+
   return (
     <div className="min-h-screen flex bg-zinc-950 text-white">
-      <aside className="w-64 bg-zinc-900 border-r border-zinc-800 flex flex-col">        
+      <aside className="bg-zinc-900 border-r border-zinc-800 flex flex-col relative" style={{ width: sidebarWidth }}>
         <div className="p-3 font-bold border-b border-zinc-800">Gomyadm</div>
         <SidebarConnection />
         <SidebarDatabase />
         <SidebarTables selectedTable={selectedTable} setSelectedTable={setSelectedTable} setView={setView} />
         <SidebarDisconnect />
+        <div
+          onMouseDown={startResize}
+          className="absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-blue-500"
+        />
       </aside>
 
       <main className="flex-1 flex flex-col">

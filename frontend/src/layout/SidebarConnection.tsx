@@ -3,8 +3,8 @@ import { Button } from "../components/button"
 import { useConnection } from "../contexts/ConnectionProvider"
 import { useConnections } from "../contexts/ConnectionsProvider"
 import { Pencil, Trash } from "lucide-react"
-import { ModalFormConnection } from "./modalFormConnection"
-import { ModalDeleteConnection } from "./modalDeleteConnection"
+import { ModalFormConnection } from "./ModalFormConnection"
+import { ModalDeleteConnection } from "./ModalDeleteConnection"
 import { createConnection } from "../models"
 
 export default function SidebarConnection() {

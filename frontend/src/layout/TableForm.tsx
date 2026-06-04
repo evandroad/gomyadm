@@ -4,6 +4,7 @@ import { useDatabase } from "@/contexts/DatabaseProvider";
 import { Input } from "@/components/input";
 import { Label } from "@/components/label";
 import { Button } from "@/components/button";
+import { castValue, getInputType } from "@/tableUtils";
 
 export default function TableForm({ table }: { table: string }) {
   const { activeDatabase } = useDatabase()
@@ -56,52 +57,22 @@ export default function TableForm({ table }: { table: string }) {
     return <div className="text-zinc-500">{ activeDatabase ? 'Carregando schema...' : 'Selecione uma base de dados' }</div>
   }
 
-  function castValue(value: string, sqlType: string): any {
-    const type = sqlType.toLowerCase()
-
-    if (type.includes("int") || type.includes("decimal") || type.includes("float") || type.includes("double")) {
-      return value === "" ? null : Number(value)
-    }
-
-    if (type.includes("bool") || type.includes("boolean")) {
-      return value === "true"
-    }
-
-    return value
-  }
-
-  function getInputType(type: string) {
-    type = type.toLowerCase()
-
-    if (type.includes("int") || type.includes("decimal") || type.includes("float") || type.includes("double")) {
-      return "number"
-    }
-
-    if (type.includes("date") || type.includes("timestamp")) {
-      return "date"
-    }
-
-    return "text"
-  }
-
   return (
-    <>
-      <div className="p-2 w-100 space-y-4">
-        {schema.columns.map((column: any) => (
-          <div key={column.name}>
-            <Label>{column.name}</Label>
+    <div className="p-2 w-100 space-y-4">
+      {schema.columns.map((column: any) => (
+        <div key={column.name}>
+          <Label>{column.name}</Label>
 
-            <Input
-              type={getInputType(column.type)}
-              required={!column.nullable}
-              value={formData[column.name] || ""}
-              onChange={(e) => setFormData(prev => ({ ...prev, [column.name]: e.target.value }))}
-            />
-          </div>
-        ))}
+          <Input
+            type={getInputType(column.type)}
+            required={!column.nullable}
+            value={formData[column.name] || ""}
+            onChange={(e) => setFormData(prev => ({ ...prev, [column.name]: e.target.value }))}
+          />
+        </div>
+      ))}
 
-        <Button onClick={handleSubmit}>Salvar</Button>
-      </div>
-    </>
+      <Button onClick={handleSubmit}>Salvar</Button>
+    </div>
   )
 }
