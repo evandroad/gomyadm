@@ -32,24 +32,32 @@ func main() {
 	queryHandler := &api.QueryHandler{ Connection: manager }
 
 	r.Get("/health", health)
-	r.Post("/api/connection/connect", connectionHandler.Connect)
-	r.Post("/api/connection/disconnect", connectionHandler.Disconnect)
-	r.Get("/api/connection/active", connectionHandler.Active)
 
-	r.Get("/api/connection", connectionHandler.GetAllConnections)
-	r.Post("/api/connection", connectionHandler.InsertConnection)
-	r.Put("/api/connection", connectionHandler.UpdateConnection)
-	r.Delete("/api/connection/{id}", connectionHandler.DeleteConnection)
+	r.Route("/api", func(r chi.Router) {
+		r.Route("/connection", func(r chi.Router) {
+			r.Post("/connect", connectionHandler.Connect)
+			r.Post("/disconnect", connectionHandler.Disconnect)
+			r.Get("/active", connectionHandler.Active)
 
-	r.Post("/api/connection/database/select", connectionHandler.SelectDatabase)
-	r.Get("/api/connection/tables", schemaHandler.ListTables)
-	r.Get("/api/connection/tables/{table}", schemaHandler.SelectTable)
-	r.Get("/api/connection/tables/struct/{table}", schemaHandler.DescribeTable)
-	r.Post("/api/connection/tables", schemaHandler.InsertValue)
-	r.Put("/api/connection/tables", schemaHandler.UpdateValue)
-	r.Delete("/api/connection/tables", schemaHandler.DeleteValue)
+			r.Get("/", connectionHandler.GetAllConnections)
+			r.Post("/", connectionHandler.InsertConnection)
+			r.Put("/", connectionHandler.UpdateConnection)
+			r.Delete("/{id}", connectionHandler.DeleteConnection)	
+		})
 
-	r.Post("/api/query", queryHandler.ExecuteQuery)
+		r.Post("/database/select", connectionHandler.SelectDatabase)
+
+		r.Route("/tables", func(r chi.Router) {
+			r.Get("/", schemaHandler.ListTables)
+			r.Get("/{table}", schemaHandler.SelectTable)
+			r.Get("/struct/{table}", schemaHandler.DescribeTable)
+			r.Post("/", schemaHandler.InsertValue)
+			r.Put("/", schemaHandler.UpdateValue)
+			r.Delete("/", schemaHandler.DeleteValue)
+		})
+
+		r.Post("/query", queryHandler.ExecuteQuery)
+	})
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) { notFound(w, r) })
 

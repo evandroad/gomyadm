@@ -9,11 +9,11 @@ if [ -z "$TABLE" ]; then
   exit 1
 fi
 
-echo "Testing GET /api/connection/tables/$TABLE"
+echo "Testing GET /api/tables/$TABLE"
 
 curl \
   --silent \
   --show-error \
-  "$BASE_URL/api/connection/tables/$TABLE"
+  "$BASE_URL/api/tables/$TABLE"
 
 echo ""

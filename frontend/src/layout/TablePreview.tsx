@@ -21,7 +21,7 @@ export default function TablePreview({ table }: { table: string }) {
 
   async function load() {
     if (!activeDatabase) return
-    const res = await fetch(`${API_URL}/api/connection/tables/${table}`)
+    const res = await fetch(`${API_URL}/api/tables/${table}`)
     if (!res.ok) {
       setSchema(null)
       return

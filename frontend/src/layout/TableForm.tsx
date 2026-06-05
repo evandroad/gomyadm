@@ -16,7 +16,7 @@ export default function TableForm({ table }: { table: string }) {
 
   async function load() {
     if (!activeDatabase) return
-    const res = await fetch(`${API_URL}/api/connection/tables/struct/${table}`)
+    const res = await fetch(`${API_URL}/api/tables/struct/${table}`)
     if (!res.ok) {
       setSchema(null)
       return
@@ -34,7 +34,7 @@ export default function TableForm({ table }: { table: string }) {
     }
 
     try {
-      const res = await fetch(`${API_URL}/api/connection/tables`, {
+      const res = await fetch(`${API_URL}/api/tables`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -72,7 +72,7 @@ export default function TableForm({ table }: { table: string }) {
         </div>
       ))}
 
-      <Button onClick={handleSubmit}>Salvar</Button>
+      <Button onClick={handleSubmit} variant="primary">Salvar</Button>
     </div>
   )
 }

@@ -22,7 +22,7 @@ export function ModalFormValue({ open, onClose, data, table }: Props) {
   useEffect(() => {load()}, [table])
 
   async function load() {
-    const res = await fetch(`${API_URL}/api/connection/tables/struct/${table}`)
+    const res = await fetch(`${API_URL}/api/tables/struct/${table}`)
     if (!res.ok) {
       setSchema(null)
       return
@@ -44,7 +44,7 @@ export function ModalFormValue({ open, onClose, data, table }: Props) {
     }
     
     try {
-      const res = await fetch(`${API_URL}/api/connection/tables`, {
+      const res = await fetch(`${API_URL}/api/tables`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -94,7 +94,7 @@ export function ModalFormValue({ open, onClose, data, table }: Props) {
           </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={handleSubmit}>Salvar</Button>
+          <Button onClick={handleSubmit} variant="primary">Salvar</Button>
           <Button onClick={onClose}>Cancelar</Button>
         </CardFooter>
       </Card>

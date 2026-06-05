@@ -17,7 +17,7 @@ export default function TableStructure({ table }: { table: string }) {
 
   async function load() {
     if (!activeDatabase) return
-    const res = await fetch(`${API_URL}/api/connection/tables/struct/${table}`)
+    const res = await fetch(`${API_URL}/api/tables/struct/${table}`)
     if (!res.ok) {
       setSchema(null)
       return
