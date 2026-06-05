@@ -6,10 +6,11 @@ import { Td } from "@/components/td";
 import { Button } from "@/components/button";
 import { Pencil, Trash } from "lucide-react";
 import { ModalFormValue } from "./ModalFormValue";
+import type { Values } from "@/models";
 
 export default function TablePreview({ table }: { table: string }) {
   const [schema, setSchema] = useState<any>(null)
-  const [selectedRow, setSelectedRow] = useState<Record<string, any> | null>(null)
+  const [selectedRow, setSelectedRow] = useState<Values | null>(null)
   const [openForm, setOpenForm] = useState(false)
   const [openDelete, setOpenDelete] = useState(false)
   const { activeDatabase } = useDatabase()
@@ -46,7 +47,7 @@ export default function TablePreview({ table }: { table: string }) {
         </thead>
 
         <tbody>
-          {schema.rows.map((row: Record<string, any>, index: number) => (
+          {schema.rows.map((row: Values, index: number) => (
               <tr key={index} className="border-b border-zinc-800 hover:bg-zinc-900/50">
                 {schema.columns.map((column: string) => <Td key={column}>{String(row[column])}</Td>)}
                 <Td>

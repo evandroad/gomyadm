@@ -1,3 +1,5 @@
+export type Values = Record<string, any>
+
 export type Connection = {
   id: string
   name: string

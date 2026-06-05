@@ -46,6 +46,8 @@ func main() {
 	r.Get("/api/connection/tables/{table}", schemaHandler.SelectTable)
 	r.Get("/api/connection/tables/struct/{table}", schemaHandler.DescribeTable)
 	r.Post("/api/connection/tables", schemaHandler.InsertValue)
+	r.Put("/api/connection/tables", schemaHandler.UpdateValue)
+	r.Delete("/api/connection/tables", schemaHandler.DeleteValue)
 
 	r.Post("/api/query", queryHandler.ExecuteQuery)
 

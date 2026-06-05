@@ -191,3 +191,48 @@ func (d MySQLDriver) InsertValue(db *sql.DB, table string, data map[string]any) 
 	_, err := db.Exec(query, values...)
 	return err
 }
+
+func (d MySQLDriver) UpdateValue(db *sql.DB, table string, key map[string]any, data map[string]any) error {
+	setClauses := make([]string, 0, len(data))
+	whereClauses := make([]string, 0, len(key))
+	values := make([]any, 0, len(data)+len(key))
+
+	for col, val := range data {
+		setClauses = append(setClauses, fmt.Sprintf("%s = ?", col))
+		values = append(values, val)
+	}
+
+	for col, val := range key {
+		whereClauses = append(whereClauses, fmt.Sprintf("%s = ?", col))
+		values = append(values, val)
+	}
+
+	query := fmt.Sprintf(
+		"UPDATE %s SET %s WHERE %s",
+		table,
+		strings.Join(setClauses, ", "),
+		strings.Join(whereClauses, " AND "),
+	)
+
+	_, err := db.Exec(query, values...)
+	return err
+}
+
+func (d MySQLDriver) DeleteValue(db *sql.DB, table string, key map[string]any) error {
+	whereClauses := make([]string, 0)
+	values := make([]any, 0, len(key))
+
+	for col, val := range key {
+		whereClauses = append(whereClauses, fmt.Sprintf("%s = ?", col))
+		values = append(values, val)
+	}
+
+	query := fmt.Sprintf(
+		"DELETE FROM %s WHERE %s",
+		table,
+		strings.Join(whereClauses, " AND "),
+	)
+
+	_, err := db.Exec(query, values...)
+	return err
+}

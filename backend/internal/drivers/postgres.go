@@ -152,7 +152,7 @@ func (d PostgresDriver) DescribeTable(db *sql.DB, table string) (*models.TableSc
 		var nullable string
 		var defaultValue sql.NullString
 
-		err := rows.Scan(&col.Name, &col.Type, &nullable, &col.Key, &defaultValue)
+		err := rows.Scan(&col.Name, &col.Type, &nullable, &defaultValue, &col.Key)
 		if err != nil {
 			return nil, err
 		}
@@ -212,6 +212,54 @@ func (d PostgresDriver) InsertValue(db *sql.DB, table string, data map[string]an
 		table,
 		strings.Join(columns, ", "),
 		strings.Join(placeholders, ", "),
+	)
+
+	_, err := db.Exec(query, values...)
+	return err
+}
+
+func (d PostgresDriver) UpdateValue(db *sql.DB, table string, key map[string]any, data map[string]any) error {
+	setClauses := make([]string, 0, len(data))
+	whereClauses := make([]string, 0, len(key))
+	values := make([]any, 0, len(data)+len(key))
+
+	i := 1
+	for col, val := range data {
+		setClauses = append(setClauses, fmt.Sprintf(`"%s" = $%d`, col, i))
+		values = append(values, val)
+		i++
+	}
+
+	for col, val := range key {
+		whereClauses = append(whereClauses, fmt.Sprintf(`"%s" = $%d`, col, i))
+		values = append(values, val)
+		i++
+	}
+
+	query := fmt.Sprintf(
+		`UPDATE "%s" SET %s WHERE %s`,
+		table,
+		strings.Join(setClauses, ", "),
+		strings.Join(whereClauses, " AND "),
+	)
+
+	_, err := db.Exec(query, values...)
+	return err
+}
+
+func (d PostgresDriver) DeleteValue(db *sql.DB, table string, key map[string]any) error {
+	whereClauses := make([]string, 0, len(key))
+	values := make([]any, 0, len(key))
+
+	for col, val := range key {
+		whereClauses = append(whereClauses, fmt.Sprintf(`"%s" = $%d`, col, len(values)+1))
+		values = append(values, val)
+	}
+
+	query := fmt.Sprintf(
+		`DELETE FROM "%s" WHERE %s`,
+		table,
+		strings.Join(whereClauses, " AND "),
 	)
 
 	_, err := db.Exec(query, values...)

@@ -1,8 +1,8 @@
 import DatabaseConnectionPage from "./pages/DatabaseConnectionPage"
 import MainPage from "./pages/MainPage"
 import { Navigate, Route, Routes } from "react-router-dom"
-import ConnectionGuard from "./ConnectionGuard"
-import GuestGuard from "./GuestGuard"
+import ConnectionGuard from "./guard/ConnectionGuard"
+import GuestGuard from "./guard/GuestGuard"
 
 export default function App() {
   return (

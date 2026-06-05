@@ -3,6 +3,7 @@ import { API_URL } from "../api";
 import { useDatabase } from "@/contexts/DatabaseProvider";
 import { Th } from "@/components/th";
 import { Td } from "@/components/td";
+import type { Values } from "@/models";
 
 export default function TableStructure({ table }: { table: string }) {
   const [schema, setSchema] = useState<any>(null)
@@ -40,7 +41,7 @@ export default function TableStructure({ table }: { table: string }) {
           </thead>
 
           <tbody>
-            {schema.columns.map((row: Record<string, any>, index: number) => (
+            {schema.columns.map((row: Values, index: number) => (
               <tr key={index} className="border-b border-zinc-800 hover:bg-zinc-900/50">
                 {COLUMNS.map((column) => <Td key={column}>{String(row[column])}</Td>)}
               </tr>

@@ -37,7 +37,7 @@ export function SidebarTables({ selectedTable, setSelectedTable, setView }: Prop
   return (
     <div className="border-r border-zinc-800">
       <div className="overflow-auto">
-        {activeDatabase && tables.length > 0 ? (
+        {activeDatabase && tables?.length > 0 ? (
           tables.map((table) => (
             <button
               key={table}

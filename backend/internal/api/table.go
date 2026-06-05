@@ -104,6 +104,67 @@ func (h *SchemaHandler) InsertValue(w http.ResponseWriter, r *http.Request) {
 	Success(w, http.StatusOK, nil)
 }
 
+func (h *SchemaHandler) UpdateValue(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		Table  string         `json:"table"`
+		Key    map[string]any `json:"key"`
+		Values map[string]any `json:"values"`
+	}
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		logger.Error("Failed to decode request body: %v", err)
+		Error(w, http.StatusBadRequest, "Invalid request body", nil)
+		return
+	}
+
+	driver, conn, err := getDriverAndConnection(h.Connection)
+	if err != nil {
+		logger.Error("Failed to get driver and connection: %v", err)
+		Error(w, http.StatusInternalServerError, "Failed to get driver and connection", nil)
+		return
+	}
+
+	err = driver.UpdateValue(conn.DB, req.Table, req.Key, req.Values)
+	if err != nil {
+		logger.Error("Failed to update data: %v", err)
+		Error(w, http.StatusInternalServerError, "Failed to update data", nil)
+		return
+	}
+
+	Success(w, http.StatusOK, nil)
+}
+
+func (h *SchemaHandler) DeleteValue(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		Table  string         `json:"table"`
+		Key    map[string]any `json:"key"`
+	}
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		logger.Error("Failed to decode request body: %v", err)
+		Error(w, http.StatusBadRequest, "Invalid request body", nil)
+		return
+	}
+
+	driver, conn, err := getDriverAndConnection(h.Connection)
+	if err != nil {
+		logger.Error("Failed to get driver and connection: %v", err)
+		Error(w, http.StatusInternalServerError, "Failed to get driver and connection", nil)
+		return
+	}
+
+	err = driver.DeleteValue(conn.DB, req.Table, req.Key)
+	if err != nil {
+		logger.Error("Failed to delete data: %v", err)
+		Error(w, http.StatusInternalServerError, "Failed to delete data", nil)
+		return
+	}
+
+	Success(w, http.StatusOK, nil)
+}
+
 func getDriverAndConnection(cm *db.ConnectionManager) (drivers.Driver, *db.Connection, error) {
 	conn, err := cm.Get()
 	if err != nil {

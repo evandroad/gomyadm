@@ -4,10 +4,9 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Input } from "@/components/input"
 import { Label } from "@/components/label"
 import ModalBase from "@/components/modalBase"
+import type { Values } from "@/models"
 import { castValue, getInputType } from "@/tableUtils"
 import { useEffect, useState } from "react"
-
-type Values = Record<string, any>
 
 type Props = {
   open: boolean
@@ -29,15 +28,18 @@ export function ModalFormValue({ open, onClose, data, table }: Props) {
       return
     }
     const data = await res.json()
-    console.log("Schema:", data)
     setSchema(data)
   }
 
   async function handleSubmit() {
+    const primaryKeys = schema.columns.filter((col: any) => col.key === "PRI")
     const payload = {
       table: schema.name,
+      key: Object.fromEntries(primaryKeys.map((column: any) => [column.name, castValue(formData[column.name], column.type)])),
       values: Object.fromEntries(
-        schema.columns.map((column: any) => [column.name, castValue(formData[column.name], column.type)])
+        schema.columns
+          .filter((col: any) => col.key !== "PRI")
+          .map((column: any) => [column.name, castValue(formData[column.name], column.type)])
       )
     }
     
@@ -48,9 +50,10 @@ export function ModalFormValue({ open, onClose, data, table }: Props) {
         body: JSON.stringify(payload),
       })
 
-      if (res.ok) {
+      if (!res.ok) {
         const data = await res.json()
         alert(`Erro: ${data.message || 'Falha ao inserir dados'}`)
+        return
       }
 
       alert("Dados inseridos com sucesso!")
