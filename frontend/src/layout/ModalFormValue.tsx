@@ -7,6 +7,7 @@ import ModalBase from "@/components/modalBase"
 import { useSchema } from "@/contexts/SchemaProvider"
 import type { ColumnSchema, Values } from "@/models"
 import { castValue, getInputType } from "@/tableUtils"
+import { notify } from "@/utils"
 import { useEffect, useState } from "react"
 
 type Props = {
@@ -41,15 +42,15 @@ export function ModalFormValue({ open, onClose, data }: Props) {
 
       if (!res.ok) {
         const data = await res.json()
-        alert(`Erro: ${data.message || 'Falha ao inserir dados'}`)
+        notify(`Erro: ${data.message || 'Falha ao alterar o dado'}`, 'error')
         return
       }
 
-      alert("Dados inseridos com sucesso!")
+      notify("Dado alterado com sucesso!")
       setFormData({})
     } catch (err: any) {
       console.error(err)
-      alert(`Erro: ${err.message || 'Falha ao inserir dados'}`)
+      notify(`Erro: ${err.message || 'Falha ao alterar o dado'}`, 'error')
     } finally {
       onClose()
     }

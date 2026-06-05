@@ -6,6 +6,7 @@ import ModalBase from "@/components/modalBase"
 import { useSchema } from "@/contexts/SchemaProvider"
 import type { Values } from "@/models"
 import { castValue } from "@/tableUtils"
+import { notify } from "@/utils"
 import { useEffect } from "react"
 
 type Props = {
@@ -37,13 +38,14 @@ export function ModalDeleteValue({ open, onClose, data }: Props) {
 
       if (!res.ok) {
         const data = await res.json()
-        alert(`Erro: ${data.message || 'Falha ao inserir dados'}`)
+        notify(`Erro: ${data.message || 'Falha ao remover o dado'}`, 'error')
         return
       }
 
-      alert("Dados inseridos com sucesso!")
-    } catch (err) {
+      notify("Dado removido com sucesso!")
+    } catch (err: any) {
       console.error(err)
+      notify(`Erro: ${err.message || 'Falha ao remover o dado'}`, 'error')
     } finally {
       onClose()
     }

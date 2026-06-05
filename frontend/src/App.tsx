@@ -1,22 +1,26 @@
+import { BrowserRouter as Router, Navigate, Route, Routes } from "react-router-dom"
 import DatabaseConnectionPage from "./pages/DatabaseConnectionPage"
 import MainPage from "./pages/MainPage"
-import { Navigate, Route, Routes } from "react-router-dom"
 import ConnectionGuard from "./guard/ConnectionGuard"
 import GuestGuard from "./guard/GuestGuard"
+import Notification from "./components/notification"
 
 export default function App() {
   return (
-    <Routes>
-      {/* rotas públicas somente sem conexão */}
-      <Route element={<GuestGuard />}>
-        <Route path="/connect" element={<DatabaseConnectionPage />} />
-      </Route>
+    <Router>
+      <Notification />
+      <Routes>
+        {/* rotas públicas somente sem conexão */}
+        <Route element={<GuestGuard />}>
+          <Route path="/connect" element={<DatabaseConnectionPage />} />
+        </Route>
 
-      {/* rotas protegidas */}
-      <Route element={<ConnectionGuard />}>
-        <Route path="/" element={<Navigate to="/app" replace />} />
-        <Route path="/app" element={<MainPage />} />
-      </Route>
-    </Routes>
+        {/* rotas protegidas */}
+        <Route element={<ConnectionGuard />}>
+          <Route path="/" element={<Navigate to="/app" replace />} />
+          <Route path="/app" element={<MainPage />} />
+        </Route>
+      </Routes>
+    </Router>
   )
 }

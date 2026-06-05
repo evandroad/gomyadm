@@ -7,6 +7,7 @@ import { Button } from "@/components/button";
 import { castValue, getInputType } from "@/tableUtils";
 import type { ColumnSchema } from "@/models";
 import { useSchema } from "@/contexts/SchemaProvider";
+import { notify } from "@/utils";
 
 export default function TableForm() {
   const { activeDatabase } = useDatabase()
@@ -31,14 +32,14 @@ export default function TableForm() {
 
       if (!res.ok) {
         const data = await res.json()
-        alert(`Erro: ${data.message || 'Falha ao inserir dados'}`)
+        notify(`Erro: ${data.message || 'Falha ao inserir dados'}`, 'error')
         return
       }
 
-      alert("Dados inseridos com sucesso!")
+      notify("Dados inseridos com sucesso!")
       setFormData({})
     } catch (err: any) {
-      alert(`Erro: ${err.message || 'Falha ao inserir dados'}`)
+      notify(`Erro: ${err.message || 'Falha ao inserir dados'}`, 'error')
     }
   }
 
