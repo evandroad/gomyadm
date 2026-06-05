@@ -4,6 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Input } from "@/components/input"
 import { Label } from "@/components/label"
 import ModalBase from "@/components/modalBase"
+import { useSchema } from "@/contexts/SchemaProvider"
 import type { ColumnSchema, Values } from "@/models"
 import { castValue, getInputType } from "@/tableUtils"
 import { useEffect, useState } from "react"
@@ -12,32 +13,20 @@ type Props = {
   open: boolean
   onClose: () => void
   data: Values
-  table: string
 }
 
-export function ModalFormValue({ open, onClose, data, table }: Props) {
+export function ModalFormValue({ open, onClose, data }: Props) {
   const [formData, setFormData] = useState<Values>({})
-  const [schema, setSchema] = useState<any>(null)
-
-  useEffect(() => {load()}, [table])
-
-  async function load() {
-    const res = await fetch(`${API_URL}/api/tables/struct/${table}`)
-    if (!res.ok) {
-      setSchema(null)
-      return
-    }
-    const data = await res.json()
-    setSchema(data)
-  }
+  const { activeSchema } = useSchema()
 
   async function handleSubmit() {
-    const primaryKeys = schema.columns.filter((col: any) => col.key === "PRI")
+    if (!activeSchema) return
+    const primaryKeys = activeSchema.columns.filter((col: any) => col.key === "PRI")
     const payload = {
-      table: schema.name,
+      table: activeSchema.name,
       key: Object.fromEntries(primaryKeys.map((column: any) => [column.name, castValue(formData[column.name], column.type)])),
       values: Object.fromEntries(
-        schema.columns
+        activeSchema.columns
           .filter((col: any) => col.key !== "PRI")
           .map((column: any) => [column.name, castValue(formData[column.name], column.type)])
       )
@@ -79,7 +68,7 @@ export function ModalFormValue({ open, onClose, data, table }: Props) {
         </CardHeader>
         <CardContent>
           <div className="p-2 w-full space-y-4">
-            {schema?.columns.map((column: ColumnSchema) => (
+            {activeSchema?.columns.map((column: ColumnSchema) => (
               <div key={column.name}>
                 <Label>{column.name}</Label>
                 <Input

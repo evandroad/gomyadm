@@ -37,7 +37,12 @@ export type ColumnSchema = {
 	autoNumber: boolean
 }
 
-export type TableStructure = {
+export type TableSchema = {
   name:    string
   columns: ColumnSchema[]
+}
+
+export type TableData = {
+  columns: string[]
+  rows: Values
 }

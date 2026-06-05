@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { API_URL } from "../api";
 import { useDatabase } from "@/contexts/DatabaseProvider";
 import { Input } from "@/components/input";
@@ -6,31 +6,19 @@ import { Label } from "@/components/label";
 import { Button } from "@/components/button";
 import { castValue, getInputType } from "@/tableUtils";
 import type { ColumnSchema } from "@/models";
+import { useSchema } from "@/contexts/SchemaProvider";
 
-export default function TableForm({ table }: { table: string }) {
+export default function TableForm() {
   const { activeDatabase } = useDatabase()
-  const [schema, setSchema] = useState<any>(null)
+  const { activeSchema } = useSchema()
   const [formData, setFormData] = useState<Record<string, string>>({})
 
-  useEffect(() => {load()}, [table])
-  useEffect(() => {setSchema(null)}, [activeDatabase])
-
-  async function load() {
-    if (!activeDatabase) return
-    const res = await fetch(`${API_URL}/api/tables/struct/${table}`)
-    if (!res.ok) {
-      setSchema(null)
-      return
-    }
-    const data = await res.json()
-    setSchema(data)
-  }
-
   async function handleSubmit() {
+    if (!activeSchema) return
     const payload = {
-      table: schema.name,
+      table: activeSchema.name,
       values: Object.fromEntries(
-        schema.columns.map((column: any) => [column.name, castValue(formData[column.name], column.type)])
+        activeSchema.columns.map((column: any) => [column.name, castValue(formData[column.name], column.type)])
       )
     }
 
@@ -54,13 +42,13 @@ export default function TableForm({ table }: { table: string }) {
     }
   }
 
-  if (!schema) {
+  if (!activeDatabase) {
     return <div className="text-zinc-500">{ activeDatabase ? 'Carregando schema...' : 'Selecione uma base de dados' }</div>
   }
 
   return (
     <div className="p-2 w-100 space-y-4">
-      {schema.columns.map((column: ColumnSchema) => (
+      {activeSchema?.columns.map((column: ColumnSchema) => (
         <div key={column.name}>
           <Label>{column.name}</Label>
 

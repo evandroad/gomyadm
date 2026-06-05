@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import TablePreview from "@/layout/TablePreview"
 import SidebarConnection from "@/layout/SidebarConnection"
 import { useConnection } from "@/contexts/ConnectionProvider"
@@ -10,15 +10,19 @@ import { SidebarDisconnect } from "@/layout/SidebarDisconnect"
 import { useDatabase } from "@/contexts/DatabaseProvider"
 import { ContentSQL } from "@/layout/ContentSQL"
 import TableForm from "@/layout/TableForm"
+import { useSchema } from "@/contexts/SchemaProvider"
 
 export type View = "data" | "structure" | "form" | "sql"
 
 export default function MainPage() {
   const { loading } = useConnection()
   const { activeDatabase } = useDatabase()
+  const { load } = useSchema()
   const [selectedTable, setSelectedTable] = useState<string | null>(null)
   const [view, setView] = useState<View>("data")
   const [sidebarWidth, setSidebarWidth] = useState(256)
+
+  useEffect(() => {load(selectedTable || '')}, [selectedTable])
 
   if (loading) {
     return (
@@ -64,12 +68,12 @@ export default function MainPage() {
       case "structure":
         return (<>
           {tabs}
-          <TableStructure table={selectedTable} />
+          <TableStructure />
         </>)
       case "form":
         return (<>
           {tabs}
-          <TableForm table={selectedTable} />
+          <TableForm />
         </>)
       default:
         return null

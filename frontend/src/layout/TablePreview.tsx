@@ -6,50 +6,51 @@ import { Td } from "@/components/td";
 import { Button } from "@/components/button";
 import { Pencil, Trash } from "lucide-react";
 import { ModalFormValue } from "./ModalFormValue";
-import type { Values } from "@/models";
+import type { TableData, Values } from "@/models";
+import { ModalDeleteValue } from "./ModalDeleteValue";
 
 export default function TablePreview({ table }: { table: string }) {
-  const [schema, setSchema] = useState<any>(null)
+  const [tableData, setTableData] = useState<TableData | null>(null)
   const [selectedRow, setSelectedRow] = useState<Values | null>(null)
   const [openForm, setOpenForm] = useState(false)
   const [openDelete, setOpenDelete] = useState(false)
   const { activeDatabase } = useDatabase()
-  console.log("openDelete:", openDelete)
 
-  useEffect(() => {load()}, [table])
-  useEffect(() => {setSchema(null)}, [activeDatabase])
+  useEffect(() => {loadTableData()}, [table])
+  useEffect(() => {setTableData(null)}, [activeDatabase])
 
-  async function load() {
+  async function loadTableData() {
     if (!activeDatabase) return
     const res = await fetch(`${API_URL}/api/tables/${table}`)
     if (!res.ok) {
-      setSchema(null)
+      setTableData(null)
       return
     }
     const data = await res.json()
-    setSchema(data)
+    setTableData(data)
   }
 
-  if (!schema) {
+  if (!tableData) {
     return <div className="text-zinc-500">{ activeDatabase ? 'Carregando schema...' : 'Selecione uma base de dados' }</div>
   }
 
   return (
     <div>
-      <ModalFormValue open={openForm} onClose={() => setOpenForm(false)} data={selectedRow ?? {}} table={table} />
+      <ModalFormValue open={openForm} onClose={() => setOpenForm(false)} data={selectedRow ?? {}} />
+      <ModalDeleteValue open={openDelete} onClose={() => setOpenDelete(false)} data={selectedRow ?? {}} />
 
       <table className="w-full text-sm text-left">
         <thead className="bg-zinc-900 border-b border-zinc-800">
           <tr>
-            {schema.columns.map((column: string) => <Th key={column}>{column}</Th>)}
+            {tableData.columns.map((column: string) => <Th key={column}>{column}</Th>)}
             <Th>Ações</Th>
           </tr>
         </thead>
 
         <tbody>
-          {schema.rows.map((row: Values, index: number) => (
+          {tableData.rows.map((row: Values, index: number) => (
               <tr key={index} className="border-b border-zinc-800 hover:bg-zinc-900/50">
-                {schema.columns.map((column: string) => <Td key={column}>{String(row[column])}</Td>)}
+                {tableData.columns.map((column: string) => <Td key={column}>{String(row[column])}</Td>)}
                 <Td>
                   <div className="space-x-2">
                     <Button variant="primary" sm onClick={() => { setSelectedRow(row); setOpenForm(true) }}>

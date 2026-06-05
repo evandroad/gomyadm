@@ -6,6 +6,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { ConnectionProvider } from './contexts/ConnectionProvider.tsx'
 import { ConnectionsProvider } from './contexts/ConnectionsProvider.tsx'
 import { DatabaseProvider } from './contexts/DatabaseProvider.tsx'
+import { SchemaProvider } from './contexts/SchemaProvider.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -13,7 +14,9 @@ createRoot(document.getElementById('root')!).render(
       <ConnectionProvider>
         <ConnectionsProvider>
           <DatabaseProvider>
-            <App />
+            <SchemaProvider>
+              <App />
+            </SchemaProvider>
           </DatabaseProvider>
         </ConnectionsProvider>
       </ConnectionProvider>

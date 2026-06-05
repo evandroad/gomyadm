@@ -1,0 +1,72 @@
+import { API_URL } from "@/api"
+import { Button } from "@/components/button"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/card"
+import { Label } from "@/components/label"
+import ModalBase from "@/components/modalBase"
+import { useSchema } from "@/contexts/SchemaProvider"
+import type { Values } from "@/models"
+import { castValue } from "@/tableUtils"
+import { useEffect } from "react"
+
+type Props = {
+  open: boolean
+  onClose: () => void
+  data: Values
+}
+
+export function ModalDeleteValue({ open, onClose, data }: Props) {
+  const { activeSchema } = useSchema()
+
+  async function saveConnection() {
+    if (!activeSchema) return
+
+    const primaryKeys = activeSchema.columns.filter((col: any) => col.key === "PRI")
+    const payload = {
+      table: activeSchema.name,
+      key: Object.fromEntries(
+        primaryKeys.map((column: any) => [column.name, castValue(data[column.name], column.type)])
+      )
+    }
+
+    try {
+      const res = await fetch(`${API_URL}/api/tables`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+
+      if (!res.ok) {
+        const data = await res.json()
+        alert(`Erro: ${data.message || 'Falha ao inserir dados'}`)
+        return
+      }
+
+      alert("Dados inseridos com sucesso!")
+    } catch (err) {
+      console.error(err)
+    } finally {
+      onClose()
+    }
+  }
+
+  useEffect(() => {
+    if (!open) return
+  }, [open])
+
+  return (
+    <ModalBase open={open} onClose={onClose} className="p-2 w-96">
+      <Card className="bg-zinc-900">
+        <CardHeader>
+          <CardTitle>Excluir Item</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {Object.entries(data).map(([key, value]) => <Label key={key}><span>{key}</span><span>{value}</span></Label>)}
+        </CardContent>
+        <CardFooter>
+          <Button onClick={onClose}>Cancelar</Button>
+          <Button onClick={saveConnection} variant="danger">Excluir</Button>
+        </CardFooter>
+      </Card>
+    </ModalBase>
+  )
+}

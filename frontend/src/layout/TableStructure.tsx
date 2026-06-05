@@ -1,32 +1,17 @@
-import { useEffect, useState } from "react"
-import { API_URL } from "../api";
 import { useDatabase } from "@/contexts/DatabaseProvider";
 import { Th } from "@/components/th";
 import { Td } from "@/components/td";
-import type { TableStructure, Values } from "@/models";
+import type { Values } from "@/models";
+import { useSchema } from "@/contexts/SchemaProvider";
 
-export default function TableStructure({ table }: { table: string }) {
-  const [schema, setSchema] = useState<TableStructure | null>(null)
+export default function TableStructure() {
   const { activeDatabase } = useDatabase()
-
-  useEffect(() => {load()}, [table])
-  useEffect(() => {setSchema(null)}, [activeDatabase])
+  const { activeSchema } = useSchema()
 
   const COLUMNS_LABEL = ['Nome', 'Tipo', 'Nulo', 'Chave', 'Padrão', 'Extra']
   const COLUMNS = ['name', 'type', 'nullable', 'key', 'default', 'extra']
 
-  async function load() {
-    if (!activeDatabase) return
-    const res = await fetch(`${API_URL}/api/tables/struct/${table}`)
-    if (!res.ok) {
-      setSchema(null)
-      return
-    }
-    const data = await res.json()
-    setSchema(data)
-  }
-
-  if (!schema) {
+  if (!activeSchema) {
     return <div className="text-zinc-500">{ activeDatabase ? 'Carregando schema...' : 'Selecione uma base de dados' }</div>
   }
 
@@ -41,7 +26,7 @@ export default function TableStructure({ table }: { table: string }) {
           </thead>
 
           <tbody>
-            {schema.columns.map((row: Values, index: number) => (
+            {activeSchema?.columns.map((row: Values, index: number) => (
               <tr key={index} className="border-b border-zinc-800 hover:bg-zinc-900/50">
                 {COLUMNS.map((column) => <Td key={column}>{String(row[column])}</Td>)}
               </tr>
