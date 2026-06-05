@@ -3,10 +3,10 @@ import { API_URL } from "../api";
 import { useDatabase } from "@/contexts/DatabaseProvider";
 import { Th } from "@/components/th";
 import { Td } from "@/components/td";
-import type { Values } from "@/models";
+import type { TableStructure, Values } from "@/models";
 
 export default function TableStructure({ table }: { table: string }) {
-  const [schema, setSchema] = useState<any>(null)
+  const [schema, setSchema] = useState<TableStructure | null>(null)
   const { activeDatabase } = useDatabase()
 
   useEffect(() => {load()}, [table])

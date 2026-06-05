@@ -5,6 +5,7 @@ import { Input } from "@/components/input";
 import { Label } from "@/components/label";
 import { Button } from "@/components/button";
 import { castValue, getInputType } from "@/tableUtils";
+import type { ColumnSchema } from "@/models";
 
 export default function TableForm({ table }: { table: string }) {
   const { activeDatabase } = useDatabase()
@@ -59,13 +60,14 @@ export default function TableForm({ table }: { table: string }) {
 
   return (
     <div className="p-2 w-100 space-y-4">
-      {schema.columns.map((column: any) => (
+      {schema.columns.map((column: ColumnSchema) => (
         <div key={column.name}>
           <Label>{column.name}</Label>
 
           <Input
             type={getInputType(column.type)}
             required={!column.nullable}
+            disabled={column.autoNumber}
             value={formData[column.name] || ""}
             onChange={(e) => setFormData(prev => ({ ...prev, [column.name]: e.target.value }))}
           />

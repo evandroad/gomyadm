@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Input } from "@/components/input"
 import { Label } from "@/components/label"
 import ModalBase from "@/components/modalBase"
-import type { Values } from "@/models"
+import type { ColumnSchema, Values } from "@/models"
 import { castValue, getInputType } from "@/tableUtils"
 import { useEffect, useState } from "react"
 
@@ -79,12 +79,13 @@ export function ModalFormValue({ open, onClose, data, table }: Props) {
         </CardHeader>
         <CardContent>
           <div className="p-2 w-full space-y-4">
-            {schema?.columns.map((column: any) => (
+            {schema?.columns.map((column: ColumnSchema) => (
               <div key={column.name}>
                 <Label>{column.name}</Label>
                 <Input
                   type={getInputType(column.type)}
                   required={!column.nullable}
+                  disabled={column.autoNumber}
                   value={formData[column.name] || ""}
                   onChange={(e) => setFormData(prev => ({ ...prev, [column.name]: e.target.value }))}
                 />

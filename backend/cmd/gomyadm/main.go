@@ -50,7 +50,7 @@ func main() {
 		r.Route("/tables", func(r chi.Router) {
 			r.Get("/", schemaHandler.ListTables)
 			r.Get("/{table}", schemaHandler.SelectTable)
-			r.Get("/struct/{table}", schemaHandler.DescribeTable)
+			r.Get("/struct/{table}", schemaHandler.TableStructure)
 			r.Post("/", schemaHandler.InsertValue)
 			r.Put("/", schemaHandler.UpdateValue)
 			r.Delete("/", schemaHandler.DeleteValue)

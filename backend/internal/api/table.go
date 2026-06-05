@@ -54,7 +54,7 @@ func (h *SchemaHandler) SelectTable(w http.ResponseWriter, r *http.Request) {
 	JSON(w, http.StatusOK, rows)
 }
 
-func (h *SchemaHandler) DescribeTable(w http.ResponseWriter, r *http.Request) {
+func (h *SchemaHandler) TableStructure(w http.ResponseWriter, r *http.Request) {
 	table := chi.URLParam(r, "table")
 
 	driver, conn, err := getDriverAndConnection(h.Connection)
@@ -64,7 +64,7 @@ func (h *SchemaHandler) DescribeTable(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	schema, err := driver.DescribeTable(conn.DB, table)
+	schema, err := driver.TableStructure(conn.DB, table)
 	if err != nil {
 		logger.Error("Failed to describe table: %v", err)
 		Error(w, http.StatusInternalServerError, "Failed to describe table", nil)

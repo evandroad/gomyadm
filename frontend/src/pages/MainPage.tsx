@@ -52,7 +52,7 @@ export default function MainPage() {
     const tabs = (<div className="flex w-fit border-b border-zinc-800 mb-2">
       <button onClick={() => setView("data")} className={getTabClass("data")}>Dados</button>
       <button onClick={() => setView("structure")} className={getTabClass("structure")}>Estrutura</button>
-      <button onClick={() => setView("form")} className={getTabClass("form")}>Formulário</button>
+      <button onClick={() => setView("form")} className={getTabClass("form")}>Inserir</button>
     </div>)
 
     switch (view) {
@@ -115,7 +115,7 @@ export default function MainPage() {
       </aside>
 
       <main className="flex-1 flex flex-col">
-        <Toolbar view={view} setView={setView} setSelectedTable={setSelectedTable} />
+        <Toolbar view={view} table={selectedTable} setView={setView} setSelectedTable={setSelectedTable} />
         {activeDatabase && (
           <div className="flex flex-col h-full p-2">
             { renderView() }

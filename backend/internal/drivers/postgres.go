@@ -114,7 +114,7 @@ func (d PostgresDriver) SelectTable(db *sql.DB, table string) (*models.TableData
 	}, nil
 }
 
-func (d PostgresDriver) DescribeTable(db *sql.DB, table string) (*models.TableSchema, error) {
+func (d PostgresDriver) TableStructure(db *sql.DB, table string) (*models.TableSchema, error) {
 	query := `
 		SELECT
     c.column_name,
@@ -148,7 +148,7 @@ func (d PostgresDriver) DescribeTable(db *sql.DB, table string) (*models.TableSc
 	}
 
 	for rows.Next() {
-		var col models.TableColumn
+		var col models.ColumnSchema
 		var nullable string
 		var defaultValue sql.NullString
 
@@ -160,6 +160,10 @@ func (d PostgresDriver) DescribeTable(db *sql.DB, table string) (*models.TableSc
 		col.Nullable = nullable == "YES"
 		if defaultValue.Valid {
 			col.Default = defaultValue.String
+		}
+
+		if strings.Contains(defaultValue.String, "nextval(") {
+			col.AutoNumber = true
 		}
 
 		schema.Columns = append(schema.Columns, col)

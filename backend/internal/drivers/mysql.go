@@ -52,7 +52,7 @@ func (d MySQLDriver) ListTables(db *sql.DB) ([]string, error) {
 	return tables, nil
 }
 
-func (d MySQLDriver) DescribeTable(db *sql.DB, table string) (*models.TableSchema, error) {
+func (d MySQLDriver) TableStructure(db *sql.DB, table string) (*models.TableSchema, error) {
 	query := `
 		SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_KEY, COLUMN_DEFAULT, EXTRA
 		FROM information_schema.columns
@@ -72,8 +72,7 @@ func (d MySQLDriver) DescribeTable(db *sql.DB, table string) (*models.TableSchem
 	}
 
 	for rows.Next() {
-		var col models.TableColumn
-
+		var col models.ColumnSchema
 		var nullable string
 		var defaultValue sql.NullString
 
@@ -83,6 +82,7 @@ func (d MySQLDriver) DescribeTable(db *sql.DB, table string) (*models.TableSchem
 		}
 
 		col.Nullable = nullable == "YES"
+		col.AutoNumber = strings.Contains(col.Extra, "auto_increment")
 		if defaultValue.Valid {
 			col.Default = defaultValue.String
 		}
