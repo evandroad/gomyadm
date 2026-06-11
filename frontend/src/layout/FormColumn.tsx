@@ -33,7 +33,7 @@ export function createColumn(data?: Partial<Column>): Column {
   }
 }
 
-const ColumnTypes = ["string", "text", "integer", "bigint", "decimal", "boolean", "date", "datetime"]
+const ColumnTypes = ["varchar", "text", "integer", "bigint", "decimal", "boolean", "date", "datetime"]
 
 export default function FormColumn() {
   const { activeDatabase } = useDatabase()
