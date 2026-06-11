@@ -15,7 +15,7 @@ type Props = {
   data: Values
 }
 
-export function ModalDeleteValue({ open, onClose, data }: Props) {
+export function ModalDeleteItem({ open, onClose, data }: Props) {
   const { activeSchema } = useSchema()
 
   async function saveConnection() {

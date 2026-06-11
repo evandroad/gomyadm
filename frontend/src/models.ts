@@ -37,6 +37,33 @@ export type ColumnSchema = {
 	autoNumber: boolean
 }
 
+export type Column = {
+  name: string
+  type: string
+  length?: string
+  nullable: boolean
+  primary: boolean
+  unique: boolean
+  autoIncrement: boolean
+  defaultValue: string
+}
+
+export function createColumn(data?: Partial<Column>): Column {
+  return {
+    name: "",
+    type: '',
+    length: '',
+    nullable: false,
+    primary: false,
+    unique: false,
+    autoIncrement: false,
+    defaultValue: '',
+    ...data
+  }
+}
+
+export const ColumnTypes = ["varchar", "text", "integer", "bigint", "decimal", "boolean", "date", "datetime"]
+
 export type TableSchema = {
   name:    string
   columns: ColumnSchema[]

@@ -5,9 +5,9 @@ import { Th } from "@/components/th";
 import { Td } from "@/components/td";
 import { Button } from "@/components/button";
 import { Pencil, Trash } from "lucide-react";
-import { ModalFormValue } from "./ModalFormValue";
+import { ModalFormItem } from "./ModalFormItem";
 import type { TableData, Values } from "@/models";
-import { ModalDeleteValue } from "./ModalDeleteValue";
+import { ModalDeleteItem } from "./ModalDeleteItem";
 
 export default function TablePreview({ table }: { table: string }) {
   const [tableData, setTableData] = useState<TableData | null>(null)
@@ -36,8 +36,8 @@ export default function TablePreview({ table }: { table: string }) {
 
   return (
     <div>
-      <ModalFormValue open={openForm} onClose={() => setOpenForm(false)} data={selectedRow ?? {}} />
-      <ModalDeleteValue open={openDelete} onClose={() => setOpenDelete(false)} data={selectedRow ?? {}} />
+      <ModalFormItem open={openForm} onClose={() => setOpenForm(false)} data={selectedRow ?? {}} />
+      <ModalDeleteItem open={openDelete} onClose={() => setOpenDelete(false)} data={selectedRow ?? {}} />
 
       <table className="w-full text-sm text-left">
         <thead className="bg-zinc-900 border-b border-zinc-800">

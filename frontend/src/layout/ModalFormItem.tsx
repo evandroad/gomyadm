@@ -16,7 +16,7 @@ type Props = {
   data: Values
 }
 
-export function ModalFormValue({ open, onClose, data }: Props) {
+export function ModalFormItem({ open, onClose, data }: Props) {
   const [formData, setFormData] = useState<Values>({})
   const { activeSchema } = useSchema()
 

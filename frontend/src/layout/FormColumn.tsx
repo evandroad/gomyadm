@@ -7,33 +7,7 @@ import { Button } from "@/components/button";
 import { useSchema } from "@/contexts/SchemaProvider";
 import { notify } from "@/utils";
 import { Select } from "@/components/select";
-
-type Column = {
-  name: string
-  type: string
-  length?: string
-  nullable: boolean
-  primary: boolean
-  unique: boolean
-  autoIncrement: boolean
-  defaultValue: string
-}
-
-export function createColumn(data?: Partial<Column>): Column {
-  return {
-    name: "",
-    type: '',
-    length: '',
-    nullable: false,
-    primary: false,
-    unique: false,
-    autoIncrement: false,
-    defaultValue: '',
-    ...data
-  }
-}
-
-const ColumnTypes = ["varchar", "text", "integer", "bigint", "decimal", "boolean", "date", "datetime"]
+import { ColumnTypes, createColumn, type Column } from "@/models";
 
 export default function FormColumn() {
   const { activeDatabase } = useDatabase()
