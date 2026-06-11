@@ -11,9 +11,12 @@ type Driver interface {
 	BuildDSN(cfg models.ConnectionConfig) string
 	ListTables(db *sql.DB) ([]string, error)
 	TableStructure(db *sql.DB, table string) (*models.TableSchema, error)
-	SelectTable(db *sql.DB, table string) (*models.TableData, error)
 	ListDatabases(db *sql.DB) ([]string, error)
-	InsertValue(db *sql.DB, table string, data map[string]any) error
-	UpdateValue(db *sql.DB, table string, key map[string]any, data map[string]any) error
-	DeleteValue(db *sql.DB, table string, key map[string]any) error
+	
+	GetAllItem(db *sql.DB, table string) (*models.TableData, error)
+	InsertItem(db *sql.DB, table string, data map[string]any) error
+	UpdateItem(db *sql.DB, table string, key map[string]any, data map[string]any) error
+	DeleteItem(db *sql.DB, table string, key map[string]any) error
+
+	InsertColumn(db *sql.DB, table string, column models.ColumnDefinition) error
 }

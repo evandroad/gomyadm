@@ -2,11 +2,12 @@
 
 . "$(dirname "$0")/common.sh"
 
-echo "Testing GET /api/tables"
+URI="api/tables"
+echo "Testing GET /$URI"
 
 curl \
   --silent \
   --show-error \
-  "$BASE_URL/api/tables"
+  "$BASE_URL/$URI"
 
 echo ""

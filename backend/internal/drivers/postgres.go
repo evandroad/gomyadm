@@ -59,61 +59,6 @@ func (d PostgresDriver) ListTables(db *sql.DB) ([]string, error) {
 	return tables, nil
 }
 
-func (d PostgresDriver) SelectTable(db *sql.DB, table string) (*models.TableData, error) {
-	query := fmt.Sprintf(`SELECT * FROM "%s"`, table)
-	rows, err := db.Query(query)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	columns, err := rows.Columns()
-	if err != nil {
-		return nil, err
-	}
-
-	results := make([]map[string]any, 0)
-
-	for rows.Next() {
-		values := make([]any, len(columns))
-		valuePtrs := make([]any, len(columns))
-
-		for i := range columns {
-			valuePtrs[i] = &values[i]
-		}
-
-		if err := rows.Scan(valuePtrs...); err != nil {
-			return nil, err
-		}
-
-		rowMap := make(map[string]any)
-		
-		for i, col := range columns {
-			val := values[i]
-
-			switch v := val.(type) {
-				case []byte:
-					rowMap[col] = string(v)
-				case time.Time:
-					rowMap[col] = v.Format("2006-01-02 15:04:05")
-				default:
-					rowMap[col] = v
-			}
-		}
-
-		results = append(results, rowMap)
-	}
-
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return &models.TableData{
-		Columns: columns,
-		Rows:    results,
-	}, nil
-}
-
 func (d PostgresDriver) TableStructure(db *sql.DB, table string) (*models.TableSchema, error) {
 	query := `
 		SELECT
@@ -198,7 +143,62 @@ func (d PostgresDriver) ListDatabases(db *sql.DB) ([]string, error) {
 	return databases, nil
 }
 
-func (d PostgresDriver) InsertValue(db *sql.DB, table string, data map[string]any) error {
+func (d PostgresDriver) GetAllItem(db *sql.DB, table string) (*models.TableData, error) {
+	query := fmt.Sprintf(`SELECT * FROM "%s"`, table)
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return nil, err
+	}
+
+	results := make([]map[string]any, 0)
+
+	for rows.Next() {
+		values := make([]any, len(columns))
+		valuePtrs := make([]any, len(columns))
+
+		for i := range columns {
+			valuePtrs[i] = &values[i]
+		}
+
+		if err := rows.Scan(valuePtrs...); err != nil {
+			return nil, err
+		}
+
+		rowMap := make(map[string]any)
+		
+		for i, col := range columns {
+			val := values[i]
+
+			switch v := val.(type) {
+				case []byte:
+					rowMap[col] = string(v)
+				case time.Time:
+					rowMap[col] = v.Format("2006-01-02 15:04:05")
+				default:
+					rowMap[col] = v
+			}
+		}
+
+		results = append(results, rowMap)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return &models.TableData{
+		Columns: columns,
+		Rows:    results,
+	}, nil
+}
+
+func (d PostgresDriver) InsertItem(db *sql.DB, table string, data map[string]any) error {
 	columns := make([]string, 0, len(data))
 	values := make([]any, 0, len(data))
 	placeholders := make([]string, 0, len(data))
@@ -222,7 +222,7 @@ func (d PostgresDriver) InsertValue(db *sql.DB, table string, data map[string]an
 	return err
 }
 
-func (d PostgresDriver) UpdateValue(db *sql.DB, table string, key map[string]any, data map[string]any) error {
+func (d PostgresDriver) UpdateItem(db *sql.DB, table string, key map[string]any, data map[string]any) error {
 	setClauses := make([]string, 0, len(data))
 	whereClauses := make([]string, 0, len(key))
 	values := make([]any, 0, len(data)+len(key))
@@ -251,7 +251,7 @@ func (d PostgresDriver) UpdateValue(db *sql.DB, table string, key map[string]any
 	return err
 }
 
-func (d PostgresDriver) DeleteValue(db *sql.DB, table string, key map[string]any) error {
+func (d PostgresDriver) DeleteItem(db *sql.DB, table string, key map[string]any) error {
 	whereClauses := make([]string, 0, len(key))
 	values := make([]any, 0, len(key))
 
@@ -268,4 +268,69 @@ func (d PostgresDriver) DeleteValue(db *sql.DB, table string, key map[string]any
 
 	_, err := db.Exec(query, values...)
 	return err
+}
+
+func (d PostgresDriver) InsertColumn(db *sql.DB, table string, column models.ColumnDefinition) error {
+	colType := strings.ToUpper(column.Type)
+
+	if column.AutoIncrement {
+		colType = "SERIAL"
+	} else if column.Length != nil {
+		colType = fmt.Sprintf("%s(%d)", colType, *column.Length)
+	}
+
+	query := fmt.Sprintf(
+		`ALTER TABLE "%s" ADD COLUMN "%s" %s`,
+		table,
+		column.Name,
+		colType,
+	)
+
+	if !column.Nullable {
+		query += " NOT NULL"
+	}
+
+	if column.DefaultValue != "" {
+		query += fmt.Sprintf(" DEFAULT '%s'", column.DefaultValue)
+	}
+
+	if _, err := db.Exec(query); err != nil {
+		return err
+	}
+
+	if column.Primary {
+		_, err := db.Exec(fmt.Sprintf(
+			`ALTER TABLE "%s" ADD PRIMARY KEY ("%s")`,
+			table,
+			column.Name,
+		))
+		if err != nil {
+			return err
+		}
+	}
+
+	if column.Unique {
+		_, err := db.Exec(fmt.Sprintf(
+			`ALTER TABLE "%s" ADD UNIQUE ("%s")`,
+			table,
+			column.Name,
+		))
+		if err != nil {
+			return err
+		}
+	}
+
+	if column.Comment != "" {
+		_, err := db.Exec(fmt.Sprintf(
+			`COMMENT ON COLUMN "%s"."%s" IS '%s'`,
+			table,
+			column.Name,
+			column.Comment,
+		))
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

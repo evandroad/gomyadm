@@ -42,7 +42,7 @@ export function SidebarTables({ selectedTable, setSelectedTable, setView }: Prop
             <button
               key={table}
               onClick={() => { setSelectedTable(table); setView("data") }}
-              className={`w-full text-left px-3 py-2 hover:bg-zinc-950 cursor-pointer ${selectedTable === table ? "bg-zinc-900" : ""}`}
+              className={`w-full text-left px-3 py-2 hover:bg-zinc-950 cursor-pointer ${selectedTable === table ? "bg-zinc-800" : ""}`}
             >
               {table}
             </button>

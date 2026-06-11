@@ -9,7 +9,7 @@ import type { ColumnSchema } from "@/models";
 import { useSchema } from "@/contexts/SchemaProvider";
 import { notify } from "@/utils";
 
-export default function TableForm() {
+export default function FormData() {
   const { activeDatabase } = useDatabase()
   const { activeSchema } = useSchema()
   const [formData, setFormData] = useState<Record<string, string>>({})
@@ -24,7 +24,7 @@ export default function TableForm() {
     }
 
     try {
-      const res = await fetch(`${API_URL}/api/tables`, {
+      const res = await fetch(`${API_URL}/api/tables/item`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

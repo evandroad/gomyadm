@@ -93,7 +93,29 @@ func (d MySQLDriver) TableStructure(db *sql.DB, table string) (*models.TableSche
 	return schema, nil
 }
 
-func (d MySQLDriver) SelectTable(db *sql.DB, table string) (*models.TableData, error) {
+func (d MySQLDriver) ListDatabases(db *sql.DB) ([]string, error) {
+	rows, err := db.Query(`SHOW DATABASES`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var databases []string
+
+	for rows.Next() {
+		var name string
+
+		if err := rows.Scan(&name); err != nil {
+			return nil, err
+		}
+
+		databases = append(databases, name)
+	}
+
+	return databases, nil
+}
+
+func (d MySQLDriver) GetAllItem(db *sql.DB, table string) (*models.TableData, error) {
 	query := fmt.Sprintf("SELECT * FROM %s LIMIT 100", table)
 	rows, err := db.Query(query)
 	if err != nil {
@@ -148,29 +170,7 @@ func (d MySQLDriver) SelectTable(db *sql.DB, table string) (*models.TableData, e
 	}, nil
 }
 
-func (d MySQLDriver) ListDatabases(db *sql.DB) ([]string, error) {
-	rows, err := db.Query(`SHOW DATABASES`)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var databases []string
-
-	for rows.Next() {
-		var name string
-
-		if err := rows.Scan(&name); err != nil {
-			return nil, err
-		}
-
-		databases = append(databases, name)
-	}
-
-	return databases, nil
-}
-
-func (d MySQLDriver) InsertValue(db *sql.DB, table string, data map[string]any) error {
+func (d MySQLDriver) InsertItem(db *sql.DB, table string, data map[string]any) error {
 	columns := make([]string, 0, len(data))
 	placeholders := make([]string, 0, len(data))
 	values := make([]any, 0, len(data))
@@ -192,7 +192,7 @@ func (d MySQLDriver) InsertValue(db *sql.DB, table string, data map[string]any) 
 	return err
 }
 
-func (d MySQLDriver) UpdateValue(db *sql.DB, table string, key map[string]any, data map[string]any) error {
+func (d MySQLDriver) UpdateItem(db *sql.DB, table string, key map[string]any, data map[string]any) error {
 	setClauses := make([]string, 0, len(data))
 	whereClauses := make([]string, 0, len(key))
 	values := make([]any, 0, len(data)+len(key))
@@ -218,7 +218,7 @@ func (d MySQLDriver) UpdateValue(db *sql.DB, table string, key map[string]any, d
 	return err
 }
 
-func (d MySQLDriver) DeleteValue(db *sql.DB, table string, key map[string]any) error {
+func (d MySQLDriver) DeleteItem(db *sql.DB, table string, key map[string]any) error {
 	whereClauses := make([]string, 0)
 	values := make([]any, 0, len(key))
 
@@ -234,5 +234,47 @@ func (d MySQLDriver) DeleteValue(db *sql.DB, table string, key map[string]any) e
 	)
 
 	_, err := db.Exec(query, values...)
+	return err
+}
+
+func (d MySQLDriver) InsertColumn(db *sql.DB, table string, column models.ColumnDefinition) error {
+	colType := strings.ToUpper(column.Type)
+
+	if column.Length != nil {
+		colType = fmt.Sprintf("%s(%d)", colType, *column.Length)
+	}
+
+	query := fmt.Sprintf(
+		"ALTER TABLE `%s` ADD COLUMN `%s` %s",
+		table,
+		column.Name,
+		colType,
+	)
+
+	if !column.Nullable {
+		query += " NOT NULL"
+	}
+
+	if column.AutoIncrement {
+		query += " AUTO_INCREMENT"
+	}
+
+	if column.Unique {
+		query += " UNIQUE"
+	}
+
+	if column.DefaultValue != "" {
+		query += fmt.Sprintf(" DEFAULT '%s'", column.DefaultValue)
+	}
+
+	if column.Comment != "" {
+		query += fmt.Sprintf(" COMMENT '%s'", column.Comment)
+	}
+
+	if column.Primary {
+		query += ", ADD PRIMARY KEY (`" + column.Name + "`)"
+	}
+
+	_, err := db.Exec(query)
 	return err
 }

@@ -29,6 +29,8 @@ func main() {
 	
 	connectionHandler := &api.ConnectionHandler{ Connection: manager }
 	schemaHandler := &api.SchemaHandler{ Connection: manager }
+	itemHandler := &api.ItemHandler{ Connection: manager }
+	columnHandler := &api.ColumnHandler{ Connection: manager }
 	queryHandler := &api.QueryHandler{ Connection: manager }
 
 	r.Get("/health", health)
@@ -49,11 +51,18 @@ func main() {
 
 		r.Route("/tables", func(r chi.Router) {
 			r.Get("/", schemaHandler.ListTables)
-			r.Get("/{table}", schemaHandler.SelectTable)
-			r.Get("/struct/{table}", schemaHandler.TableStructure)
-			r.Post("/", schemaHandler.InsertValue)
-			r.Put("/", schemaHandler.UpdateValue)
-			r.Delete("/", schemaHandler.DeleteValue)
+			
+			r.Route("/item", func(r chi.Router) {
+				r.Get("/{table}", itemHandler.GetAll)
+				r.Post("/", itemHandler.Insert)
+				r.Put("/", itemHandler.Update)
+				r.Delete("/", itemHandler.Delete)
+			})
+			
+			r.Route("/column", func(r chi.Router) {
+				r.Get("/{table}", columnHandler.GetSchema)
+				r.Post("/", columnHandler.Insert)
+			})
 		})
 
 		r.Post("/query", queryHandler.ExecuteQuery)

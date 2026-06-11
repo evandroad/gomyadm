@@ -30,7 +30,7 @@ export function ModalDeleteValue({ open, onClose, data }: Props) {
     }
 
     try {
-      const res = await fetch(`${API_URL}/api/tables`, {
+      const res = await fetch(`${API_URL}/api/tables/item`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)

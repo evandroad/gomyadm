@@ -9,10 +9,11 @@ import TableStructure from "@/layout/TableStructure"
 import { SidebarDisconnect } from "@/layout/SidebarDisconnect"
 import { useDatabase } from "@/contexts/DatabaseProvider"
 import { ContentSQL } from "@/layout/ContentSQL"
-import TableForm from "@/layout/TableForm"
+import FormData from "@/layout/FormData"
 import { useSchema } from "@/contexts/SchemaProvider"
+import FormColumn from "@/layout/FormColumn"
 
-export type View = "data" | "structure" | "form" | "sql"
+export type View = "data" | "structure" | "formData" | "formColumn" | "sql"
 
 export default function MainPage() {
   const { loading } = useConnection()
@@ -36,7 +37,8 @@ export default function MainPage() {
     switch (view) {
       case "data":
       case "structure":
-      case "form":
+      case "formData":
+      case "formColumn":
         if (!selectedTable) {
           return (
             <div className="text-zinc-500">{!activeDatabase ? 'Selecione uma base de dados' : 'Selecione uma tabela'}</div>
@@ -56,28 +58,35 @@ export default function MainPage() {
     const tabs = (<div className="flex w-fit border-b border-zinc-800 mb-2">
       <button onClick={() => setView("data")} className={getTabClass("data")}>Dados</button>
       <button onClick={() => setView("structure")} className={getTabClass("structure")}>Estrutura</button>
-      <button onClick={() => setView("form")} className={getTabClass("form")}>Inserir</button>
+      {(view == 'data' || view == 'formData') && 
+        <button onClick={() => setView("formData")} className={getTabClass("formData")}>Novo Item</button>
+      }
+      {(view == 'structure' || view == 'formColumn') && 
+        <button onClick={() => setView("formColumn")} className={getTabClass("formColumn")}>Nova Coluna</button>
+      }
     </div>)
+
+    let content = <div>Conteúdo não encontrado</div>
 
     switch (view) {
       case "data":
-        return (<>
-          {tabs}
-          <TablePreview table={selectedTable} />
-        </>)
+        content = <TablePreview table={selectedTable} />
+        break
       case "structure":
-        return (<>
-          {tabs}
-          <TableStructure />
-        </>)
-      case "form":
-        return (<>
-          {tabs}
-          <TableForm />
-        </>)
-      default:
-        return null
+        content = <TableStructure />
+        break
+      case "formData":
+        content = <FormData />
+        break
+      case "formColumn":
+        content = <FormColumn />
+        break
     }
+
+    return (<>
+      {tabs}
+      {content}
+    </>)
   }
 
   function getTabClass(tab: string) {
@@ -107,7 +116,7 @@ export default function MainPage() {
   return (
     <div className="min-h-screen flex bg-zinc-950 text-white">
       <aside className="bg-zinc-900 border-r border-zinc-800 flex flex-col relative" style={{ width: sidebarWidth }}>
-        <div className="p-3 font-bold border-b border-zinc-800">Gomyadm</div>
+        <div className="py-4 px-3 font-semibold text-lg border-b border-zinc-800">Gomyadm</div>
         <SidebarConnection />
         <SidebarDatabase />
         <SidebarTables selectedTable={selectedTable} setSelectedTable={setSelectedTable} setView={setView} />

@@ -2,9 +2,11 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/evandroad/gomyadm/internal/db"
+	"github.com/evandroad/gomyadm/internal/drivers"
 	"github.com/evandroad/gomyadm/internal/logger"
 	"github.com/evandroad/gomyadm/internal/models"
 	. "github.com/evandroad/gomyadm/internal/respond"
@@ -145,4 +147,19 @@ func (ch *ConnectionHandler) DeleteConnection(w http.ResponseWriter, r *http.Req
 	}
 
 	Success(w, http.StatusOK, H{ "message": "connection deleted" })
+}
+
+func getDriverAndConnection(cm *db.ConnectionManager) (drivers.Driver, *db.Connection, error) {
+	conn, err := cm.Get()
+	if err != nil {
+		logger.Error("Failed to get active connection: %v", err)
+		return nil, nil, err
+	}
+
+	driver, ok := drivers.GetDriver(conn.Config.Driver)
+	if !ok {
+		return nil, nil, fmt.Errorf("unsupported driver: %s", conn.Config.Driver)
+	}
+
+	return driver, conn, nil
 }

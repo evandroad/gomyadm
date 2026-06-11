@@ -34,7 +34,7 @@ export function ModalFormValue({ open, onClose, data }: Props) {
     }
     
     try {
-      const res = await fetch(`${API_URL}/api/tables`, {
+      const res = await fetch(`${API_URL}/api/tables/item`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
