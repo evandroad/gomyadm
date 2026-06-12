@@ -7,13 +7,14 @@ import { Button } from "@/components/button";
 import { Pencil, Trash } from "lucide-react";
 import { useState } from "react";
 import { ModalFormColumn } from "./ModalFormColumn";
+import { ModalDeleteColumn } from "./ModalDeleteColumn";
 
 export default function TableSchema() {
   const { activeDatabase } = useDatabase()
   const { activeSchema } = useSchema()
   const [selectedRow, setSelectedRow] = useState<Column | null>(null)
   const [openForm, setOpenForm] = useState(false)
-  const [/*openDelete*/, setOpenDelete] = useState(false)
+  const [openDelete, setOpenDelete] = useState(false)
 
   const COLUMNS_LABEL = ['Nome', 'Tipo', 'Tamanho', 'Nulo', 'Chave', 'Exclusivo', 'Auto Inc.','Padrão', 'Ações']
 
@@ -24,6 +25,7 @@ export default function TableSchema() {
   return (
     <>
       <ModalFormColumn open={openForm} onClose={() => setOpenForm(false)} data={selectedRow} />
+      <ModalDeleteColumn open={openDelete} onClose={() => setOpenDelete(false)} data={selectedRow} />
 
       <div>
         <table className="w-full text-sm text-left">
