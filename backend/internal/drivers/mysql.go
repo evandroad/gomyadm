@@ -3,6 +3,8 @@ package drivers
 import (
 	"database/sql"
 	"fmt"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -50,47 +52,6 @@ func (d MySQLDriver) ListTables(db *sql.DB) ([]string, error) {
 	}
 
 	return tables, nil
-}
-
-func (d MySQLDriver) TableStructure(db *sql.DB, table string) (*models.TableSchema, error) {
-	query := `
-		SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_KEY, COLUMN_DEFAULT, EXTRA
-		FROM information_schema.columns
-		WHERE table_schema = DATABASE()
-		AND table_name = ?
-		ORDER BY ORDINAL_POSITION
-	`
-
-	rows, err := db.Query(query, table)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	schema := &models.TableSchema{
-		Name: table,
-	}
-
-	for rows.Next() {
-		var col models.ColumnSchema
-		var nullable string
-		var defaultValue sql.NullString
-
-		err := rows.Scan(&col.Name, &col.Type, &nullable, &col.Key, &defaultValue, &col.Extra)
-		if err != nil {
-			return nil, err
-		}
-
-		col.Nullable = nullable == "YES"
-		col.AutoNumber = strings.Contains(col.Extra, "auto_increment")
-		if defaultValue.Valid {
-			col.Default = defaultValue.String
-		}
-
-		schema.Columns = append(schema.Columns, col)
-	}
-
-	return schema, nil
 }
 
 func (d MySQLDriver) ListDatabases(db *sql.DB) ([]string, error) {
@@ -237,6 +198,78 @@ func (d MySQLDriver) DeleteItem(db *sql.DB, table string, key map[string]any) er
 	return err
 }
 
+func (d MySQLDriver) GetAllColumn(db *sql.DB, table string) (*models.TableSchema, error) {
+	query := `
+		SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_KEY, COLUMN_DEFAULT, EXTRA
+		FROM information_schema.columns
+		WHERE table_schema = DATABASE()
+		AND table_name = ?
+		ORDER BY ORDINAL_POSITION
+	`
+
+	rows, err := db.Query(query, table)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	schema := &models.TableSchema{
+		Name: table,
+	}
+
+	for rows.Next() {
+		var col models.ColumnDefinition
+		var nullable string
+		var key string
+		var extra string
+		var columnType string
+		var defaultValue sql.NullString
+
+		err := rows.Scan(&col.Name, &columnType, &nullable, &key, &defaultValue, &extra)
+		if err != nil {
+			return nil, err
+		}
+
+		col.Type = extractBaseType(columnType)
+		col.Length = extractLength(columnType)
+		col.Nullable = nullable == "YES"
+		col.Primary = key == "PRI"
+		col.Unique = key == "UNI"
+		col.AutoIncrement = strings.Contains(extra, "auto_increment")
+		if defaultValue.Valid {
+			col.DefaultValue = defaultValue.String
+		}
+
+		schema.Columns = append(schema.Columns, col)
+	}
+
+	return schema, nil
+}
+
+func extractBaseType(columnType string) string {
+	if idx := strings.Index(columnType, "("); idx != -1 {
+		return strings.ToUpper(columnType[:idx])
+	}
+
+	return strings.ToUpper(columnType)
+}
+
+func extractLength(columnType string) *int {
+	re := regexp.MustCompile(`\((\d+)`)
+	match := re.FindStringSubmatch(columnType)
+
+	if len(match) < 2 {
+		return nil
+	}
+
+	n, err := strconv.Atoi(match[1])
+	if err != nil {
+		return nil
+	}
+
+	return &n
+}
+
 func (d MySQLDriver) InsertColumn(db *sql.DB, table string, column models.ColumnDefinition) error {
 	colType := strings.ToUpper(column.Type)
 
@@ -267,8 +300,42 @@ func (d MySQLDriver) InsertColumn(db *sql.DB, table string, column models.Column
 		query += fmt.Sprintf(" DEFAULT '%s'", column.DefaultValue)
 	}
 
-	if column.Comment != "" {
-		query += fmt.Sprintf(" COMMENT '%s'", column.Comment)
+	if column.Primary {
+		query += ", ADD PRIMARY KEY (`" + column.Name + "`)"
+	}
+
+	_, err := db.Exec(query)
+	return err
+}
+
+func (d MySQLDriver) UpdateColumn(db *sql.DB, table string, oldName string, column models.ColumnDefinition) error {
+	colType := strings.ToUpper(column.Type)
+
+	if column.Length != nil {
+		colType = fmt.Sprintf("%s(%d)", colType, *column.Length)
+	}
+
+	query := fmt.Sprintf(
+		"ALTER TABLE `%s` MODIFY COLUMN `%s` %s",
+		table,
+		oldName,
+		colType,
+	)
+
+	if !column.Nullable {
+		query += " NOT NULL"
+	}
+
+	if column.AutoIncrement {
+		query += " AUTO_INCREMENT"
+	}
+
+	if column.Unique {
+		query += " UNIQUE"
+	}
+
+	if column.DefaultValue != "" {
+		query += fmt.Sprintf(" DEFAULT '%s'", column.DefaultValue)
 	}
 
 	if column.Primary {

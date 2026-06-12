@@ -1,21 +1,21 @@
 import { useDatabase } from "@/contexts/DatabaseProvider";
 import { Th } from "@/components/th";
 import { Td } from "@/components/td";
-import type { Values } from "@/models";
+import type { Column } from "@/models";
 import { useSchema } from "@/contexts/SchemaProvider";
 import { Button } from "@/components/button";
 import { Pencil, Trash } from "lucide-react";
 import { useState } from "react";
+import { ModalFormColumn } from "./ModalFormColumn";
 
-export default function TableStructure() {
+export default function TableSchema() {
   const { activeDatabase } = useDatabase()
   const { activeSchema } = useSchema()
-  const [/*selectedRow*/, setSelectedRow] = useState<Values | null>(null)
-  const [/*openForm*/, setOpenForm] = useState(false)
+  const [selectedRow, setSelectedRow] = useState<Column | null>(null)
+  const [openForm, setOpenForm] = useState(false)
   const [/*openDelete*/, setOpenDelete] = useState(false)
 
-  const COLUMNS_LABEL = ['Nome', 'Tipo', 'Nulo', 'Chave', 'Padrão', 'Extra', 'Ações']
-  const COLUMNS = ['name', 'type', 'nullable', 'key', 'default', 'extra']
+  const COLUMNS_LABEL = ['Nome', 'Tipo', 'Tamanho', 'Nulo', 'Chave', 'Exclusivo', 'Auto Inc.','Padrão', 'Ações']
 
   if (!activeSchema) {
     return <div className="text-zinc-500">{ activeDatabase ? 'Carregando schema...' : 'Selecione uma base de dados' }</div>
@@ -23,6 +23,8 @@ export default function TableStructure() {
 
   return (
     <>
+      <ModalFormColumn open={openForm} onClose={() => setOpenForm(false)} data={selectedRow} />
+
       <div>
         <table className="w-full text-sm text-left">
           <thead className="bg-zinc-900 border-b border-zinc-800">
@@ -30,11 +32,17 @@ export default function TableStructure() {
               {COLUMNS_LABEL.map((column, index) => <Th key={String(index)}>{column}</Th>)}
             </tr>
           </thead>
-
           <tbody>
-            {activeSchema?.columns.map((row: Values, index: number) => (
+            {activeSchema?.columns.map((row: Column, index: number) => (
               <tr key={index} className="border-b border-zinc-800 hover:bg-zinc-900/50">
-                {COLUMNS.map((column) => <Td key={column}>{String(row[column])}</Td>)}
+                <Td>{row.name}</Td>
+                <Td>{row.type}</Td>
+                <Td>{row.length ?? ''}</Td>
+                <Td>{row.nullable ? 'V' : ''}</Td>
+                <Td>{row.primary ? 'V' : ''}</Td>
+                <Td>{row.unique ? 'V' : ''}</Td>
+                <Td>{row.autoIncrement ? 'V' : ''}</Td>
+                <Td>{row.defaultValue}</Td>
                 <Td>
                   <div className="space-x-2">
                     <Button variant="primary" sm onClick={() => { setSelectedRow(row); setOpenForm(true) }}>

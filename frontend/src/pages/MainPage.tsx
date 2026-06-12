@@ -5,7 +5,7 @@ import { useConnection } from "@/contexts/ConnectionProvider"
 import { SidebarDatabase } from "@/layout/SidebarDatabase"
 import { SidebarTables } from "@/layout/SidebarTables"
 import { Toolbar } from "@/layout/Toolbar"
-import TableStructure from "@/layout/TableStructure"
+import TableSchema from "@/layout/TableSchema"
 import { SidebarDisconnect } from "@/layout/SidebarDisconnect"
 import { useDatabase } from "@/contexts/DatabaseProvider"
 import { ContentSQL } from "@/layout/ContentSQL"
@@ -73,7 +73,7 @@ export default function MainPage() {
         content = <TablePreview table={selectedTable} />
         break
       case "structure":
-        content = <TableStructure />
+        content = <TableSchema />
         break
       case "formData":
         content = <FormData />

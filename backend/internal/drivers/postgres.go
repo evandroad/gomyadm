@@ -59,64 +59,6 @@ func (d PostgresDriver) ListTables(db *sql.DB) ([]string, error) {
 	return tables, nil
 }
 
-func (d PostgresDriver) TableStructure(db *sql.DB, table string) (*models.TableSchema, error) {
-	query := `
-		SELECT
-    c.column_name,
-    c.data_type,
-    c.is_nullable,
-    c.column_default,
-    CASE
-        WHEN tc.constraint_type = 'PRIMARY KEY' THEN 'PRI'
-        WHEN tc.constraint_type = 'UNIQUE' THEN 'UNI'
-        ELSE ''
-    END AS column_key
-		FROM information_schema.columns c
-		LEFT JOIN information_schema.key_column_usage kcu
-				ON c.table_name = kcu.table_name
-			AND c.column_name = kcu.column_name
-		LEFT JOIN information_schema.table_constraints tc
-				ON kcu.constraint_name = tc.constraint_name
-		WHERE c.table_schema = 'public'
-			AND c.table_name = $1
-		ORDER BY c.ordinal_position;
-	`
-
-	rows, err := db.Query(query, table)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	schema := &models.TableSchema{
-		Name: table,
-	}
-
-	for rows.Next() {
-		var col models.ColumnSchema
-		var nullable string
-		var defaultValue sql.NullString
-
-		err := rows.Scan(&col.Name, &col.Type, &nullable, &defaultValue, &col.Key)
-		if err != nil {
-			return nil, err
-		}
-
-		col.Nullable = nullable == "YES"
-		if defaultValue.Valid {
-			col.Default = defaultValue.String
-		}
-
-		if strings.Contains(defaultValue.String, "nextval(") {
-			col.AutoNumber = true
-		}
-
-		schema.Columns = append(schema.Columns, col)
-	}
-
-	return schema, nil
-}
-
 func (d PostgresDriver) ListDatabases(db *sql.DB) ([]string, error) {
 	rows, err := db.Query(`
 		SELECT datname
@@ -270,6 +212,75 @@ func (d PostgresDriver) DeleteItem(db *sql.DB, table string, key map[string]any)
 	return err
 }
 
+func (d PostgresDriver) GetAllColumn(db *sql.DB, table string) (*models.TableSchema, error) {
+	query := `
+		SELECT
+			c.column_name,
+			c.data_type,
+			c.character_maximum_length,
+			c.is_nullable,
+			c.column_default,
+			c.is_identity,
+			CASE
+					WHEN tc.constraint_type = 'PRIMARY KEY' THEN 'PRI'
+					WHEN tc.constraint_type = 'UNIQUE' THEN 'UNI'
+					ELSE ''
+			END AS column_key
+		FROM information_schema.columns c
+		LEFT JOIN information_schema.key_column_usage kcu
+			ON c.table_name = kcu.table_name
+			AND c.column_name = kcu.column_name
+		LEFT JOIN information_schema.table_constraints tc
+			ON kcu.constraint_name = tc.constraint_name
+		WHERE c.table_schema = 'public'
+			AND c.table_name = $1
+		ORDER BY c.ordinal_position;
+	`
+
+	rows, err := db.Query(query, table)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	schema := &models.TableSchema{
+		Name: table,
+	}
+
+	for rows.Next() {
+		var col models.ColumnDefinition
+		var nullable string
+		var key string
+		var isIdentity string
+		var length sql.NullInt64
+		var defaultValue sql.NullString
+
+		err := rows.Scan(&col.Name, &col.Type, &length, &nullable, &defaultValue, &isIdentity, &key)
+		if err != nil {
+			return nil, err
+		}
+
+		if length.Valid {
+			l := int(length.Int64)
+			col.Length = &l
+		}
+
+		col.Nullable = nullable == "YES"
+		col.Primary = key == "PRI"
+		col.Unique = key == "UNI"
+
+		if defaultValue.Valid {
+			col.DefaultValue = defaultValue.String
+		}
+
+		col.AutoIncrement = isIdentity == "YES" || (defaultValue.Valid && strings.Contains(defaultValue.String, "nextval("))
+
+		schema.Columns = append(schema.Columns, col)
+	}
+
+	return schema, nil
+}
+
 func (d PostgresDriver) InsertColumn(db *sql.DB, table string, column models.ColumnDefinition) error {
 	colType := strings.ToUpper(column.Type)
 
@@ -320,12 +331,53 @@ func (d PostgresDriver) InsertColumn(db *sql.DB, table string, column models.Col
 		}
 	}
 
-	if column.Comment != "" {
+	return nil
+}
+
+func (d PostgresDriver) UpdateColumn(db *sql.DB, table string, oldName string, column models.ColumnDefinition) error {
+	colType := strings.ToUpper(column.Type)
+
+	if column.AutoIncrement {
+		colType = "SERIAL"
+	} else if column.Length != nil {
+		colType = fmt.Sprintf("%s(%d)", colType, *column.Length)
+	}
+
+	query := fmt.Sprintf(
+		`ALTER TABLE "%s" ADD COLUMN "%s" %s`,
+		table,
+		column.Name,
+		colType,
+	)
+
+	if !column.Nullable {
+		query += " NOT NULL"
+	}
+
+	if column.DefaultValue != "" {
+		query += fmt.Sprintf(" DEFAULT '%s'", column.DefaultValue)
+	}
+
+	if _, err := db.Exec(query); err != nil {
+		return err
+	}
+
+	if column.Primary {
 		_, err := db.Exec(fmt.Sprintf(
-			`COMMENT ON COLUMN "%s"."%s" IS '%s'`,
+			`ALTER TABLE "%s" ADD PRIMARY KEY ("%s")`,
 			table,
 			column.Name,
-			column.Comment,
+		))
+		if err != nil {
+			return err
+		}
+	}
+
+	if column.Unique {
+		_, err := db.Exec(fmt.Sprintf(
+			`ALTER TABLE "%s" ADD UNIQUE ("%s")`,
+			table,
+			column.Name,
 		))
 		if err != nil {
 			return err

@@ -6,37 +6,26 @@ import { Label } from "@/components/label"
 import ModalBase from "@/components/modalBase"
 import { Select } from "@/components/select"
 import { useSchema } from "@/contexts/SchemaProvider"
-import { ColumnTypes, createColumn, type Column, type Values } from "@/models"
-import { castValue } from "@/tableUtils"
+import { ColumnTypes, createColumn, type Column } from "@/models"
 import { notify } from "@/utils"
 import { useEffect, useState } from "react"
 
 type Props = {
   open: boolean
   onClose: () => void
-  data: Values
+  data: Column | null
 }
 
 export function ModalFormColumn({ open, onClose, data }: Props) {
-  const [formData, setFormData] = useState<Values>({})
   const { activeSchema } = useSchema()
   const [column, setColumn] = useState<Column>(createColumn())
 
   async function handleSubmit() {
     if (!activeSchema) return
-    const primaryKeys = activeSchema.columns.filter((col: any) => col.key === "PRI")
-    const payload = {
-      table: activeSchema.name,
-      key: Object.fromEntries(primaryKeys.map((column: any) => [column.name, castValue(formData[column.name], column.type)])),
-      values: Object.fromEntries(
-        activeSchema.columns
-          .filter((col: any) => col.key !== "PRI")
-          .map((column: any) => [column.name, castValue(formData[column.name], column.type)])
-      )
-    }
+    const payload = { table: activeSchema.name, column }
     
     try {
-      const res = await fetch(`${API_URL}/api/tables/item`, {
+      const res = await fetch(`${API_URL}/api/tables/column`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -49,7 +38,6 @@ export function ModalFormColumn({ open, onClose, data }: Props) {
       }
 
       notify("Dado alterado com sucesso!")
-      setFormData({})
     } catch (err: any) {
       console.error(err)
       notify(`Erro: ${err.message || 'Falha ao alterar o dado'}`, 'error')
@@ -60,7 +48,7 @@ export function ModalFormColumn({ open, onClose, data }: Props) {
 
   useEffect(() => {
     if (!open) return
-    setFormData(data)
+    if (data) setColumn(data)
   }, [open])
 
   return (
@@ -71,7 +59,7 @@ export function ModalFormColumn({ open, onClose, data }: Props) {
         </CardHeader>
         <CardContent>
           <div className="p-2 w-full space-y-4">
-            <Label>Name</Label>
+            <Label>Nome</Label>
             <Input value={column.name} onChange={(e) => setColumn({ ...column, name: e.target.value })} />
       
             <Label>Tipo</Label>
@@ -129,8 +117,6 @@ export function ModalFormColumn({ open, onClose, data }: Props) {
                 />
               </div>
             </div>
-      
-            <Button onClick={handleSubmit} variant="primary">Salvar</Button>
           </div>
         </CardContent>
         <CardFooter>

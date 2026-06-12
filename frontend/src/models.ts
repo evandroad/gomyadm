@@ -27,16 +27,6 @@ export function createConnection(data?: Partial<Connection>): Connection {
   }
 }
 
-export type ColumnSchema = {
-	name:       string
-	type:       string
-	nullable:   boolean
-	key:        string
-	default:    string
-	extra:      string
-	autoNumber: boolean
-}
-
 export type Column = {
   name: string
   type: string
@@ -62,11 +52,11 @@ export function createColumn(data?: Partial<Column>): Column {
   }
 }
 
-export const ColumnTypes = ["varchar", "text", "integer", "bigint", "decimal", "boolean", "date", "datetime"]
+export const ColumnTypes = ["VARCHAR", "TEXT", "INT", "BIGINT", "DECIMAL", "BOOLEAN", "DATE", "DATETIME"]
 
 export type TableSchema = {
   name:    string
-  columns: ColumnSchema[]
+  columns: Column[]
 }
 
 export type TableData = {

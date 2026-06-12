@@ -15,7 +15,7 @@ type ColumnHandler struct {
 	Connection *db.ConnectionManager
 }
 
-func (h *ColumnHandler) GetSchema(w http.ResponseWriter, r *http.Request) {
+func (h *ColumnHandler) GetAllColumn(w http.ResponseWriter, r *http.Request) {
 	table := chi.URLParam(r, "table")
 
 	driver, conn, err := getDriverAndConnection(h.Connection)
@@ -25,7 +25,7 @@ func (h *ColumnHandler) GetSchema(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	schema, err := driver.TableStructure(conn.DB, table)
+	schema, err := driver.GetAllColumn(conn.DB, table)
 	if err != nil {
 		logger.Error("Failed to describe table: %v", err)
 		Error(w, http.StatusInternalServerError, "Failed to describe table", nil)
@@ -56,6 +56,37 @@ func (h *ColumnHandler) Insert(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = driver.InsertColumn(conn.DB, req.Table, req.Values)
+	if err != nil {
+		logger.Error("Failed to insert data: %v", err)
+		Error(w, http.StatusInternalServerError, "Failed to insert data", nil)
+		return
+	}
+
+	Success(w, http.StatusOK, nil)
+}
+
+func (h *ColumnHandler) Update(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		Table   string         			    `json:"table"`
+		OldName string                  `json:"oldName"`
+		Column  models.ColumnDefinition `json:"column"`
+	}
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		logger.Error("Failed to decode request body: %v", err)
+		Error(w, http.StatusBadRequest, "Invalid request body", nil)
+		return
+	}
+
+	driver, conn, err := getDriverAndConnection(h.Connection)
+	if err != nil {
+		logger.Error("Failed to get driver and connection: %v", err)
+		Error(w, http.StatusInternalServerError, "Failed to get driver and connection", nil)
+		return
+	}
+
+	err = driver.UpdateColumn(conn.DB, req.Table, req.OldName, req.Column)
 	if err != nil {
 		logger.Error("Failed to insert data: %v", err)
 		Error(w, http.StatusInternalServerError, "Failed to insert data", nil)

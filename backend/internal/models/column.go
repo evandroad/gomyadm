@@ -9,5 +9,4 @@ type ColumnDefinition struct {
 	Unique        bool   `json:"unique"`
 	AutoIncrement bool   `json:"autoIncrement"`
 	DefaultValue  string `json:"defaultValue"`
-	Comment       string `json:"comment"`
 }
