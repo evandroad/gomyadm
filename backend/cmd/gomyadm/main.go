@@ -60,9 +60,10 @@ func main() {
 			})
 			
 			r.Route("/column", func(r chi.Router) {
-				r.Get("/{table}", columnHandler.GetAllColumn)
+				r.Get("/{table}", columnHandler.GetAll)
 				r.Post("/", columnHandler.Insert)
 				r.Put("/", columnHandler.Update)
+				r.Delete("/{table}/{column}", columnHandler.Delete)
 			})
 		})
 

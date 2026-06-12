@@ -286,6 +286,6 @@ Bottom
 - [] Excluir tabela
 - [x] Criar coluna
 - [x] Editar coluna
-- [] Excluir coluna
+- [x] Excluir coluna
 - [] Visualizar índices
 - [x] Executar SQL livre

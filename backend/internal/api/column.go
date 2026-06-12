@@ -15,7 +15,7 @@ type ColumnHandler struct {
 	Connection *db.ConnectionManager
 }
 
-func (h *ColumnHandler) GetAllColumn(w http.ResponseWriter, r *http.Request) {
+func (h *ColumnHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	table := chi.URLParam(r, "table")
 
 	driver, conn, err := getDriverAndConnection(h.Connection)
@@ -90,6 +90,27 @@ func (h *ColumnHandler) Update(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logger.Error("Failed to insert data: %v", err)
 		Error(w, http.StatusInternalServerError, "Failed to insert data", nil)
+		return
+	}
+
+	Success(w, http.StatusOK, nil)
+}
+
+func (h *ColumnHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	table := chi.URLParam(r, "table")
+	column := chi.URLParam(r, "column")
+
+	driver, conn, err := getDriverAndConnection(h.Connection)
+	if err != nil {
+		logger.Error("Failed to get driver and connection: %v", err)
+		Error(w, http.StatusInternalServerError, "Failed to get driver and connection", nil)
+		return
+	}
+
+	err = driver.DeleteColumn(conn.DB, table, column)
+	if err != nil {
+		logger.Error("Failed to describe table: %v", err)
+		Error(w, http.StatusInternalServerError, "Failed to describe table", nil)
 		return
 	}
 

@@ -386,3 +386,14 @@ func (d PostgresDriver) UpdateColumn(db *sql.DB, table string, oldName string, c
 
 	return nil
 }
+
+func (d PostgresDriver) DeleteColumn(db *sql.DB, table string, column string) error {
+	query := fmt.Sprintf(
+		"ALTER TABLE `%s` DROP COLUMN `%s`",
+		table,
+		column,
+	)
+
+	_, err := db.Exec(query)
+	return err
+}

@@ -346,3 +346,14 @@ func (d MySQLDriver) UpdateColumn(db *sql.DB, table string, oldName string, colu
 	_, err := db.Exec(query)
 	return err
 }
+
+func (d MySQLDriver) DeleteColumn(db *sql.DB, table string, column string) error {
+	query := fmt.Sprintf(
+		"ALTER TABLE `%s` DROP COLUMN `%s`",
+		table,
+		column,
+	)
+
+	_, err := db.Exec(query)
+	return err
+}

@@ -20,4 +20,5 @@ type Driver interface {
 	GetAllColumn(db *sql.DB, table string) (*models.TableSchema, error)
 	InsertColumn(db *sql.DB, table string, column models.ColumnDefinition) error
 	UpdateColumn(db *sql.DB, table string, oldName string, column models.ColumnDefinition) error
+	DeleteColumn(db *sql.DB, table string, column string) error
 }
