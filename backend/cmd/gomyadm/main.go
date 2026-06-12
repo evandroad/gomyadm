@@ -41,10 +41,10 @@ func main() {
 			r.Post("/disconnect", connectionHandler.Disconnect)
 			r.Get("/active", connectionHandler.Active)
 
-			r.Get("/", connectionHandler.GetAllConnections)
-			r.Post("/", connectionHandler.InsertConnection)
-			r.Put("/", connectionHandler.UpdateConnection)
-			r.Delete("/{id}", connectionHandler.DeleteConnection)	
+			r.Get("/", connectionHandler.GetAll)
+			r.Post("/", connectionHandler.Insert)
+			r.Put("/", connectionHandler.Update)
+			r.Delete("/{id}", connectionHandler.Delete)	
 		})
 
 		r.Post("/database/select", connectionHandler.SelectDatabase)

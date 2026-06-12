@@ -1,11 +1,11 @@
 #!/usr/bin/sh
 
-. "$(dirname "$0")/common.sh"
+. "$(dirname "$0")/../common.sh"
 
 curl \
-  --request POST \
-  --header "Content-Type: application/json" \
-  --data '{
+  -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
     "driver": "mysql",
     "host": "127.0.0.1",
     "port": 3306,

@@ -18,7 +18,7 @@ export default function FormColumn() {
     if (!activeSchema) return
 
     const values = { ...column, length: column.length === "" ? undefined : Number(column.length) }
-    const payload = { table: activeSchema.name, values }
+    const payload = { table: activeSchema.name, column: values }
 
     try {
       const res = await fetch(`${API_URL}/api/tables/column`, {

@@ -4,10 +4,6 @@
 
 echo "Testing GET /health"
 
-curl \
-  --silent \
-  --show-error \
-  --location \
-  "$BASE_URL/health"
+curl -sS "$BASE_URL/health"
 
 echo ""

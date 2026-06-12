@@ -5,9 +5,6 @@
 URI="api/tables"
 echo "Testing GET /$URI"
 
-curl \
-  --silent \
-  --show-error \
-  "$BASE_URL/$URI"
+curl -sS "$BASE_URL/$URI"
 
 echo ""

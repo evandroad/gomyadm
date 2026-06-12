@@ -89,12 +89,12 @@ func (ch *ConnectionHandler) SelectDatabase(w http.ResponseWriter, r *http.Reque
 	Success(w, http.StatusOK, H{ "message": "Database " + req.Database + " selected successfully" })
 }
 
-func (ch *ConnectionHandler) GetAllConnections(w http.ResponseWriter, r *http.Request) {
+func (ch *ConnectionHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	connections := storage.GetConnectionsStore().List()
 	JSON(w, http.StatusOK, connections)
 }
 
-func (ch *ConnectionHandler) InsertConnection(w http.ResponseWriter, r *http.Request) {
+func (ch *ConnectionHandler) Insert(w http.ResponseWriter, r *http.Request) {
 	var cfg models.ConnectionConfig
 
 	err := json.NewDecoder(r.Body).Decode(&cfg)
@@ -116,7 +116,7 @@ func (ch *ConnectionHandler) InsertConnection(w http.ResponseWriter, r *http.Req
 	})
 }
 
-func (ch *ConnectionHandler) UpdateConnection(w http.ResponseWriter, r *http.Request) {
+func (ch *ConnectionHandler) Update(w http.ResponseWriter, r *http.Request) {
 	var cfg models.ConnectionConfig
 
 	err := json.NewDecoder(r.Body).Decode(&cfg)
@@ -136,7 +136,7 @@ func (ch *ConnectionHandler) UpdateConnection(w http.ResponseWriter, r *http.Req
 	JSON(w, http.StatusOK, map[string]any{"message": "connection updated"})
 }
 
-func (ch *ConnectionHandler) DeleteConnection(w http.ResponseWriter, r *http.Request) {
+func (ch *ConnectionHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
 	err := storage.GetConnectionsStore().Delete(id)

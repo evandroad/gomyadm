@@ -1,11 +1,12 @@
 #!/usr/bin/sh
 
-. "$(dirname "$0")/common.sh"
+. "$(dirname "$0")/../common.sh"
 
 curl \
-  --request POST \
-  --header "Content-Type: application/json" \
-  --data '{
+  -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": "d8m2va6sd8766cdpbnm0",
     "name": "super-api",
     "driver": "mysql",
     "host": "localhost",

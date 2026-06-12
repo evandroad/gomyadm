@@ -276,8 +276,16 @@ Bottom
 
 ## Features
 
-* salvar conexão
-* conectar
-* listar tabelas
-* executar SELECT
-* mostrar grid
+- [x] salvar conexão
+- [x] conectar
+- [x] listar tabelas
+- [x] executar SELECT
+- [x] mostrar grid
+- [] Criar tabela
+- [] Renomear tabela
+- [] Excluir tabela
+- [x] Criar coluna
+- [x] Editar coluna
+- [] Excluir coluna
+- [] Visualizar índices
+- [x] Executar SQL livre

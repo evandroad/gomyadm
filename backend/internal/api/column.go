@@ -38,13 +38,13 @@ func (h *ColumnHandler) GetAllColumn(w http.ResponseWriter, r *http.Request) {
 func (h *ColumnHandler) Insert(w http.ResponseWriter, r *http.Request) {
 	var req struct {
 		Table  string         			   `json:"table"`
-		Values models.ColumnDefinition `json:"values"`
+		Column models.ColumnDefinition `json:"column"`
 	}
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		logger.Error("Failed to decode request body: %v", err)
-		Error(w, http.StatusBadRequest, "Invalid request body", nil)
+		Error(w, http.StatusBadRequest, "Invalid request body", err.Error())
 		return
 	}
 
@@ -55,10 +55,10 @@ func (h *ColumnHandler) Insert(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = driver.InsertColumn(conn.DB, req.Table, req.Values)
+	err = driver.InsertColumn(conn.DB, req.Table, req.Column)
 	if err != nil {
 		logger.Error("Failed to insert data: %v", err)
-		Error(w, http.StatusInternalServerError, "Failed to insert data", nil)
+		Error(w, http.StatusInternalServerError, "Failed to insert data", err)
 		return
 	}
 
