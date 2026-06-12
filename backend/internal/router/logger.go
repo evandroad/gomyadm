@@ -57,7 +57,7 @@ func Logger(next http.Handler) http.Handler {
 		if sw.status >= 400 { statusColor = yellow }
 		if sw.status >= 500 { statusColor = red }
 
-		fmt.Printf("[DKM] %s | %s%s%s from %s - %s%d%s %s↓%s ↑%s%s in %s%s%s\n",
+		fmt.Printf("%s | %s%s%s from %s - %s%d%s %s↓%s ↑%s%s in %s%s%s\n",
 			time.Now().Format("06/01/02 15:04:05.000"),
 			cyan, r.Method + " " + r.URL.String(), reset,
 			r.RemoteAddr,

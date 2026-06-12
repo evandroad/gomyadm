@@ -316,9 +316,10 @@ func (d MySQLDriver) UpdateColumn(db *sql.DB, table string, oldName string, colu
 	}
 
 	query := fmt.Sprintf(
-		"ALTER TABLE `%s` MODIFY COLUMN `%s` %s",
+		"ALTER TABLE `%s` CHANGE COLUMN `%s` `%s` %s",
 		table,
 		oldName,
+		column.Name,
 		colType,
 	)
 

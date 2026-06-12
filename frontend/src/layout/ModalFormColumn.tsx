@@ -19,10 +19,12 @@ type Props = {
 export function ModalFormColumn({ open, onClose, data }: Props) {
   const { activeSchema } = useSchema()
   const [column, setColumn] = useState<Column>(createColumn())
+  const [oldName, setOldName] = useState<string>('')
 
   async function handleSubmit() {
     if (!activeSchema) return
-    const payload = { table: activeSchema.name, column }
+    const value = { ...column, length: Number(column.length) }
+    const payload = { table: activeSchema.name, oldName, column: value }
     
     try {
       const res = await fetch(`${API_URL}/api/tables/column`, {
@@ -48,7 +50,10 @@ export function ModalFormColumn({ open, onClose, data }: Props) {
 
   useEffect(() => {
     if (!open) return
-    if (data) setColumn(data)
+    if (data) {
+      setColumn(data)
+      setOldName(data.name)
+    }
   }, [open])
 
   return (

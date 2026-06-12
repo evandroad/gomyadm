@@ -1,5 +1,9 @@
 package models
 
+import (
+	"encoding/json"
+)
+
 type ColumnDefinition struct {
 	Name          string `json:"name"`
 	Type          string `json:"type"`
@@ -9,4 +13,9 @@ type ColumnDefinition struct {
 	Unique        bool   `json:"unique"`
 	AutoIncrement bool   `json:"autoIncrement"`
 	DefaultValue  string `json:"defaultValue"`
+}
+
+func (c *ColumnDefinition) ToString() string {
+	v, _ := json.Marshal(c)
+	return string(v)
 }
