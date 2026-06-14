@@ -5,7 +5,7 @@ import { Input } from "@/components/input"
 import { Label } from "@/components/label"
 import ModalBase from "@/components/modalBase"
 import { useSchema } from "@/contexts/SchemaProvider"
-import type { ColumnSchema, Values } from "@/models"
+import type { Column, Values } from "@/models"
 import { castValue, getInputType } from "@/tableUtils"
 import { notify } from "@/utils"
 import { useEffect, useState } from "react"
@@ -22,10 +22,10 @@ export function ModalFormItem({ open, onClose, data }: Props) {
 
   async function handleSubmit() {
     if (!activeSchema) return
-    const primaryKeys = activeSchema.columns.filter((col: any) => col.key === "PRI")
+    const primaryKeys = activeSchema.columns.filter((col: Column) => col.primary)
     const payload = {
       table: activeSchema.name,
-      key: Object.fromEntries(primaryKeys.map((column: any) => [column.name, castValue(formData[column.name], column.type)])),
+      key: Object.fromEntries(primaryKeys.map((column: Column) => [column.name, castValue(formData[column.name], column.type)])),
       values: Object.fromEntries(
         activeSchema.columns
           .filter((col: any) => col.key !== "PRI")
@@ -69,13 +69,13 @@ export function ModalFormItem({ open, onClose, data }: Props) {
         </CardHeader>
         <CardContent>
           <div className="p-2 w-full space-y-4">
-            {activeSchema?.columns.map((column: ColumnSchema) => (
+            {activeSchema?.columns.map((column: Column) => (
               <div key={column.name}>
                 <Label>{column.name}</Label>
                 <Input
                   type={getInputType(column.type)}
                   required={!column.nullable}
-                  disabled={column.autoNumber}
+                  disabled={column.autoIncrement}
                   value={formData[column.name] || ""}
                   onChange={(e) => setFormData(prev => ({ ...prev, [column.name]: e.target.value }))}
                 />

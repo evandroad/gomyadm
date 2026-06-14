@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Label } from "@/components/label"
 import ModalBase from "@/components/modalBase"
 import { useSchema } from "@/contexts/SchemaProvider"
-import type { Values } from "@/models"
+import type { Column, Values } from "@/models"
 import { castValue } from "@/tableUtils"
 import { notify } from "@/utils"
 import { useEffect } from "react"
@@ -21,7 +21,7 @@ export function ModalDeleteItem({ open, onClose, data }: Props) {
   async function saveConnection() {
     if (!activeSchema) return
 
-    const primaryKeys = activeSchema.columns.filter((col: any) => col.key === "PRI")
+    const primaryKeys = activeSchema.columns.filter((col: Column) => col.primary)
     const payload = {
       table: activeSchema.name,
       key: Object.fromEntries(

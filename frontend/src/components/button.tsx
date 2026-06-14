@@ -5,8 +5,10 @@ const variants = {
   primary: "bg-blue-700 hover:bg-blue-800",
 }
 
+type variantsType = "default" | "success" | "danger" | "primary"
+
 type ButtonProps = React.ComponentProps<"button"> & {
-  variant?: "default" | "success" | "danger" | "primary"
+  variant?: variantsType 
   sm?: boolean
   bg?: string
 }

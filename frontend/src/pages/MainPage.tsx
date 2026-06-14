@@ -9,7 +9,7 @@ import TableSchema from "@/layout/TableSchema"
 import { SidebarDisconnect } from "@/layout/SidebarDisconnect"
 import { useDatabase } from "@/contexts/DatabaseProvider"
 import { ContentSQL } from "@/layout/ContentSQL"
-import FormData from "@/layout/FormData"
+import FormData from "@/layout/FormItem"
 import { useSchema } from "@/contexts/SchemaProvider"
 import FormColumn from "@/layout/FormColumn"
 

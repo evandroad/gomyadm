@@ -5,11 +5,11 @@ import { Input } from "@/components/input";
 import { Label } from "@/components/label";
 import { Button } from "@/components/button";
 import { castValue, getInputType } from "@/tableUtils";
-import type { ColumnSchema } from "@/models";
 import { useSchema } from "@/contexts/SchemaProvider";
 import { notify } from "@/utils";
+import type { Column } from "@/models";
 
-export default function FormData() {
+export default function FormItem() {
   const { activeDatabase } = useDatabase()
   const { activeSchema } = useSchema()
   const [formData, setFormData] = useState<Record<string, string>>({})
@@ -49,14 +49,14 @@ export default function FormData() {
 
   return (
     <div className="p-2 w-100 space-y-4">
-      {activeSchema?.columns.map((column: ColumnSchema) => (
+      {activeSchema?.columns.map((column: Column) => (
         <div key={column.name}>
           <Label>{column.name}</Label>
 
           <Input
             type={getInputType(column.type)}
             required={!column.nullable}
-            disabled={column.autoNumber}
+            disabled={column.autoIncrement}
             value={formData[column.name] || ""}
             onChange={(e) => setFormData(prev => ({ ...prev, [column.name]: e.target.value }))}
           />

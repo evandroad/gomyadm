@@ -1,7 +1,9 @@
 import { API_URL } from "@/api"
+import { Button } from "@/components/button"
 import { useConnection } from "@/contexts/ConnectionProvider"
 import { useDatabase } from "@/contexts/DatabaseProvider"
 import type { View } from "@/pages/MainPage"
+import { Plus } from "lucide-react"
 import { useEffect, useState } from "react"
 
 type Props = {
@@ -37,6 +39,9 @@ export function SidebarTables({ selectedTable, setSelectedTable, setView }: Prop
   return (
     <div className="border-r border-zinc-800">
       <div className="overflow-auto">
+        <div className="flex justify-end">
+          <Button sm className="m-1" variant="primary"><Plus size={16}/></Button>
+        </div>
         {activeDatabase && tables?.length > 0 ? (
           tables.map((table) => (
             <button
