@@ -12,7 +12,13 @@ type SchemaHandler struct {
 	Connection *db.ConnectionManager
 }
 
-func (h *SchemaHandler) ListTables(w http.ResponseWriter, r *http.Request) {
+// @Summary Lista de tabelas
+// @Description Retorna todas as tabelas do banco selecionado
+// @Tags tables
+// @Produce json
+// @Success 200 {array} string
+// @Router /tables [get]
+func (h *SchemaHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	driver, conn, err := getDriverAndConnection(h.Connection)
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)

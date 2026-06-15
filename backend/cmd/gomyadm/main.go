@@ -58,7 +58,7 @@ func main() {
 		r.Post("/database/select", connectionHandler.SelectDatabase)
 
 		r.Route("/tables", func(r chi.Router) {
-			r.Get("/", schemaHandler.ListTables)
+			r.Get("/", schemaHandler.GetAll)
 			
 			r.Route("/item", func(r chi.Router) {
 				r.Get("/{table}", itemHandler.GetAll)

@@ -1,11 +1,5 @@
 basePath: /api/
 definitions:
-  api.Request:
-    properties:
-      database:
-        example: my_system
-        type: string
-    type: object
   models.ConnectionConfig:
     properties:
       database:
@@ -51,6 +45,17 @@ definitions:
         type: string
       port:
         type: integer
+    type: object
+  models.DatabaseRequest:
+    properties:
+      database:
+        example: my_system
+        type: string
+    type: object
+  models.QueryRequest:
+    properties:
+      query:
+        type: string
     type: object
   respond.Response:
     properties:
@@ -98,8 +103,7 @@ paths:
         "201":
           description: Created
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/respond.Response'
       summary: Salva conexão
       tags:
       - connection
@@ -203,7 +207,7 @@ paths:
         name: database
         required: true
         schema:
-          $ref: '#/definitions/api.Request'
+          $ref: '#/definitions/models.DatabaseRequest'
       produces:
       - application/json
       responses:
@@ -212,4 +216,40 @@ paths:
       summary: Seleciona um banco de dados
       tags:
       - database
+  /query:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dados da query
+        in: body
+        name: connection
+        required: true
+        schema:
+          $ref: '#/definitions/models.QueryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respond.Response'
+      summary: Executa query
+      tags:
+      - query
+  /tables:
+    get:
+      description: Retorna todas as tabelas do banco selecionado
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Lista de tabelas
+      tags:
+      - tables
 swagger: "2.0"

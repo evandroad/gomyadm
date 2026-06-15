@@ -20,3 +20,7 @@ type ConnectionResponse struct {
 	Database string    `json:"database"`
 	Databases []string `json:"databases"`
 }
+
+type DatabaseRequest struct {
+	Database string `json:"database" example:"my_system"`
+}

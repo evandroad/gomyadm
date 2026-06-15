@@ -91,8 +91,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/respond.Response"
                         }
                     }
                 }
@@ -226,7 +225,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.Request"
+                            "$ref": "#/definitions/models.DatabaseRequest"
                         }
                     }
                 ],
@@ -236,18 +235,65 @@ const docTemplate = `{
                     }
                 }
             }
-        }
-    },
-    "definitions": {
-        "api.Request": {
-            "type": "object",
-            "properties": {
-                "database": {
-                    "type": "string",
-                    "example": "my_system"
+        },
+        "/query": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "query"
+                ],
+                "summary": "Executa query",
+                "parameters": [
+                    {
+                        "description": "Dados da query",
+                        "name": "connection",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.QueryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/respond.Response"
+                        }
+                    }
                 }
             }
         },
+        "/tables": {
+            "get": {
+                "description": "Retorna todas as tabelas do banco selecionado",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tables"
+                ],
+                "summary": "Lista de tabelas",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
         "models.ConnectionConfig": {
             "type": "object",
             "properties": {
@@ -311,6 +357,23 @@ const docTemplate = `{
                 },
                 "port": {
                     "type": "integer"
+                }
+            }
+        },
+        "models.DatabaseRequest": {
+            "type": "object",
+            "properties": {
+                "database": {
+                    "type": "string",
+                    "example": "my_system"
+                }
+            }
+        },
+        "models.QueryRequest": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string"
                 }
             }
         },

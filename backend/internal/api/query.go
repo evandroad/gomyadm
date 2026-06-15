@@ -15,6 +15,13 @@ type QueryHandler struct {
 	Connection *db.ConnectionManager
 }
 
+// @Summary Executa query
+// @Tags query
+// @Accept json
+// @Produce json
+// @Param connection body models.QueryRequest true "Dados da query"
+// @Success 200 {object} respond.Response
+// @Router /query [post]
 func (h *QueryHandler) ExecuteQuery(w http.ResponseWriter, r *http.Request) {
 	var req models.QueryRequest
 

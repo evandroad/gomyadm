@@ -20,10 +20,6 @@ type ConnectionHandler struct {
 	Connection *db.ConnectionManager
 }
 
-type Request struct {
-	Database string `json:"database" example:"my_system"`
-}
-
 // @Summary Faz a conexão
 // @Tags connection
 // @Accept json
@@ -94,11 +90,11 @@ func (ch *ConnectionHandler) Active(w http.ResponseWriter, r *http.Request) {
 // @Tags database
 // @Accept json
 // @Produce json
-// @Param database body Request true "Banco de Dados"
+// @Param database body models.DatabaseRequest true "Banco de Dados"
 // @Success 200
 // @Router /database/select [post]
 func (ch *ConnectionHandler) SelectDatabase(w http.ResponseWriter, r *http.Request) {
-	var req Request
+	var req models.DatabaseRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		logger.Error("Failed to decode request body: %v", err)
@@ -132,7 +128,7 @@ func (ch *ConnectionHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param connection body models.ConnectionConfig true "Dados da conexão"
-// @Success 201 {object} map[string]any
+// @Success 201 {object} respond.Response
 // @Router /connection [post]
 func (ch *ConnectionHandler) Insert(w http.ResponseWriter, r *http.Request) {
 	var cfg models.ConnectionConfig
@@ -151,9 +147,7 @@ func (ch *ConnectionHandler) Insert(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	JSON(w, http.StatusCreated, map[string]any{
-		"message": "connection saved",
-	})
+	Success(w, http.StatusCreated, "Connection saved.", nil)
 }
 
 // @Summary Altera conexão
