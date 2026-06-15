@@ -1,14 +1,14 @@
 package models
 
 type ConnectionConfig struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Driver   string `json:"driver"`
-	Host     string `json:"host"`
-	Port     int    `json:"port"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Database string `json:"database"`
+	ID       string `json:"id" example:""`
+	Name     string `json:"name" example:""`
+	Driver   string `json:"driver" example:"mysql"`
+	Host     string `json:"host" example:"127.0.0.1"`
+	Port     int    `json:"port" example:"3306"`
+	Username string `json:"username" example:"admin"`
+	Password string `json:"password" example:"senha123"`
+	Database string `json:"database" example:""`
 }
 
 type ConnectionResponse struct {

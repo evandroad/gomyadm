@@ -1,0 +1,215 @@
+basePath: /api/
+definitions:
+  api.Request:
+    properties:
+      database:
+        example: my_system
+        type: string
+    type: object
+  models.ConnectionConfig:
+    properties:
+      database:
+        example: ""
+        type: string
+      driver:
+        example: mysql
+        type: string
+      host:
+        example: 127.0.0.1
+        type: string
+      id:
+        example: ""
+        type: string
+      name:
+        example: ""
+        type: string
+      password:
+        example: senha123
+        type: string
+      port:
+        example: 3306
+        type: integer
+      username:
+        example: admin
+        type: string
+    type: object
+  models.ConnectionResponse:
+    properties:
+      database:
+        type: string
+      databases:
+        items:
+          type: string
+        type: array
+      driver:
+        type: string
+      host:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      port:
+        type: integer
+    type: object
+  respond.Response:
+    properties:
+      data: {}
+      error:
+        type: string
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+host: localhost:8181
+info:
+  contact: {}
+  description: API para gerenciamento de bancos de dados.
+  title: Database Manager API
+  version: "1.0"
+paths:
+  /connection:
+    get:
+      description: Retorna todas as conexões cadastradas
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ConnectionConfig'
+      summary: Lista conexões salvas
+      tags:
+      - connection
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dados da conexão
+        in: body
+        name: connection
+        required: true
+        schema:
+          $ref: '#/definitions/models.ConnectionConfig'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Salva conexão
+      tags:
+      - connection
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dados da conexão
+        in: body
+        name: connection
+        required: true
+        schema:
+          $ref: '#/definitions/models.ConnectionConfig'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respond.Response'
+      summary: Altera conexão
+      tags:
+      - connection
+  /connection/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID da conexão
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respond.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/respond.Response'
+      summary: Remove conexão
+      tags:
+      - connection
+  /connection/active:
+    get:
+      description: Retorna a conexão ativa
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ConnectionResponse'
+      summary: Conexão ativa
+      tags:
+      - connection
+  /connection/connect:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dados da conexão
+        in: body
+        name: connection
+        required: true
+        schema:
+          $ref: '#/definitions/models.ConnectionConfig'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ConnectionResponse'
+      summary: Faz a conexão
+      tags:
+      - connection
+  /connection/disconnect:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Desfaz a conexão
+      tags:
+      - connection
+  /database/select:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Banco de Dados
+        in: body
+        name: database
+        required: true
+        schema:
+          $ref: '#/definitions/api.Request'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Seleciona um banco de dados
+      tags:
+      - database
+swagger: "2.0"

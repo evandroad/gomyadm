@@ -61,7 +61,7 @@ func (h *ItemHandler) Insert(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	Success(w, http.StatusOK, nil)
+	Success(w, http.StatusOK, "Item inserido com sucesso.", nil)
 }
 
 func (h *ItemHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -92,7 +92,7 @@ func (h *ItemHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	Success(w, http.StatusOK, nil)
+	Success(w, http.StatusOK, "Item alterado com sucesso.", nil)
 }
 
 func (h *ItemHandler) Delete(w http.ResponseWriter, r *http.Request) {
@@ -122,5 +122,5 @@ func (h *ItemHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	Success(w, http.StatusOK, nil)
+	Success(w, http.StatusOK, "Item removido com sucesso.", nil)
 }

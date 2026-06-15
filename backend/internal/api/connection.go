@@ -13,12 +13,24 @@ import (
 	"github.com/evandroad/gomyadm/internal/storage"
 	"github.com/go-chi/chi/v5"
 	"github.com/rs/xid"
+	_ "github.com/evandroad/gomyadm/docs"
 )
 
 type ConnectionHandler struct {
 	Connection *db.ConnectionManager
 }
 
+type Request struct {
+	Database string `json:"database" example:"my_system"`
+}
+
+// @Summary Faz a conexão
+// @Tags connection
+// @Accept json
+// @Produce json
+// @Param connection body models.ConnectionConfig true "Dados da conexão"
+// @Success 200 {object} models.ConnectionResponse
+// @Router /connection/connect [post]
 func (ch *ConnectionHandler) Connect(w http.ResponseWriter, r *http.Request) {
 	var cfg models.ConnectionConfig
 
@@ -44,6 +56,12 @@ func (ch *ConnectionHandler) Connect(w http.ResponseWriter, r *http.Request) {
 	JSON(w, http.StatusOK, data)
 }
 
+// @Summary Desfaz a conexão
+// @Tags connection
+// @Accept json
+// @Produce json
+// @Success 200
+// @Router /connection/disconnect [post]
 func (ch *ConnectionHandler) Disconnect(w http.ResponseWriter, r *http.Request) {
 	err := ch.Connection.Disconnect()
 	if err != nil {
@@ -52,9 +70,15 @@ func (ch *ConnectionHandler) Disconnect(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	Success(w, http.StatusOK, nil)
+	Success(w, http.StatusOK, "Conexão encerrada com sucesso.", nil)
 }
 
+// @Summary Conexão ativa
+// @Description Retorna a conexão ativa
+// @Tags connection
+// @Produce json
+// @Success 200 {object} models.ConnectionResponse
+// @Router /connection/active [get]
 func (ch *ConnectionHandler) Active(w http.ResponseWriter, r *http.Request) {
 	conn, err := ch.Connection.Active()
 	if err != nil {
@@ -66,11 +90,14 @@ func (ch *ConnectionHandler) Active(w http.ResponseWriter, r *http.Request) {
 	JSON(w, http.StatusOK, conn)
 }
 
+// @Summary Seleciona um banco de dados
+// @Tags database
+// @Accept json
+// @Produce json
+// @Param database body Request true "Banco de Dados"
+// @Success 200
+// @Router /database/select [post]
 func (ch *ConnectionHandler) SelectDatabase(w http.ResponseWriter, r *http.Request) {
-	type Request struct {
-		Database string `json:"database"`
-	}
-
 	var req Request
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
@@ -86,14 +113,27 @@ func (ch *ConnectionHandler) SelectDatabase(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	Success(w, http.StatusOK, H{ "message": "Database " + req.Database + " selected successfully" })
+	Success(w, http.StatusOK, "Database " + req.Database + " selected successfully.", nil)
 }
 
+// @Summary Lista conexões salvas
+// @Description Retorna todas as conexões cadastradas
+// @Tags connection
+// @Produce json
+// @Success 200 {object} models.ConnectionConfig
+// @Router /connection [get]
 func (ch *ConnectionHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	connections := storage.GetConnectionsStore().List()
 	JSON(w, http.StatusOK, connections)
 }
 
+// @Summary Salva conexão
+// @Tags connection
+// @Accept json
+// @Produce json
+// @Param connection body models.ConnectionConfig true "Dados da conexão"
+// @Success 201 {object} map[string]any
+// @Router /connection [post]
 func (ch *ConnectionHandler) Insert(w http.ResponseWriter, r *http.Request) {
 	var cfg models.ConnectionConfig
 
@@ -116,6 +156,13 @@ func (ch *ConnectionHandler) Insert(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// @Summary Altera conexão
+// @Tags connection
+// @Accept json
+// @Produce json
+// @Param connection body models.ConnectionConfig true "Dados da conexão"
+// @Success 200 {object} respond.Response
+// @Router /connection [put]
 func (ch *ConnectionHandler) Update(w http.ResponseWriter, r *http.Request) {
 	var cfg models.ConnectionConfig
 
@@ -133,9 +180,17 @@ func (ch *ConnectionHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	JSON(w, http.StatusOK, map[string]any{"message": "connection updated"})
+	Success(w, http.StatusOK, "Connection updated.", nil)
 }
 
+// @Summary Remove conexão
+// @Tags connection
+// @Accept json
+// @Produce json
+// @Param id path string true "ID da conexão"
+// @Success 200 {object} respond.Response
+// @Failure 404 {object} respond.Response
+// @Router /connection/{id} [delete]
 func (ch *ConnectionHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
@@ -146,7 +201,7 @@ func (ch *ConnectionHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	Success(w, http.StatusOK, H{ "message": "connection deleted" })
+	Success(w, http.StatusOK, "Connection deleted.", nil)
 }
 
 func getDriverAndConnection(cm *db.ConnectionManager) (drivers.Driver, *db.Connection, error) {

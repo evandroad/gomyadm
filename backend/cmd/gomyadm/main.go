@@ -11,8 +11,15 @@ import (
 	"github.com/evandroad/gomyadm/internal/storage"
 	. "github.com/evandroad/gomyadm/internal/respond"
 	"github.com/evandroad/gomyadm/internal/router"
+	_ "github.com/evandroad/gomyadm/docs"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
+// @title Database Manager API
+// @version 1.0
+// @description API para gerenciamento de bancos de dados.
+// @host localhost:8181
+// @BasePath /api/
 func main() {
 	store := storage.GetConnectionsStore()
 	err := store.Init()
@@ -34,6 +41,7 @@ func main() {
 	queryHandler := &api.QueryHandler{ Connection: manager }
 
 	r.Get("/health", health)
+	r.Get("/swagger/*", httpSwagger.WrapHandler)
 
 	r.Route("/api", func(r chi.Router) {
 		r.Route("/connection", func(r chi.Router) {
@@ -82,7 +90,7 @@ func main() {
 }
 
 func health(w http.ResponseWriter, r *http.Request) {
-	Success(w, http.StatusOK, nil)
+	Success(w, http.StatusOK, "API ok.", nil)
 }
 
 func notFound(w http.ResponseWriter, r *http.Request) {

@@ -62,7 +62,7 @@ func (h *ColumnHandler) Insert(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	Success(w, http.StatusOK, nil)
+	Success(w, http.StatusOK, "Coluna salva com sucesso.", nil)
 }
 
 func (h *ColumnHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -93,7 +93,7 @@ func (h *ColumnHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	Success(w, http.StatusOK, nil)
+	Success(w, http.StatusOK, "Coluna alterada com sucesso.", nil)
 }
 
 func (h *ColumnHandler) Delete(w http.ResponseWriter, r *http.Request) {
@@ -114,5 +114,5 @@ func (h *ColumnHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	Success(w, http.StatusOK, nil)
+	Success(w, http.StatusOK, "Coluna removida com sucesso.", nil)
 }
