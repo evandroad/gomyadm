@@ -8,7 +8,7 @@ export function SidebarDisconnect() {
   const navigate = useNavigate()
 
   async function disconnect() {
-    const res = await fetch(`${API_URL}/api/connection/disconnect`, { method: "POST" })
+    const res = await fetch(`${API_URL}/api/session`, { method: "DELETE" })
 
     if (res.ok) {
       setActiveConnection(null)

@@ -33,7 +33,7 @@ export default function DatabaseConnectionPage() {
         ...connection,
         port: parseInt(connection.port as string, 10),
       }
-      const res = await fetch( API_URL + "/api/connection/connect", {
+      const res = await fetch( API_URL + "/api/session", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
