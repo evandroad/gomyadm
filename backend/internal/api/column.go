@@ -15,6 +15,13 @@ type ColumnHandler struct {
 	Connection *db.ConnectionManager
 }
 
+// @Summary Listar colunas de uma tabela
+// @Description Retorna uma lista com as colunas e o schema de uma tabela
+// @Tags column
+// @Produce json
+// @Param table path string true "Tabela"
+// @Success 200 {object} models.TableSchema
+// @Router /tables/column/{table} [get]
 func (h *ColumnHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	table := chi.URLParam(r, "table")
 
@@ -35,11 +42,16 @@ func (h *ColumnHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	JSON(w, http.StatusOK, schema)
 }
 
+// @Summary Insere coluna
+// @Description Insere uma coluna em uma tabela
+// @Tags column
+// @Accept json
+// @Produce json
+// @Param column body models.ColumnRequest true "Coluna novo"
+// @Success 201 {object} respond.Response
+// @Router /tables/column [post]
 func (h *ColumnHandler) Insert(w http.ResponseWriter, r *http.Request) {
-	var req struct {
-		Table  string         			   `json:"table"`
-		Column models.ColumnDefinition `json:"column"`
-	}
+	var req models.ColumnRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
@@ -65,12 +77,16 @@ func (h *ColumnHandler) Insert(w http.ResponseWriter, r *http.Request) {
 	Success(w, http.StatusOK, "Coluna salva com sucesso.", nil)
 }
 
+// @Summary Altera coluna
+// @Description Altera uma coluna em uma tabela
+// @Tags column
+// @Accept json
+// @Produce json
+// @Param column body models.ColumnRequest true "Coluna"
+// @Success 200 {object} respond.Response
+// @Router /tables/column [put]
 func (h *ColumnHandler) Update(w http.ResponseWriter, r *http.Request) {
-	var req struct {
-		Table   string         			    `json:"table"`
-		OldName string                  `json:"oldName"`
-		Column  models.ColumnDefinition `json:"column"`
-	}
+	var req models.ColumnRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
@@ -96,6 +112,14 @@ func (h *ColumnHandler) Update(w http.ResponseWriter, r *http.Request) {
 	Success(w, http.StatusOK, "Coluna alterada com sucesso.", nil)
 }
 
+// @Summary Remove coluna
+// @Description Remove uma coluna de uma tabela
+// @Tags column
+// @Produce json
+// @Param table path string true "Tabela"
+// @Param column path string true "Coluna"
+// @Success 200 {object} respond.Response
+// @Router /tables/column/{table}/{column} [delete]
 func (h *ColumnHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	table := chi.URLParam(r, "table")
 	column := chi.URLParam(r, "column")

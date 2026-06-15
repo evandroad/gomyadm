@@ -1,5 +1,41 @@
 basePath: /api/
 definitions:
+  models.ColumnDefinition:
+    properties:
+      autoIncrement:
+        example: false
+        type: boolean
+      defaultValue:
+        example: ""
+        type: string
+      length:
+        example: 10
+        type: integer
+      name:
+        example: teste
+        type: string
+      nullable:
+        example: true
+        type: boolean
+      primary:
+        example: false
+        type: boolean
+      type:
+        example: INT
+        type: string
+      unique:
+        example: true
+        type: boolean
+    type: object
+  models.ColumnRequest:
+    properties:
+      column:
+        $ref: '#/definitions/models.ColumnDefinition'
+      oldName:
+        type: string
+      table:
+        type: string
+    type: object
   models.ConnectionConfig:
     properties:
       database:
@@ -79,6 +115,15 @@ definitions:
           additionalProperties: {}
           type: object
         type: array
+    type: object
+  models.TableSchema:
+    properties:
+      columns:
+        items:
+          $ref: '#/definitions/models.ColumnDefinition'
+        type: array
+      name:
+        type: string
     type: object
   respond.Response:
     properties:
@@ -275,6 +320,92 @@ paths:
       summary: Lista de tabelas
       tags:
       - tables
+  /tables/column:
+    post:
+      consumes:
+      - application/json
+      description: Insere uma coluna em uma tabela
+      parameters:
+      - description: Coluna novo
+        in: body
+        name: column
+        required: true
+        schema:
+          $ref: '#/definitions/models.ColumnRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/respond.Response'
+      summary: Insere coluna
+      tags:
+      - column
+    put:
+      consumes:
+      - application/json
+      description: Altera uma coluna em uma tabela
+      parameters:
+      - description: Coluna
+        in: body
+        name: column
+        required: true
+        schema:
+          $ref: '#/definitions/models.ColumnRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respond.Response'
+      summary: Altera coluna
+      tags:
+      - column
+  /tables/column/{table}:
+    get:
+      description: Retorna uma lista com as colunas e o schema de uma tabela
+      parameters:
+      - description: Tabela
+        in: path
+        name: table
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TableSchema'
+      summary: Listar colunas de uma tabela
+      tags:
+      - column
+  /tables/column/{table}/{column}:
+    delete:
+      description: Remove uma coluna de uma tabela
+      parameters:
+      - description: Tabela
+        in: path
+        name: table
+        required: true
+        type: string
+      - description: Coluna
+        in: path
+        name: column
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respond.Response'
+      summary: Remove coluna
+      tags:
+      - column
   /tables/item:
     delete:
       description: Remove um item de uma tabela

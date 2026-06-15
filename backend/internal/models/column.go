@@ -5,17 +5,23 @@ import (
 )
 
 type ColumnDefinition struct {
-	Name          string `json:"name"`
-	Type          string `json:"type"`
-	Length        *int   `json:"length,omitempty"`
-	Nullable      bool   `json:"nullable"`
-	Primary       bool   `json:"primary"`
-	Unique        bool   `json:"unique"`
-	AutoIncrement bool   `json:"autoIncrement"`
-	DefaultValue  string `json:"defaultValue"`
+	Name          string `json:"name" example:"teste"`
+	Type          string `json:"type" example:"INT"`
+	Length        *int   `json:"length,omitempty" example:"10"`
+	Nullable      bool   `json:"nullable" example:"true"`
+	Primary       bool   `json:"primary" example:"false"`
+	Unique        bool   `json:"unique" example:"true"`
+	AutoIncrement bool   `json:"autoIncrement" example:"false"`
+	DefaultValue  string `json:"defaultValue" example:""`
 }
 
 func (c *ColumnDefinition) ToString() string {
 	v, _ := json.Marshal(c)
 	return string(v)
+}
+
+type ColumnRequest struct {
+	Table   string         	 `json:"table"`
+	OldName string           `json:"oldName"`
+	Column  ColumnDefinition `json:"column"`
 }

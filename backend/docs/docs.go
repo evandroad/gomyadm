@@ -291,6 +291,137 @@ const docTemplate = `{
                 }
             }
         },
+        "/tables/column": {
+            "put": {
+                "description": "Altera uma coluna em uma tabela",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "column"
+                ],
+                "summary": "Altera coluna",
+                "parameters": [
+                    {
+                        "description": "Coluna",
+                        "name": "column",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ColumnRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/respond.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Insere uma coluna em uma tabela",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "column"
+                ],
+                "summary": "Insere coluna",
+                "parameters": [
+                    {
+                        "description": "Coluna novo",
+                        "name": "column",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ColumnRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/respond.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/tables/column/{table}": {
+            "get": {
+                "description": "Retorna uma lista com as colunas e o schema de uma tabela",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "column"
+                ],
+                "summary": "Listar colunas de uma tabela",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tabela",
+                        "name": "table",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TableSchema"
+                        }
+                    }
+                }
+            }
+        },
+        "/tables/column/{table}/{column}": {
+            "delete": {
+                "description": "Remove uma coluna de uma tabela",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "column"
+                ],
+                "summary": "Remove coluna",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tabela",
+                        "name": "table",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Coluna",
+                        "name": "column",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/respond.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/tables/item": {
             "put": {
                 "description": "Altera um item em uma tabela",
@@ -417,6 +548,57 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.ColumnDefinition": {
+            "type": "object",
+            "properties": {
+                "autoIncrement": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "defaultValue": {
+                    "type": "string",
+                    "example": ""
+                },
+                "length": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "name": {
+                    "type": "string",
+                    "example": "teste"
+                },
+                "nullable": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "primary": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "type": {
+                    "type": "string",
+                    "example": "INT"
+                },
+                "unique": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "models.ColumnRequest": {
+            "type": "object",
+            "properties": {
+                "column": {
+                    "$ref": "#/definitions/models.ColumnDefinition"
+                },
+                "oldName": {
+                    "type": "string"
+                },
+                "table": {
+                    "type": "string"
+                }
+            }
+        },
         "models.ConnectionConfig": {
             "type": "object",
             "properties": {
@@ -531,6 +713,20 @@ const docTemplate = `{
                         "type": "object",
                         "additionalProperties": {}
                     }
+                }
+            }
+        },
+        "models.TableSchema": {
+            "type": "object",
+            "properties": {
+                "columns": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ColumnDefinition"
+                    }
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
