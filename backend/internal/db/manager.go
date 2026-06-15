@@ -16,7 +16,7 @@ import (
 
 type ConnectionManager struct {
 	mu         sync.RWMutex
-	connection *Connection
+	connection *models.Connection
 }
 
 func NewConnectionManager() *ConnectionManager {
@@ -67,7 +67,7 @@ func (m *ConnectionManager) Disconnect() error {
 	return nil
 }
 
-func (m *ConnectionManager) Get() (*Connection, error) {
+func (m *ConnectionManager) Get() (*models.Connection, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 
@@ -114,6 +114,21 @@ func (m *ConnectionManager) SelectDatabase(name string) error {
 	return nil
 }
 
+func (m *ConnectionManager) GetDriverAndConnection() (drivers.Driver, *models.Connection, error) {
+	conn, err := m.Get()
+	if err != nil {
+		logger.Error("Failed to get active connection: %v", err)
+		return nil, nil, err
+	}
+
+	driver, ok := drivers.GetDriver(conn.Config.Driver)
+	if !ok {
+		return nil, nil, fmt.Errorf("unsupported driver: %s", conn.Config.Driver)
+	}
+
+	return driver, conn, nil
+}
+
 func (m *ConnectionManager) createConnection(cfg models.ConnectionConfig) error {
 	driver, ok := drivers.GetDriver(cfg.Driver)
 	if !ok {
@@ -140,7 +155,7 @@ func (m *ConnectionManager) createConnection(cfg models.ConnectionConfig) error 
 		return fmt.Errorf("failed to list databases: %w", err)
 	}
 
-	m.connection = &Connection{
+	m.connection = &models.Connection{
 		Config: cfg,
 		DB:     db,
 		DBs:    databases,

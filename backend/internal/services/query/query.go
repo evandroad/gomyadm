@@ -1,4 +1,4 @@
-package services
+package queryService
 
 import (
 	"database/sql"

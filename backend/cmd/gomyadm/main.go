@@ -8,11 +8,12 @@ import (
 
 	"github.com/evandroad/gomyadm/internal/api"
 	"github.com/evandroad/gomyadm/internal/db"
-	"github.com/evandroad/gomyadm/internal/storage"
 	. "github.com/evandroad/gomyadm/internal/respond"
 	"github.com/evandroad/gomyadm/internal/router"
+	"github.com/evandroad/gomyadm/internal/services/connection"
+
 	_ "github.com/evandroad/gomyadm/docs"
-	httpSwagger "github.com/swaggo/http-swagger"
+	"github.com/swaggo/http-swagger"
 )
 
 // @title Database Manager API
@@ -21,8 +22,7 @@ import (
 // @host localhost:8181
 // @BasePath /api/
 func main() {
-	store := storage.GetConnectionsStore()
-	err := store.Init()
+	err := connectionService.Init()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -34,7 +34,9 @@ func main() {
 
 	manager := db.NewConnectionManager()
 	
+	sessionHandler := &api.SessionHandler{ Connection: manager }
 	connectionHandler := &api.ConnectionHandler{ Connection: manager }
+	databaseHandler := &api.DatabaseHandler{ Connection: manager }
 	schemaHandler := &api.SchemaHandler{ Connection: manager }
 	itemHandler := &api.ItemHandler{ Connection: manager }
 	columnHandler := &api.ColumnHandler{ Connection: manager }
@@ -44,18 +46,20 @@ func main() {
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
 
 	r.Route("/api", func(r chi.Router) {
-		r.Route("/connection", func(r chi.Router) {
-			r.Post("/connect", connectionHandler.Connect)
-			r.Post("/disconnect", connectionHandler.Disconnect)
-			r.Get("/active", connectionHandler.Active)
+		r.Route("/session", func(r chi.Router) {
+			r.Post("/", sessionHandler.Connect)
+			r.Delete("/", sessionHandler.Disconnect)
+			r.Get("/", sessionHandler.Active)
+		})
 
+		r.Route("/connection", func(r chi.Router) {
 			r.Get("/", connectionHandler.GetAll)
 			r.Post("/", connectionHandler.Insert)
 			r.Put("/", connectionHandler.Update)
 			r.Delete("/{id}", connectionHandler.Delete)	
 		})
 
-		r.Post("/database/select", connectionHandler.SelectDatabase)
+		r.Post("/database/select", databaseHandler.SelectDatabase)
 
 		r.Route("/tables", func(r chi.Router) {
 			r.Get("/", schemaHandler.GetAll)

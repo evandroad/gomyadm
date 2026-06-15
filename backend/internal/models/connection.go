@@ -1,5 +1,13 @@
 package models
 
+import "database/sql"
+
+type Connection struct {
+	Config ConnectionConfig
+	DB     *sql.DB
+	DBs		[]string
+}
+
 type ConnectionConfig struct {
 	ID       string `json:"id" example:""`
 	Name     string `json:"name" example:""`
@@ -23,4 +31,12 @@ type ConnectionResponse struct {
 
 type DatabaseRequest struct {
 	Database string `json:"database" example:"my_system"`
+}
+
+func (c *Connection) Matches(cfg ConnectionConfig) bool {
+	return c.Config.Driver == cfg.Driver &&
+		c.Config.Host == cfg.Host &&
+		c.Config.Port == cfg.Port &&
+		c.Config.Username == cfg.Username &&
+		c.Config.Database == cfg.Database
 }

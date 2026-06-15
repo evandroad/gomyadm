@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/evandroad/gomyadm/internal/db"
-	"github.com/evandroad/gomyadm/internal/models"
-	"github.com/evandroad/gomyadm/internal/services"
 	"github.com/evandroad/gomyadm/internal/logger"
+	"github.com/evandroad/gomyadm/internal/models"
+	"github.com/evandroad/gomyadm/internal/services/query"
 	. "github.com/evandroad/gomyadm/internal/respond"
 )
 
@@ -38,7 +38,7 @@ func (h *QueryHandler) ExecuteQuery(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := services.ExecuteQuery(conn.DB, req.Query)
+	result, err := queryService.ExecuteQuery(conn.DB, req.Query)
 	if err != nil {
 		logger.Error("Failed to execute query: %v", err)
 		Error(w, http.StatusBadRequest, err.Error(), nil)

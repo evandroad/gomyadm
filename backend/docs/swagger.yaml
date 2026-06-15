@@ -52,10 +52,33 @@ definitions:
         example: my_system
         type: string
     type: object
+  models.ItemRequest:
+    properties:
+      key:
+        additionalProperties: {}
+        type: object
+      table:
+        type: string
+      values:
+        additionalProperties: {}
+        type: object
+    type: object
   models.QueryRequest:
     properties:
       query:
         type: string
+    type: object
+  models.TableData:
+    properties:
+      columns:
+        items:
+          type: string
+        type: array
+      rows:
+        items:
+          additionalProperties: {}
+          type: object
+        type: array
     type: object
   respond.Response:
     properties:
@@ -151,52 +174,6 @@ paths:
       summary: Remove conexão
       tags:
       - connection
-  /connection/active:
-    get:
-      description: Retorna a conexão ativa
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.ConnectionResponse'
-      summary: Conexão ativa
-      tags:
-      - connection
-  /connection/connect:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: Dados da conexão
-        in: body
-        name: connection
-        required: true
-        schema:
-          $ref: '#/definitions/models.ConnectionConfig'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.ConnectionResponse'
-      summary: Faz a conexão
-      tags:
-      - connection
-  /connection/disconnect:
-    post:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-      summary: Desfaz a conexão
-      tags:
-      - connection
   /database/select:
     post:
       consumes:
@@ -237,6 +214,52 @@ paths:
       summary: Executa query
       tags:
       - query
+  /session:
+    delete:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respond.Response'
+      summary: Desfaz a conexão
+      tags:
+      - session
+    get:
+      description: Retorna a conexão ativa
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ConnectionResponse'
+      summary: Conexão ativa
+      tags:
+      - session
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dados da conexão
+        in: body
+        name: connection
+        required: true
+        schema:
+          $ref: '#/definitions/models.ConnectionConfig'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ConnectionResponse'
+      summary: Faz a conexão
+      tags:
+      - session
   /tables:
     get:
       description: Retorna todas as tabelas do banco selecionado
@@ -252,4 +275,85 @@ paths:
       summary: Lista de tabelas
       tags:
       - tables
+  /tables/item:
+    delete:
+      description: Remove um item de uma tabela
+      parameters:
+      - description: Item
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/models.ItemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TableData'
+      summary: Remove item
+      tags:
+      - item
+    post:
+      consumes:
+      - application/json
+      description: Insere um item em uma tabela
+      parameters:
+      - description: Item novo
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/models.ItemRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/respond.Response'
+      summary: Insere item
+      tags:
+      - item
+    put:
+      consumes:
+      - application/json
+      description: Altera um item em uma tabela
+      parameters:
+      - description: Item
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/models.ItemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respond.Response'
+      summary: Altera item
+      tags:
+      - item
+  /tables/item/{table}:
+    get:
+      description: Retorna uma lista com as colunas e uma com os itens
+      parameters:
+      - description: Tabela
+        in: path
+        name: table
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TableData'
+      summary: Lista colunas e itens
+      tags:
+      - item
 swagger: "2.0"

@@ -6,6 +6,7 @@ import (
 
 	"github.com/evandroad/gomyadm/internal/db"
 	"github.com/evandroad/gomyadm/internal/logger"
+	"github.com/evandroad/gomyadm/internal/models"
 	. "github.com/evandroad/gomyadm/internal/respond"
 	"github.com/go-chi/chi/v5"
 )
@@ -14,13 +15,20 @@ type ItemHandler struct {
 	Connection *db.ConnectionManager
 }
 
+// @Summary Lista colunas e itens
+// @Description Retorna uma lista com as colunas e uma com os itens
+// @Tags item
+// @Produce json
+// @Param table path string true "Tabela"
+// @Success 200 {object} models.TableData
+// @Router /tables/item/{table} [get]
 func (h *ItemHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	table := chi.URLParam(r, "table")
 
-	driver, conn, err := getDriverAndConnection(h.Connection)
+	driver, conn, err := h.Connection.GetDriverAndConnection()
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
-		Error(w, http.StatusInternalServerError, "Failed to get driver and connection", nil)
+		Error(w, http.StatusInternalServerError, "No connection established.", nil)
 		return
 	}
 
@@ -34,11 +42,16 @@ func (h *ItemHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	JSON(w, http.StatusOK, rows)
 }
 
+// @Summary Insere item
+// @Description Insere um item em uma tabela
+// @Tags item
+// @Accept json
+// @Produce json
+// @Param item body models.ItemRequest true "Item novo"
+// @Success 201 {object} respond.Response
+// @Router /tables/item [post]
 func (h *ItemHandler) Insert(w http.ResponseWriter, r *http.Request) {
-	var req struct {
-		Table  string         `json:"table"`
-		Values map[string]any `json:"values"`
-	}
+	var req models.ItemRequest	
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
@@ -47,10 +60,10 @@ func (h *ItemHandler) Insert(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	driver, conn, err := getDriverAndConnection(h.Connection)
+	driver, conn, err := h.Connection.GetDriverAndConnection()
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
-		Error(w, http.StatusInternalServerError, "Failed to get driver and connection", nil)
+		Error(w, http.StatusInternalServerError, "No connection established.", nil)
 		return
 	}
 
@@ -61,15 +74,19 @@ func (h *ItemHandler) Insert(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	Success(w, http.StatusOK, "Item inserido com sucesso.", nil)
+	Success(w, http.StatusCreated, "Item inserido com sucesso.", nil)
 }
 
+// @Summary Altera item
+// @Description Altera um item em uma tabela
+// @Tags item
+// @Accept json
+// @Produce json
+// @Param item body models.ItemRequest true "Item"
+// @Success 200 {object} respond.Response
+// @Router /tables/item [put]
 func (h *ItemHandler) Update(w http.ResponseWriter, r *http.Request) {
-	var req struct {
-		Table  string         `json:"table"`
-		Key    map[string]any `json:"key"`
-		Values map[string]any `json:"values"`
-	}
+	var req models.ItemRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
@@ -78,10 +95,10 @@ func (h *ItemHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	driver, conn, err := getDriverAndConnection(h.Connection)
+	driver, conn, err := h.Connection.GetDriverAndConnection()
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
-		Error(w, http.StatusInternalServerError, "Failed to get driver and connection", nil)
+		Error(w, http.StatusInternalServerError, "No connection established.", nil)
 		return
 	}
 
@@ -95,11 +112,15 @@ func (h *ItemHandler) Update(w http.ResponseWriter, r *http.Request) {
 	Success(w, http.StatusOK, "Item alterado com sucesso.", nil)
 }
 
+// @Summary Remove item
+// @Description Remove um item de uma tabela
+// @Tags item
+// @Produce json
+// @Param item body models.ItemRequest true "Item"
+// @Success 200 {object} models.TableData
+// @Router /tables/item [delete]
 func (h *ItemHandler) Delete(w http.ResponseWriter, r *http.Request) {
-	var req struct {
-		Table  string         `json:"table"`
-		Key    map[string]any `json:"key"`
-	}
+	var req models.ItemRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
@@ -108,10 +129,10 @@ func (h *ItemHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	driver, conn, err := getDriverAndConnection(h.Connection)
+	driver, conn, err := h.Connection.GetDriverAndConnection()
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
-		Error(w, http.StatusInternalServerError, "Failed to get driver and connection", nil)
+		Error(w, http.StatusInternalServerError, "No connection established.", nil)
 		return
 	}
 

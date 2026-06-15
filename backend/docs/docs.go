@@ -97,78 +97,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/connection/active": {
-            "get": {
-                "description": "Retorna a conexão ativa",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "connection"
-                ],
-                "summary": "Conexão ativa",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.ConnectionResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/connection/connect": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "connection"
-                ],
-                "summary": "Faz a conexão",
-                "parameters": [
-                    {
-                        "description": "Dados da conexão",
-                        "name": "connection",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.ConnectionConfig"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.ConnectionResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/connection/disconnect": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "connection"
-                ],
-                "summary": "Desfaz a conexão",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
         "/connection/{id}": {
             "delete": {
                 "consumes": [
@@ -269,6 +197,77 @@ const docTemplate = `{
                 }
             }
         },
+        "/session": {
+            "get": {
+                "description": "Retorna a conexão ativa",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "session"
+                ],
+                "summary": "Conexão ativa",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ConnectionResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "session"
+                ],
+                "summary": "Faz a conexão",
+                "parameters": [
+                    {
+                        "description": "Dados da conexão",
+                        "name": "connection",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ConnectionConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ConnectionResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "session"
+                ],
+                "summary": "Desfaz a conexão",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/respond.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/tables": {
             "get": {
                 "description": "Retorna todas as tabelas do banco selecionado",
@@ -287,6 +286,130 @@ const docTemplate = `{
                             "items": {
                                 "type": "string"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/tables/item": {
+            "put": {
+                "description": "Altera um item em uma tabela",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "item"
+                ],
+                "summary": "Altera item",
+                "parameters": [
+                    {
+                        "description": "Item",
+                        "name": "item",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ItemRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/respond.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Insere um item em uma tabela",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "item"
+                ],
+                "summary": "Insere item",
+                "parameters": [
+                    {
+                        "description": "Item novo",
+                        "name": "item",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ItemRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/respond.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Remove um item de uma tabela",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "item"
+                ],
+                "summary": "Remove item",
+                "parameters": [
+                    {
+                        "description": "Item",
+                        "name": "item",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ItemRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TableData"
+                        }
+                    }
+                }
+            }
+        },
+        "/tables/item/{table}": {
+            "get": {
+                "description": "Retorna uma lista com as colunas e uma com os itens",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "item"
+                ],
+                "summary": "Lista colunas e itens",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tabela",
+                        "name": "table",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TableData"
                         }
                     }
                 }
@@ -369,11 +492,45 @@ const docTemplate = `{
                 }
             }
         },
+        "models.ItemRequest": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "object",
+                    "additionalProperties": {}
+                },
+                "table": {
+                    "type": "string"
+                },
+                "values": {
+                    "type": "object",
+                    "additionalProperties": {}
+                }
+            }
+        },
         "models.QueryRequest": {
             "type": "object",
             "properties": {
                 "query": {
                     "type": "string"
+                }
+            }
+        },
+        "models.TableData": {
+            "type": "object",
+            "properties": {
+                "columns": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "rows": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": {}
+                    }
                 }
             }
         },

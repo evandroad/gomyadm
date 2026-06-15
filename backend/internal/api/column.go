@@ -18,7 +18,7 @@ type ColumnHandler struct {
 func (h *ColumnHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	table := chi.URLParam(r, "table")
 
-	driver, conn, err := getDriverAndConnection(h.Connection)
+	driver, conn, err := h.Connection.GetDriverAndConnection()
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
 		Error(w, http.StatusInternalServerError, "Failed to get driver and connection", nil)
@@ -48,7 +48,7 @@ func (h *ColumnHandler) Insert(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	driver, conn, err := getDriverAndConnection(h.Connection)
+	driver, conn, err := h.Connection.GetDriverAndConnection()
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
 		Error(w, http.StatusInternalServerError, "Failed to get driver and connection", nil)
@@ -79,7 +79,7 @@ func (h *ColumnHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	driver, conn, err := getDriverAndConnection(h.Connection)
+	driver, conn, err := h.Connection.GetDriverAndConnection()
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
 		Error(w, http.StatusInternalServerError, "Failed to get driver and connection", nil)
@@ -100,7 +100,7 @@ func (h *ColumnHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	table := chi.URLParam(r, "table")
 	column := chi.URLParam(r, "column")
 
-	driver, conn, err := getDriverAndConnection(h.Connection)
+	driver, conn, err := h.Connection.GetDriverAndConnection()
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
 		Error(w, http.StatusInternalServerError, "Failed to get driver and connection", nil)

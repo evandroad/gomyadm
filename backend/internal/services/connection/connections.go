@@ -1,8 +1,8 @@
-package storage
+package connectionService
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"os"
 	"path/filepath"
 	"sync"
@@ -17,21 +17,32 @@ type ConnectionsStore struct {
 }
 
 var (
-	instance *ConnectionsStore
-	once     sync.Once
+	store *ConnectionsStore
+	once  sync.Once
 )
 
-func GetConnectionsStore() *ConnectionsStore {
+var (
+	ErrConnectionNotFound = errors.New("connection not found")
+	ErrConnectionExists   = errors.New("connection already exists")
+)
+
+func getStore() *ConnectionsStore {
 	once.Do(func() {
-		instance = &ConnectionsStore{
+		store = &ConnectionsStore{
 			filePath: filepath.Join("data", "connections.json"),
 		}
 	})
 
-	return instance
+	return store
 }
 
-func (s *ConnectionsStore) Init() error {
+func Init() error { return getStore().init() }
+func List() []models.ConnectionConfig { return getStore().list() }
+func Create(conn models.ConnectionConfig) error { return getStore().create(conn) }
+func Update(id string, conn models.ConnectionConfig) error { return getStore().update(id, conn) }
+func Delete(id string) error { return getStore().delete(id) }
+
+func (s *ConnectionsStore) init() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -68,7 +79,7 @@ func (s *ConnectionsStore) Init() error {
 	return nil
 }
 
-func (s *ConnectionsStore) List() []models.ConnectionConfig {
+func (s *ConnectionsStore) list() []models.ConnectionConfig {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -78,27 +89,13 @@ func (s *ConnectionsStore) List() []models.ConnectionConfig {
 	return result
 }
 
-func (s *ConnectionsStore) Get(id string) (*models.ConnectionConfig, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-
-	for _, conn := range s.connections {
-		if conn.ID == id {
-			c := conn
-			return &c, nil
-		}
-	}
-
-	return nil, fmt.Errorf("connection not found")
-}
-
-func (s *ConnectionsStore) Create(conn models.ConnectionConfig) error {
+func (s *ConnectionsStore) create(conn models.ConnectionConfig) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	for _, existing := range s.connections {
 		if existing.ID == conn.ID {
-			return fmt.Errorf("connection already exists")
+			return ErrConnectionExists
 		}
 	}
 
@@ -107,7 +104,7 @@ func (s *ConnectionsStore) Create(conn models.ConnectionConfig) error {
 	return s.saveToDisk()
 }
 
-func (s *ConnectionsStore) Update(id string, conn models.ConnectionConfig) error {
+func (s *ConnectionsStore) update(id string, conn models.ConnectionConfig) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -121,10 +118,10 @@ func (s *ConnectionsStore) Update(id string, conn models.ConnectionConfig) error
 		}
 	}
 
-	return fmt.Errorf("connection not found")
+	return ErrConnectionNotFound
 }
 
-func (s *ConnectionsStore) Delete(id string) error {
+func (s *ConnectionsStore) delete(id string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -139,7 +136,7 @@ func (s *ConnectionsStore) Delete(id string) error {
 		}
 	}
 
-	return fmt.Errorf("connection not found")
+	return ErrConnectionNotFound
 }
 
 func (s *ConnectionsStore) saveToDisk() error {
