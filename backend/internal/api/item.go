@@ -21,7 +21,7 @@ type ItemHandler struct {
 // @Produce json
 // @Param table path string true "Tabela"
 // @Success 200 {object} models.TableData
-// @Router /tables/item/{table} [get]
+// @Router /table/item/{table} [get]
 func (h *ItemHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	table := chi.URLParam(r, "table")
 
@@ -42,15 +42,15 @@ func (h *ItemHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	JSON(w, http.StatusOK, rows)
 }
 
-// @Summary Insere item
-// @Description Insere um item em uma tabela
+// @Summary Cria item
+// @Description Cria um item em uma tabela
 // @Tags item
 // @Accept json
 // @Produce json
 // @Param item body models.ItemRequest true "Item novo"
 // @Success 201 {object} respond.Response
-// @Router /tables/item [post]
-func (h *ItemHandler) Insert(w http.ResponseWriter, r *http.Request) {
+// @Router /table/item [post]
+func (h *ItemHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var req models.ItemRequest	
 
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -67,7 +67,7 @@ func (h *ItemHandler) Insert(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = driver.InsertItem(conn.DB, req.Table, req.Values)
+	err = driver.CreateItem(conn.DB, req.Table, req.Values)
 	if err != nil {
 		logger.Error("Failed to insert data: %v", err)
 		Error(w, http.StatusInternalServerError, "Failed to insert data", nil)
@@ -84,7 +84,7 @@ func (h *ItemHandler) Insert(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param item body models.ItemRequest true "Item"
 // @Success 200 {object} respond.Response
-// @Router /tables/item [put]
+// @Router /table/item [put]
 func (h *ItemHandler) Update(w http.ResponseWriter, r *http.Request) {
 	var req models.ItemRequest
 
@@ -118,7 +118,7 @@ func (h *ItemHandler) Update(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param item body models.ItemRequest true "Item"
 // @Success 200 {object} models.TableData
-// @Router /tables/item [delete]
+// @Router /table/item [delete]
 func (h *ItemHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	var req models.ItemRequest
 

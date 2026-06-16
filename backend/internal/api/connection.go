@@ -24,7 +24,7 @@ type ConnectionHandler struct {
 // @Success 200 {object} models.ConnectionConfig
 // @Router /connection [get]
 func (ch *ConnectionHandler) GetAll(w http.ResponseWriter, r *http.Request) {
-	connections := connectionService.List()
+	connections := connectionService.GetAll()
 	JSON(w, http.StatusOK, connections)
 }
 
@@ -35,7 +35,7 @@ func (ch *ConnectionHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 // @Param connection body models.ConnectionConfig true "Dados da conexão"
 // @Success 201 {object} respond.Response
 // @Router /connection [post]
-func (ch *ConnectionHandler) Insert(w http.ResponseWriter, r *http.Request) {
+func (ch *ConnectionHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var cfg models.ConnectionConfig
 
 	err := json.NewDecoder(r.Body).Decode(&cfg)

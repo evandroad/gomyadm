@@ -8,9 +8,10 @@ import (
 
 	"github.com/evandroad/gomyadm/internal/api"
 	"github.com/evandroad/gomyadm/internal/db"
-	. "github.com/evandroad/gomyadm/internal/respond"
 	"github.com/evandroad/gomyadm/internal/router"
+	"github.com/evandroad/gomyadm/internal/services/column"
 	"github.com/evandroad/gomyadm/internal/services/connection"
+	. "github.com/evandroad/gomyadm/internal/respond"
 
 	_ "github.com/evandroad/gomyadm/docs"
 	"github.com/swaggo/http-swagger"
@@ -33,13 +34,15 @@ func main() {
 	r.Use(router.Logger)
 
 	manager := db.NewConnectionManager()
+
+	columnService := columnService.NewColumnService(manager)
 	
 	sessionHandler := &api.SessionHandler{ Connection: manager }
 	connectionHandler := &api.ConnectionHandler{ Connection: manager }
 	databaseHandler := &api.DatabaseHandler{ Connection: manager }
-	schemaHandler := &api.SchemaHandler{ Connection: manager }
+	tableHandler := &api.TableHandler{ Connection: manager }
 	itemHandler := &api.ItemHandler{ Connection: manager }
-	columnHandler := &api.ColumnHandler{ Connection: manager }
+	columnHandler := api.NewColumnHandler(columnService)
 	queryHandler := &api.QueryHandler{ Connection: manager }
 
 	r.Get("/health", health)
@@ -54,26 +57,27 @@ func main() {
 
 		r.Route("/connection", func(r chi.Router) {
 			r.Get("/", connectionHandler.GetAll)
-			r.Post("/", connectionHandler.Insert)
+			r.Post("/", connectionHandler.Create)
 			r.Put("/", connectionHandler.Update)
 			r.Delete("/{id}", connectionHandler.Delete)	
 		})
 
 		r.Post("/database/select", databaseHandler.SelectDatabase)
 
-		r.Route("/tables", func(r chi.Router) {
-			r.Get("/", schemaHandler.GetAll)
+		r.Route("/table", func(r chi.Router) {
+			r.Get("/", tableHandler.GetAll)
+			r.Post("/", tableHandler.Create)
 			
 			r.Route("/item", func(r chi.Router) {
 				r.Get("/{table}", itemHandler.GetAll)
-				r.Post("/", itemHandler.Insert)
+				r.Post("/", itemHandler.Create)
 				r.Put("/", itemHandler.Update)
 				r.Delete("/", itemHandler.Delete)
 			})
 			
 			r.Route("/column", func(r chi.Router) {
 				r.Get("/{table}", columnHandler.GetAll)
-				r.Post("/", columnHandler.Insert)
+				r.Post("/", columnHandler.Create)
 				r.Put("/", columnHandler.Update)
 				r.Delete("/{table}/{column}", columnHandler.Delete)
 			})

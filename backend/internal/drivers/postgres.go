@@ -33,7 +33,35 @@ func (d PostgresDriver) BuildDSN(cfg models.ConnectionConfig) string {
 	)
 }
 
-func (d PostgresDriver) ListTables(db *sql.DB) ([]string, error) {
+func (d PostgresDriver) GetAllDatabase(db *sql.DB) ([]string, error) {
+	rows, err := db.Query(`
+		SELECT datname
+		FROM pg_database
+		WHERE datistemplate = false
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var databases []string
+
+	for rows.Next() {
+		var name string
+
+		if err := rows.Scan(&name); err != nil {
+			return nil, err
+		}
+
+		databases = append(databases, name)
+	}
+
+	return databases, nil
+}
+
+// TABLE
+
+func (d PostgresDriver) GetAllTable(db *sql.DB) ([]string, error) {
 	rows, err := db.Query(`
 		SELECT tablename
 		FROM pg_tables
@@ -59,31 +87,37 @@ func (d PostgresDriver) ListTables(db *sql.DB) ([]string, error) {
 	return tables, nil
 }
 
-func (d PostgresDriver) ListDatabases(db *sql.DB) ([]string, error) {
-	rows, err := db.Query(`
-		SELECT datname
-		FROM pg_database
-		WHERE datistemplate = false
-	`)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
+func (d PostgresDriver) CreateTable(db *sql.DB, table string, columns []models.ColumnDefinition) error {
+	definitions := make([]string, 0, len(columns))
+	primaryKeys := make([]string, 0)
 
-	var databases []string
+	for _, column := range columns {
+		definitions = append(definitions, buildColumnDefinitionPostgres(column))
 
-	for rows.Next() {
-		var name string
-
-		if err := rows.Scan(&name); err != nil {
-			return nil, err
+		if column.Primary {
+			primaryKeys = append(
+				primaryKeys,
+				fmt.Sprintf(`"%s"`, column.Name),
+			)
 		}
-
-		databases = append(databases, name)
 	}
 
-	return databases, nil
+	if len(primaryKeys) > 0 {
+		definitions = append(
+			definitions,
+			fmt.Sprintf(
+				"PRIMARY KEY (%s)",
+				strings.Join(primaryKeys, ", "),
+			),
+		)
+	}
+
+	query := fmt.Sprintf(`CREATE TABLE "%s" (%s)`, table, strings.Join(definitions, ", "))
+	_, err := db.Exec(query)
+	return err
 }
+
+// ITEM
 
 func (d PostgresDriver) GetAllItem(db *sql.DB, table string) (*models.TableData, error) {
 	query := fmt.Sprintf(`SELECT * FROM "%s"`, table)
@@ -140,7 +174,7 @@ func (d PostgresDriver) GetAllItem(db *sql.DB, table string) (*models.TableData,
 	}, nil
 }
 
-func (d PostgresDriver) InsertItem(db *sql.DB, table string, data map[string]any) error {
+func (d PostgresDriver) CreateItem(db *sql.DB, table string, data map[string]any) error {
 	columns := make([]string, 0, len(data))
 	values := make([]any, 0, len(data))
 	placeholders := make([]string, 0, len(data))
@@ -212,6 +246,8 @@ func (d PostgresDriver) DeleteItem(db *sql.DB, table string, key map[string]any)
 	return err
 }
 
+// COLUMN
+
 func (d PostgresDriver) GetAllColumn(db *sql.DB, table string) (*models.TableSchema, error) {
 	query := `
 		SELECT
@@ -281,29 +317,8 @@ func (d PostgresDriver) GetAllColumn(db *sql.DB, table string) (*models.TableSch
 	return schema, nil
 }
 
-func (d PostgresDriver) InsertColumn(db *sql.DB, table string, column models.ColumnDefinition) error {
-	colType := strings.ToUpper(column.Type)
-
-	if column.AutoIncrement {
-		colType = "SERIAL"
-	} else if column.Length != nil {
-		colType = fmt.Sprintf("%s(%d)", colType, *column.Length)
-	}
-
-	query := fmt.Sprintf(
-		`ALTER TABLE "%s" ADD COLUMN "%s" %s`,
-		table,
-		column.Name,
-		colType,
-	)
-
-	if !column.Nullable {
-		query += " NOT NULL"
-	}
-
-	if column.DefaultValue != "" {
-		query += fmt.Sprintf(" DEFAULT '%s'", column.DefaultValue)
-	}
+func (d PostgresDriver) CreateColumn(db *sql.DB, table string, column models.ColumnDefinition) error {
+	query := fmt.Sprintf(`ALTER TABLE "%s" ADD COLUMN %s`, table, buildColumnDefinitionPostgres(column))
 
 	if _, err := db.Exec(query); err != nil {
 		return err
@@ -335,31 +350,59 @@ func (d PostgresDriver) InsertColumn(db *sql.DB, table string, column models.Col
 }
 
 func (d PostgresDriver) UpdateColumn(db *sql.DB, table string, oldName string, column models.ColumnDefinition) error {
+	if oldName != column.Name {
+		_, err := db.Exec(fmt.Sprintf(`ALTER TABLE "%s" RENAME COLUMN "%s" TO "%s"`, table, oldName, column.Name))
+		if err != nil {
+			return err
+		}
+	}
+	
 	colType := strings.ToUpper(column.Type)
 
-	if column.AutoIncrement {
-		colType = "SERIAL"
-	} else if column.Length != nil {
+	if column.Length != nil {
 		colType = fmt.Sprintf("%s(%d)", colType, *column.Length)
 	}
 
-	query := fmt.Sprintf(
-		`ALTER TABLE "%s" ADD COLUMN "%s" %s`,
+	_, err := db.Exec(fmt.Sprintf(
+		`ALTER TABLE "%s" ALTER COLUMN "%s" TYPE %s`,
 		table,
 		column.Name,
 		colType,
-	)
+	))
+	if err != nil {
+		return err
+	}
 
-	if !column.Nullable {
-		query += " NOT NULL"
+	if column.Nullable {
+		_, err = db.Exec(fmt.Sprintf(
+			`ALTER TABLE "%s" ALTER COLUMN "%s" DROP NOT NULL`,
+			table,
+			column.Name,
+		))
+	} else {
+		_, err = db.Exec(fmt.Sprintf(
+			`ALTER TABLE "%s" ALTER COLUMN "%s" SET NOT NULL`,
+			table,
+			column.Name,
+		))
+	}
+	if err != nil {
+		return err
 	}
 
 	if column.DefaultValue != "" {
-		query += fmt.Sprintf(" DEFAULT '%s'", column.DefaultValue)
-	}
-
-	if _, err := db.Exec(query); err != nil {
-		return err
+		_, err = db.Exec(fmt.Sprintf(
+			`ALTER TABLE "%s" ALTER COLUMN "%s" SET DEFAULT '%s'`,
+			table,
+			column.Name,
+			column.DefaultValue,
+		))
+	} else {
+		_, err = db.Exec(fmt.Sprintf(
+			`ALTER TABLE "%s" ALTER COLUMN "%s" DROP DEFAULT`,
+			table,
+			column.Name,
+		))
 	}
 
 	if column.Primary {
@@ -396,4 +439,31 @@ func (d PostgresDriver) DeleteColumn(db *sql.DB, table string, column string) er
 
 	_, err := db.Exec(query)
 	return err
+}
+
+func buildColumnDefinitionPostgres(column models.ColumnDefinition) string {
+	colType := strings.ToUpper(column.Type)
+
+	if column.AutoIncrement {
+		switch colType {
+		case "INT", "INTEGER":
+			colType = "SERIAL"
+		case "BIGINT":
+			colType = "BIGSERIAL"
+		}
+	} else if column.Length != nil {
+		colType = fmt.Sprintf("%s(%d)", colType, *column.Length)
+	}
+
+	def := fmt.Sprintf(`"%s" %s`, column.Name, colType)
+
+	if !column.Nullable {
+		def += " NOT NULL"
+	}
+
+	if column.DefaultValue != "" {
+		def += fmt.Sprintf(" DEFAULT '%s'", column.DefaultValue)
+	}
+
+	return def
 }

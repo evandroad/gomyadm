@@ -30,7 +30,7 @@ export function SidebarTables({ selectedTable, setSelectedTable, setView }: Prop
   async function loadTables() {
     if (!activeConnection || !activeDatabase) return
 
-    const res = await fetch(`${API_URL}/api/tables`)
+    const res = await fetch(`${API_URL}/api/table`)
     const data = await res.json()
     setTables(data)
     setSelectedTable(null)

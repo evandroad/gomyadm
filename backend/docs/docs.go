@@ -268,14 +268,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/tables": {
+        "/table": {
             "get": {
                 "description": "Retorna todas as tabelas do banco selecionado",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "tables"
+                    "table"
                 ],
                 "summary": "Lista de tabelas",
                 "responses": {
@@ -289,9 +289,41 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "post": {
+                "description": "Cria uma tabela",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "table"
+                ],
+                "summary": "Cria tabela",
+                "parameters": [
+                    {
+                        "description": "Tabela nova",
+                        "name": "tabela",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TableRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/respond.Response"
+                        }
+                    }
+                }
             }
         },
-        "/tables/column": {
+        "/table/column": {
             "put": {
                 "description": "Altera uma coluna em uma tabela",
                 "consumes": [
@@ -325,7 +357,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Insere uma coluna em uma tabela",
+                "description": "Cria uma coluna em uma tabela",
                 "consumes": [
                     "application/json"
                 ],
@@ -335,7 +367,7 @@ const docTemplate = `{
                 "tags": [
                     "column"
                 ],
-                "summary": "Insere coluna",
+                "summary": "Cria coluna",
                 "parameters": [
                     {
                         "description": "Coluna novo",
@@ -357,7 +389,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/tables/column/{table}": {
+        "/table/column/{table}": {
             "get": {
                 "description": "Retorna uma lista com as colunas e o schema de uma tabela",
                 "produces": [
@@ -386,7 +418,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/tables/column/{table}/{column}": {
+        "/table/column/{table}/{column}": {
             "delete": {
                 "description": "Remove uma coluna de uma tabela",
                 "produces": [
@@ -422,7 +454,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/tables/item": {
+        "/table/item": {
             "put": {
                 "description": "Altera um item em uma tabela",
                 "consumes": [
@@ -456,7 +488,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Insere um item em uma tabela",
+                "description": "Cria um item em uma tabela",
                 "consumes": [
                     "application/json"
                 ],
@@ -466,7 +498,7 @@ const docTemplate = `{
                 "tags": [
                     "item"
                 ],
-                "summary": "Insere item",
+                "summary": "Cria item",
                 "parameters": [
                     {
                         "description": "Item novo",
@@ -517,7 +549,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/tables/item/{table}": {
+        "/table/item/{table}": {
             "get": {
                 "description": "Retorna uma lista com as colunas e uma com os itens",
                 "produces": [
@@ -715,6 +747,9 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "models.TableRequest": {
+            "type": "object"
         },
         "models.TableSchema": {
             "type": "object",

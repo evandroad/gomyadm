@@ -116,6 +116,8 @@ definitions:
           type: object
         type: array
     type: object
+  models.TableRequest:
+    type: object
   models.TableSchema:
     properties:
       columns:
@@ -305,7 +307,7 @@ paths:
       summary: Faz a conexão
       tags:
       - session
-  /tables:
+  /table:
     get:
       description: Retorna todas as tabelas do banco selecionado
       produces:
@@ -319,12 +321,33 @@ paths:
             type: array
       summary: Lista de tabelas
       tags:
-      - tables
-  /tables/column:
+      - table
     post:
       consumes:
       - application/json
-      description: Insere uma coluna em uma tabela
+      description: Cria uma tabela
+      parameters:
+      - description: Tabela nova
+        in: body
+        name: tabela
+        required: true
+        schema:
+          $ref: '#/definitions/models.TableRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/respond.Response'
+      summary: Cria tabela
+      tags:
+      - table
+  /table/column:
+    post:
+      consumes:
+      - application/json
+      description: Cria uma coluna em uma tabela
       parameters:
       - description: Coluna novo
         in: body
@@ -339,7 +362,7 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/respond.Response'
-      summary: Insere coluna
+      summary: Cria coluna
       tags:
       - column
     put:
@@ -363,7 +386,7 @@ paths:
       summary: Altera coluna
       tags:
       - column
-  /tables/column/{table}:
+  /table/column/{table}:
     get:
       description: Retorna uma lista com as colunas e o schema de uma tabela
       parameters:
@@ -382,7 +405,7 @@ paths:
       summary: Listar colunas de uma tabela
       tags:
       - column
-  /tables/column/{table}/{column}:
+  /table/column/{table}/{column}:
     delete:
       description: Remove uma coluna de uma tabela
       parameters:
@@ -406,7 +429,7 @@ paths:
       summary: Remove coluna
       tags:
       - column
-  /tables/item:
+  /table/item:
     delete:
       description: Remove um item de uma tabela
       parameters:
@@ -429,7 +452,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Insere um item em uma tabela
+      description: Cria um item em uma tabela
       parameters:
       - description: Item novo
         in: body
@@ -444,7 +467,7 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/respond.Response'
-      summary: Insere item
+      summary: Cria item
       tags:
       - item
     put:
@@ -468,7 +491,7 @@ paths:
       summary: Altera item
       tags:
       - item
-  /tables/item/{table}:
+  /table/item/{table}:
     get:
       description: Retorna uma lista com as colunas e uma com os itens
       parameters:

@@ -20,7 +20,7 @@ export function SchemaProvider({ children }: { children: ReactNode }) {
     if (!activeDatabase) return
     if (table === thisTable) return
     setThisTable(table)
-    const res = await fetch(`${API_URL}/api/tables/column/${table}`)
+    const res = await fetch(`${API_URL}/api/table/column/${table}`)
     if (!res.ok) {
       setActiveSchema(null)
       return

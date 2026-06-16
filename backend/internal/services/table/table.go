@@ -14,7 +14,7 @@ func GetAll(m *db.ConnectionManager) ([]string, error) {
 		return []string{}, fmt.Errorf("Failed to get driver and connection")
 	}
 
-	tables, err := driver.ListTables(conn.DB)
+	tables, err := driver.GetAllTable(conn.DB)
 	if err != nil {
 		logger.Error("Failed to list tables: %v", err)
 		return []string{}, fmt.Errorf("Failed to list tables")

@@ -24,7 +24,7 @@ export default function FormItem() {
     }
 
     try {
-      const res = await fetch(`${API_URL}/api/tables/item`, {
+      const res = await fetch(`${API_URL}/api/table/item`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

@@ -37,7 +37,7 @@ func getStore() *ConnectionsStore {
 }
 
 func Init() error { return getStore().init() }
-func List() []models.ConnectionConfig { return getStore().list() }
+func GetAll() []models.ConnectionConfig { return getStore().list() }
 func Create(conn models.ConnectionConfig) error { return getStore().create(conn) }
 func Update(id string, conn models.ConnectionConfig) error { return getStore().update(id, conn) }
 func Delete(id string) error { return getStore().delete(id) }

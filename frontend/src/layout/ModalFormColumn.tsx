@@ -27,7 +27,7 @@ export function ModalFormColumn({ open, onClose, data }: Props) {
     const payload = { table: activeSchema.name, oldName, column: value }
     
     try {
-      const res = await fetch(`${API_URL}/api/tables/column`, {
+      const res = await fetch(`${API_URL}/api/table/column`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

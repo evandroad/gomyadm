@@ -23,6 +23,7 @@ type DatabaseHandler struct {
 // @Router /database/select [post]
 func (h *DatabaseHandler) SelectDatabase(w http.ResponseWriter, r *http.Request) {
 	var req models.DatabaseRequest
+
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		logger.Error("Failed to decode request body: %v", err)

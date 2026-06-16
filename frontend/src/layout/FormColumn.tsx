@@ -21,7 +21,7 @@ export default function FormColumn() {
     const payload = { table: activeSchema.name, column: values }
 
     try {
-      const res = await fetch(`${API_URL}/api/tables/column`, {
+      const res = await fetch(`${API_URL}/api/table/column`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

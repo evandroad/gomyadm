@@ -21,7 +21,7 @@ export function ModalDeleteColumn({ open, onClose, data }: Props) {
     if (!activeSchema) return
 
     try {
-      const res = await fetch(`${API_URL}/api/tables/column/${activeSchema.name}/${data?.name}`, {
+      const res = await fetch(`${API_URL}/api/table/column/${activeSchema.name}/${data?.name}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" }
       })

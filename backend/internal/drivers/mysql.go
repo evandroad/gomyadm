@@ -32,7 +32,31 @@ func (d MySQLDriver) BuildDSN(cfg models.ConnectionConfig) string {
 	)
 }
 
-func (d MySQLDriver) ListTables(db *sql.DB) ([]string, error) {
+func (d MySQLDriver) GetAllDatabase(db *sql.DB) ([]string, error) {
+	rows, err := db.Query(`SHOW DATABASES`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var databases []string
+
+	for rows.Next() {
+		var name string
+
+		if err := rows.Scan(&name); err != nil {
+			return nil, err
+		}
+
+		databases = append(databases, name)
+	}
+
+	return databases, nil
+}
+
+// TABLE
+
+func (d MySQLDriver) GetAllTable(db *sql.DB) ([]string, error) {
 	rows, err := db.Query("SHOW TABLES")
 	if err != nil {
 		return nil, err
@@ -54,27 +78,34 @@ func (d MySQLDriver) ListTables(db *sql.DB) ([]string, error) {
 	return tables, nil
 }
 
-func (d MySQLDriver) ListDatabases(db *sql.DB) ([]string, error) {
-	rows, err := db.Query(`SHOW DATABASES`)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
+func (d MySQLDriver) CreateTable(db *sql.DB, table string, columns []models.ColumnDefinition) error {
+	definitions := make([]string, 0, len(columns))
+	primaryKeys := make([]string, 0)
 
-	var databases []string
+	for _, column := range columns {
+		definitions = append(definitions, buildColumnDefinitionMySql(column))
 
-	for rows.Next() {
-		var name string
-
-		if err := rows.Scan(&name); err != nil {
-			return nil, err
+		if column.Primary {
+			primaryKeys = append(
+				primaryKeys,
+				fmt.Sprintf("`%s`", column.Name),
+			)
 		}
-
-		databases = append(databases, name)
 	}
 
-	return databases, nil
+	if len(primaryKeys) > 0 {
+		definitions = append(
+			definitions,
+			fmt.Sprintf("PRIMARY KEY (%s)", strings.Join(primaryKeys, ", ")),
+		)
+	}
+
+	query := fmt.Sprintf("CREATE TABLE `%s` (%s)", table, strings.Join(definitions, ", "))
+	_, err := db.Exec(query)
+	return err
 }
+
+// ITEM
 
 func (d MySQLDriver) GetAllItem(db *sql.DB, table string) (*models.TableData, error) {
 	query := fmt.Sprintf("SELECT * FROM %s LIMIT 100", table)
@@ -131,7 +162,7 @@ func (d MySQLDriver) GetAllItem(db *sql.DB, table string) (*models.TableData, er
 	}, nil
 }
 
-func (d MySQLDriver) InsertItem(db *sql.DB, table string, data map[string]any) error {
+func (d MySQLDriver) CreateItem(db *sql.DB, table string, data map[string]any) error {
 	columns := make([]string, 0, len(data))
 	placeholders := make([]string, 0, len(data))
 	values := make([]any, 0, len(data))
@@ -198,6 +229,8 @@ func (d MySQLDriver) DeleteItem(db *sql.DB, table string, key map[string]any) er
 	return err
 }
 
+// COLUMN
+
 func (d MySQLDriver) GetAllColumn(db *sql.DB, table string) (*models.TableSchema, error) {
 	query := `
 		SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_KEY, COLUMN_DEFAULT, EXTRA
@@ -246,6 +279,67 @@ func (d MySQLDriver) GetAllColumn(db *sql.DB, table string) (*models.TableSchema
 	return schema, nil
 }
 
+func (d MySQLDriver) CreateColumn(db *sql.DB, table string, column models.ColumnDefinition) error {
+	query := fmt.Sprintf("ALTER TABLE `%s` ADD COLUMN %s", table, buildColumnDefinitionMySql(column))
+
+	if column.Primary {
+		query += ", ADD PRIMARY KEY (`" + column.Name + "`)"
+	}
+
+	_, err := db.Exec(query)
+	return err
+}
+
+func (d MySQLDriver) UpdateColumn(db *sql.DB, table string, oldName string, column models.ColumnDefinition) error {
+	query := fmt.Sprintf("ALTER TABLE `%s` CHANGE COLUMN `%s` %s", table, oldName, buildColumnDefinitionMySql(column))
+
+	if column.Primary {
+		query += ", ADD PRIMARY KEY (`" + column.Name + "`)"
+	}
+
+	_, err := db.Exec(query)
+	return err
+}
+
+func (d MySQLDriver) DeleteColumn(db *sql.DB, table string, column string) error {
+	query := fmt.Sprintf(
+		"ALTER TABLE `%s` DROP COLUMN `%s`",
+		table,
+		column,
+	)
+
+	_, err := db.Exec(query)
+	return err
+}
+
+func buildColumnDefinitionMySql(column models.ColumnDefinition) string {
+	colType := strings.ToUpper(column.Type)
+
+	if column.Length != nil {
+		colType = fmt.Sprintf("%s(%d)", colType, *column.Length)
+	}
+
+	def := fmt.Sprintf("`%s` %s", column.Name, colType)
+
+	if !column.Nullable {
+		def += " NOT NULL"
+	}
+
+	if column.AutoIncrement {
+		def += " AUTO_INCREMENT"
+	}
+
+	if column.Unique {
+		def += " UNIQUE"
+	}
+
+	if column.DefaultValue != "" {
+		def += fmt.Sprintf(" DEFAULT '%s'", column.DefaultValue)
+	}
+
+	return def
+}
+
 func extractBaseType(columnType string) string {
 	if idx := strings.Index(columnType, "("); idx != -1 {
 		return strings.ToUpper(columnType[:idx])
@@ -268,92 +362,4 @@ func extractLength(columnType string) *int {
 	}
 
 	return &n
-}
-
-func (d MySQLDriver) InsertColumn(db *sql.DB, table string, column models.ColumnDefinition) error {
-	colType := strings.ToUpper(column.Type)
-
-	if column.Length != nil {
-		colType = fmt.Sprintf("%s(%d)", colType, *column.Length)
-	}
-
-	query := fmt.Sprintf(
-		"ALTER TABLE `%s` ADD COLUMN `%s` %s",
-		table,
-		column.Name,
-		colType,
-	)
-
-	if !column.Nullable {
-		query += " NOT NULL"
-	}
-
-	if column.AutoIncrement {
-		query += " AUTO_INCREMENT"
-	}
-
-	if column.Unique {
-		query += " UNIQUE"
-	}
-
-	if column.DefaultValue != "" {
-		query += fmt.Sprintf(" DEFAULT '%s'", column.DefaultValue)
-	}
-
-	if column.Primary {
-		query += ", ADD PRIMARY KEY (`" + column.Name + "`)"
-	}
-
-	_, err := db.Exec(query)
-	return err
-}
-
-func (d MySQLDriver) UpdateColumn(db *sql.DB, table string, oldName string, column models.ColumnDefinition) error {
-	colType := strings.ToUpper(column.Type)
-
-	if column.Length != nil {
-		colType = fmt.Sprintf("%s(%d)", colType, *column.Length)
-	}
-
-	query := fmt.Sprintf(
-		"ALTER TABLE `%s` CHANGE COLUMN `%s` `%s` %s",
-		table,
-		oldName,
-		column.Name,
-		colType,
-	)
-
-	if !column.Nullable {
-		query += " NOT NULL"
-	}
-
-	if column.AutoIncrement {
-		query += " AUTO_INCREMENT"
-	}
-
-	if column.Unique {
-		query += " UNIQUE"
-	}
-
-	if column.DefaultValue != "" {
-		query += fmt.Sprintf(" DEFAULT '%s'", column.DefaultValue)
-	}
-
-	if column.Primary {
-		query += ", ADD PRIMARY KEY (`" + column.Name + "`)"
-	}
-
-	_, err := db.Exec(query)
-	return err
-}
-
-func (d MySQLDriver) DeleteColumn(db *sql.DB, table string, column string) error {
-	query := fmt.Sprintf(
-		"ALTER TABLE `%s` DROP COLUMN `%s`",
-		table,
-		column,
-	)
-
-	_, err := db.Exec(query)
-	return err
 }
