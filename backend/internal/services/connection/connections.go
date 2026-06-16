@@ -26,7 +26,7 @@ var (
 	ErrConnectionExists   = errors.New("connection already exists")
 )
 
-func getStore() *ConnectionsStore {
+func GetStore() *ConnectionsStore {
 	once.Do(func() {
 		store = &ConnectionsStore{
 			filePath: filepath.Join("data", "connections.json"),
@@ -36,11 +36,7 @@ func getStore() *ConnectionsStore {
 	return store
 }
 
-func Init() error { return getStore().init() }
-func GetAll() []models.ConnectionConfig { return getStore().list() }
-func Create(conn models.ConnectionConfig) error { return getStore().create(conn) }
-func Update(id string, conn models.ConnectionConfig) error { return getStore().update(id, conn) }
-func Delete(id string) error { return getStore().delete(id) }
+func Init() error { return GetStore().init() }
 
 func (s *ConnectionsStore) init() error {
 	s.mu.Lock()
@@ -79,7 +75,7 @@ func (s *ConnectionsStore) init() error {
 	return nil
 }
 
-func (s *ConnectionsStore) list() []models.ConnectionConfig {
+func (s *ConnectionsStore) GetAll() []models.ConnectionConfig {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -89,7 +85,7 @@ func (s *ConnectionsStore) list() []models.ConnectionConfig {
 	return result
 }
 
-func (s *ConnectionsStore) create(conn models.ConnectionConfig) error {
+func (s *ConnectionsStore) Create(conn models.ConnectionConfig) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -104,7 +100,7 @@ func (s *ConnectionsStore) create(conn models.ConnectionConfig) error {
 	return s.saveToDisk()
 }
 
-func (s *ConnectionsStore) update(id string, conn models.ConnectionConfig) error {
+func (s *ConnectionsStore) Update(id string, conn models.ConnectionConfig) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -121,7 +117,7 @@ func (s *ConnectionsStore) update(id string, conn models.ConnectionConfig) error
 	return ErrConnectionNotFound
 }
 
-func (s *ConnectionsStore) delete(id string) error {
+func (s *ConnectionsStore) Delete(id string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 

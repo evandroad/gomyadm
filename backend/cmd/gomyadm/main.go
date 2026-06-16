@@ -37,10 +37,11 @@ func main() {
 	manager := db.NewConnectionManager()
 
 	sessionService := sessionService.NewSessionService(manager)
+	connectionService := connectionService.GetStore()
 	columnService := columnService.NewColumnService(manager)
 	
 	sessionHandler := api.NewSessionHandler(sessionService)
-	connectionHandler := &api.ConnectionHandler{ Connection: manager }
+	connectionHandler := api.NewConnectionHandler(connectionService)
 	databaseHandler := &api.DatabaseHandler{ Connection: manager }
 	tableHandler := &api.TableHandler{ Connection: manager }
 	itemHandler := &api.ItemHandler{ Connection: manager }

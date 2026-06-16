@@ -5,16 +5,22 @@ import (
 	"net/http"
 
 	_ "github.com/evandroad/gomyadm/docs"
-	"github.com/evandroad/gomyadm/internal/db"
 	"github.com/evandroad/gomyadm/internal/logger"
 	"github.com/evandroad/gomyadm/internal/models"
-	. "github.com/evandroad/gomyadm/internal/respond"
 	"github.com/evandroad/gomyadm/internal/services/connection"
+	. "github.com/evandroad/gomyadm/internal/respond"
+
 	"github.com/go-chi/chi/v5"
 )
 
 type ConnectionHandler struct {
-	Connection *db.ConnectionManager
+	Service *connectionService.ConnectionsStore
+}
+
+func NewConnectionHandler(service *connectionService.ConnectionsStore) *ConnectionHandler {
+	return &ConnectionHandler{
+		Service: service,
+	}
 }
 
 // @Summary Lista conexões salvas
@@ -23,9 +29,8 @@ type ConnectionHandler struct {
 // @Produce json
 // @Success 200 {object} models.ConnectionConfig
 // @Router /connection [get]
-func (ch *ConnectionHandler) GetAll(w http.ResponseWriter, r *http.Request) {
-	connections := connectionService.GetAll()
-	JSON(w, http.StatusOK, connections)
+func (h *ConnectionHandler) GetAll(w http.ResponseWriter, r *http.Request) {
+	JSON(w, http.StatusOK, h.Service.GetAll())
 }
 
 // @Summary Salva conexão
@@ -35,7 +40,7 @@ func (ch *ConnectionHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 // @Param connection body models.ConnectionConfig true "Dados da conexão"
 // @Success 201 {object} respond.Response
 // @Router /connection [post]
-func (ch *ConnectionHandler) Create(w http.ResponseWriter, r *http.Request) {
+func (h *ConnectionHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var cfg models.ConnectionConfig
 
 	err := json.NewDecoder(r.Body).Decode(&cfg)
@@ -45,7 +50,7 @@ func (ch *ConnectionHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = connectionService.Create(cfg)
+	err = h.Service.Create(cfg)
 	if err != nil {
 		logger.Error("Failed to save connection: %v", err)
 		Error(w, http.StatusInternalServerError, "Failed to save connection", nil)
@@ -62,7 +67,7 @@ func (ch *ConnectionHandler) Create(w http.ResponseWriter, r *http.Request) {
 // @Param connection body models.ConnectionConfig true "Dados da conexão"
 // @Success 200 {object} respond.Response
 // @Router /connection [put]
-func (ch *ConnectionHandler) Update(w http.ResponseWriter, r *http.Request) {
+func (h *ConnectionHandler) Update(w http.ResponseWriter, r *http.Request) {
 	var cfg models.ConnectionConfig
 
 	err := json.NewDecoder(r.Body).Decode(&cfg)
@@ -72,7 +77,7 @@ func (ch *ConnectionHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = connectionService.Update(cfg.ID, cfg)
+	err = h.Service.Update(cfg.ID, cfg)
 	if err != nil {
 		logger.Error("Failed to update connection: %v", err)
 		Error(w, http.StatusInternalServerError, "Failed to update connection", nil)
@@ -90,10 +95,10 @@ func (ch *ConnectionHandler) Update(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} respond.Response
 // @Failure 404 {object} respond.Response
 // @Router /connection/{id} [delete]
-func (ch *ConnectionHandler) Delete(w http.ResponseWriter, r *http.Request) {
+func (h *ConnectionHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
-	err := connectionService.Delete(id)
+	err := h.Service.Delete(id)
 	if err != nil {
 		logger.Error("Failed to delete connection: %v", err)
 		Error(w, http.StatusInternalServerError, "Failed to delete connection", nil)
