@@ -35,7 +35,7 @@ func (h *TableHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 // @Tags table
 // @Accept json
 // @Produce json
-// @Param tabela body models.TableRequest true "Tabela nova"
+// @Param tabela body models.TableData true "Tabela nova"
 // @Success 201 {object} respond.Response
 // @Router /table [post]
 func (h *TableHandler) Create(w http.ResponseWriter, r *http.Request) {

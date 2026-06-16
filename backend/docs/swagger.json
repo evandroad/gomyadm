@@ -303,7 +303,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.TableRequest"
+                            "$ref": "#/definitions/models.TableData"
                         }
                     }
                 ],
@@ -741,9 +741,6 @@
                     }
                 }
             }
-        },
-        "models.TableRequest": {
-            "type": "object"
         },
         "models.TableSchema": {
             "type": "object",

@@ -11,6 +11,7 @@ import (
 	"github.com/evandroad/gomyadm/internal/router"
 	"github.com/evandroad/gomyadm/internal/services/column"
 	"github.com/evandroad/gomyadm/internal/services/connection"
+	"github.com/evandroad/gomyadm/internal/services/session"
 	. "github.com/evandroad/gomyadm/internal/respond"
 
 	_ "github.com/evandroad/gomyadm/docs"
@@ -35,9 +36,10 @@ func main() {
 
 	manager := db.NewConnectionManager()
 
+	sessionService := sessionService.NewSessionService(manager)
 	columnService := columnService.NewColumnService(manager)
 	
-	sessionHandler := &api.SessionHandler{ Connection: manager }
+	sessionHandler := api.NewSessionHandler(sessionService)
 	connectionHandler := &api.ConnectionHandler{ Connection: manager }
 	databaseHandler := &api.DatabaseHandler{ Connection: manager }
 	tableHandler := &api.TableHandler{ Connection: manager }

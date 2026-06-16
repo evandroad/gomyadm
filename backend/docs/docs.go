@@ -309,7 +309,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.TableRequest"
+                            "$ref": "#/definitions/models.TableData"
                         }
                     }
                 ],
@@ -747,9 +747,6 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "models.TableRequest": {
-            "type": "object"
         },
         "models.TableSchema": {
             "type": "object",

@@ -4,17 +4,20 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/evandroad/gomyadm/internal/db"
 	"github.com/evandroad/gomyadm/internal/logger"
 	"github.com/evandroad/gomyadm/internal/models"
 	"github.com/evandroad/gomyadm/internal/services/session"
 	. "github.com/evandroad/gomyadm/internal/respond"
-
-	"github.com/rs/xid"
 )
 
 type SessionHandler struct {
-	Connection *db.ConnectionManager
+	Service *sessionService.SessionService
+}
+
+func NewSessionHandler(service *sessionService.SessionService) *SessionHandler {
+	return &SessionHandler{
+		Service: service,
+	}
 }
 
 // @Summary Faz a conexão
@@ -33,13 +36,9 @@ func (h *SessionHandler) Connect(w http.ResponseWriter, r *http.Request) {
 		Error(w, http.StatusBadRequest, "Invalid request body", nil)
 		return
 	}
-	
-	if cfg.ID == "" {
-		cfg.ID = xid.New().String()
-	}
 
 	var data models.ConnectionResponse
-	data, err = sessionService.Connect(h.Connection, cfg)
+	data, err = h.Service.Connect(cfg)
 	if err != nil {
 		logger.Error("Failed to connect: %v", err)
 		Error(w, http.StatusBadRequest, "Failed to connect", nil)
@@ -56,7 +55,7 @@ func (h *SessionHandler) Connect(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} respond.Response
 // @Router /session [delete]
 func (h *SessionHandler) Disconnect(w http.ResponseWriter, r *http.Request) {
-	err := sessionService.Disconnect(h.Connection)
+	err := h.Service.Disconnect()
 	if err != nil {
 		logger.Error("Failed to disconnect: %v", err)
 		Error(w, http.StatusNotFound, "Connection not found", nil)
@@ -73,7 +72,7 @@ func (h *SessionHandler) Disconnect(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} models.ConnectionResponse
 // @Router /session [get]
 func (h *SessionHandler) Active(w http.ResponseWriter, r *http.Request) {
-	conn, err := sessionService.Active(h.Connection)
+	conn, err := h.Service.Active()
 	if err != nil {
 		logger.Error("Failed to get active connection: %v", err)
 		Error(w, http.StatusNotFound, "No active connection", nil)

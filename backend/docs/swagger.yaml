@@ -116,8 +116,6 @@ definitions:
           type: object
         type: array
     type: object
-  models.TableRequest:
-    type: object
   models.TableSchema:
     properties:
       columns:
@@ -332,7 +330,7 @@ paths:
         name: tabela
         required: true
         schema:
-          $ref: '#/definitions/models.TableRequest'
+          $ref: '#/definitions/models.TableData'
       produces:
       - application/json
       responses:
