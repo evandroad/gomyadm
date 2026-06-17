@@ -3,7 +3,7 @@ import { Button } from "@/components/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/card"
 import { Label } from "@/components/label"
 import ModalBase from "@/components/modalBase"
-import { useSchema } from "@/contexts/SchemaProvider"
+import { useTable } from "@/contexts/TableProvider"
 import type { Column } from "@/models"
 import { notify } from "@/utils"
 import { useEffect } from "react"
@@ -15,13 +15,13 @@ type Props = {
 }
 
 export function ModalDeleteColumn({ open, onClose, data }: Props) {
-  const { activeSchema } = useSchema()
+  const { activeTable } = useTable()
 
   async function saveConnection() {
-    if (!activeSchema) return
+    if (!activeTable) return
 
     try {
-      const res = await fetch(`${API_URL}/api/table/column/${activeSchema.name}/${data?.name}`, {
+      const res = await fetch(`${API_URL}/api/table/column/${activeTable.name}/${data?.name}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" }
       })

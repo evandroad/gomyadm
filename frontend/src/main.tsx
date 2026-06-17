@@ -5,16 +5,16 @@ import App from './App.tsx'
 import { ConnectionProvider } from './contexts/ConnectionProvider.tsx'
 import { ConnectionsProvider } from './contexts/ConnectionsProvider.tsx'
 import { DatabaseProvider } from './contexts/DatabaseProvider.tsx'
-import { SchemaProvider } from './contexts/SchemaProvider.tsx'
+import { TableProvider } from './contexts/TableProvider.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ConnectionProvider>
       <ConnectionsProvider>
         <DatabaseProvider>
-          <SchemaProvider>
+          <TableProvider>
             <App />
-          </SchemaProvider>
+          </TableProvider>
         </DatabaseProvider>
       </ConnectionsProvider>
     </ConnectionProvider>

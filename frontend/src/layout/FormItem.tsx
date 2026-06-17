@@ -5,21 +5,21 @@ import { Input } from "@/components/input";
 import { Label } from "@/components/label";
 import { Button } from "@/components/button";
 import { castValue, getInputType } from "@/tableUtils";
-import { useSchema } from "@/contexts/SchemaProvider";
+import { useTable } from "@/contexts/TableProvider";
 import { notify } from "@/utils";
 import type { Column } from "@/models";
 
 export default function FormItem() {
   const { activeDatabase } = useDatabase()
-  const { activeSchema } = useSchema()
+  const { activeTable } = useTable()
   const [formData, setFormData] = useState<Record<string, string>>({})
 
   async function handleSubmit() {
-    if (!activeSchema) return
+    if (!activeTable) return
     const payload = {
-      table: activeSchema.name,
+      table: activeTable.name,
       values: Object.fromEntries(
-        activeSchema.columns.map((column: any) => [column.name, castValue(formData[column.name], column.type)])
+        activeTable.columns.map((column: any) => [column.name, castValue(formData[column.name], column.type)])
       )
     }
 
@@ -49,7 +49,7 @@ export default function FormItem() {
 
   return (
     <div className="p-2 w-100 space-y-4">
-      {activeSchema?.columns.map((column: Column) => (
+      {activeTable?.columns.map((column: Column) => (
         <div key={column.name}>
           <Label>{column.name}</Label>
 

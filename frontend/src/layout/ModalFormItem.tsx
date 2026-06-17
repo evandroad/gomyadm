@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Input } from "@/components/input"
 import { Label } from "@/components/label"
 import ModalBase from "@/components/modalBase"
-import { useSchema } from "@/contexts/SchemaProvider"
+import { useTable } from "@/contexts/TableProvider"
 import type { Column, Values } from "@/models"
 import { castValue, getInputType } from "@/tableUtils"
 import { notify } from "@/utils"
@@ -18,16 +18,16 @@ type Props = {
 
 export function ModalFormItem({ open, onClose, data }: Props) {
   const [formData, setFormData] = useState<Values>({})
-  const { activeSchema } = useSchema()
+  const { activeTable } = useTable()
 
   async function handleSubmit() {
-    if (!activeSchema) return
-    const primaryKeys = activeSchema.columns.filter((col: Column) => col.primary)
+    if (!activeTable) return
+    const primaryKeys = activeTable.columns.filter((col: Column) => col.primary)
     const payload = {
-      table: activeSchema.name,
+      table: activeTable.name,
       key: Object.fromEntries(primaryKeys.map((column: Column) => [column.name, castValue(formData[column.name], column.type)])),
       values: Object.fromEntries(
-        activeSchema.columns
+        activeTable.columns
           .filter((col: any) => col.key !== "PRI")
           .map((column: any) => [column.name, castValue(formData[column.name], column.type)])
       )
@@ -69,7 +69,7 @@ export function ModalFormItem({ open, onClose, data }: Props) {
         </CardHeader>
         <CardContent>
           <div className="p-2 w-full space-y-4">
-            {activeSchema?.columns.map((column: Column) => (
+            {activeTable?.columns.map((column: Column) => (
               <div key={column.name}>
                 <Label>{column.name}</Label>
                 <Input

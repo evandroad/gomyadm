@@ -5,7 +5,7 @@ import { Input } from "@/components/input"
 import { Label } from "@/components/label"
 import ModalBase from "@/components/modalBase"
 import { Select } from "@/components/select"
-import { useSchema } from "@/contexts/SchemaProvider"
+import { useTable } from "@/contexts/TableProvider"
 import { ColumnTypes, createColumn, type Column } from "@/models"
 import { notify } from "@/utils"
 import { useEffect, useState } from "react"
@@ -17,14 +17,14 @@ type Props = {
 }
 
 export function ModalFormColumn({ open, onClose, data }: Props) {
-  const { activeSchema } = useSchema()
+  const { activeTable } = useTable()
   const [column, setColumn] = useState<Column>(createColumn())
   const [oldName, setOldName] = useState<string>('')
 
   async function handleSubmit() {
-    if (!activeSchema) return
+    if (!activeTable) return
     const value = { ...column, length: Number(column.length) }
-    const payload = { table: activeSchema.name, oldName, column: value }
+    const payload = { table: activeTable.name, oldName, column: value }
     
     try {
       const res = await fetch(`${API_URL}/api/table/column`, {

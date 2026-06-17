@@ -54,7 +54,7 @@ export function createColumn(data?: Partial<Column>): Column {
 
 export const ColumnTypes = ["VARCHAR", "TEXT", "INT", "BIGINT", "DECIMAL", "BOOLEAN", "DATE", "DATETIME"]
 
-export type TableSchema = {
+export type Table = {
   name:    string
   columns: Column[]
 }

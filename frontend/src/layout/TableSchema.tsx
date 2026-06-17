@@ -2,7 +2,7 @@ import { useDatabase } from "@/contexts/DatabaseProvider";
 import { Th } from "@/components/th";
 import { Td } from "@/components/td";
 import type { Column } from "@/models";
-import { useSchema } from "@/contexts/SchemaProvider";
+import { useTable } from "@/contexts/TableProvider";
 import { Button } from "@/components/button";
 import { Pencil, Trash } from "lucide-react";
 import { useState } from "react";
@@ -11,14 +11,14 @@ import { ModalDeleteColumn } from "./ModalDeleteColumn";
 
 export default function TableSchema() {
   const { activeDatabase } = useDatabase()
-  const { activeSchema } = useSchema()
+  const { activeTable } = useTable()
   const [selectedRow, setSelectedRow] = useState<Column | null>(null)
   const [openForm, setOpenForm] = useState(false)
   const [openDelete, setOpenDelete] = useState(false)
 
   const COLUMNS_LABEL = ['Nome', 'Tipo', 'Tamanho', 'Nulo', 'Chave', 'Exclusivo', 'Auto Inc.','Padrão', 'Ações']
 
-  if (!activeSchema) {
+  if (!activeTable) {
     return <div className="text-zinc-500">{ activeDatabase ? 'Carregando schema...' : 'Selecione uma base de dados' }</div>
   }
 
@@ -35,7 +35,7 @@ export default function TableSchema() {
             </tr>
           </thead>
           <tbody>
-            {activeSchema?.columns.map((row: Column, index: number) => (
+            {activeTable?.columns.map((row: Column, index: number) => (
               <tr key={index} className="border-b border-zinc-800 hover:bg-zinc-900/50">
                 <Td>{row.name}</Td>
                 <Td>{row.type}</Td>

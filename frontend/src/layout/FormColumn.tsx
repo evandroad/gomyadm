@@ -4,21 +4,21 @@ import { useDatabase } from "@/contexts/DatabaseProvider";
 import { Input } from "@/components/input";
 import { Label } from "@/components/label";
 import { Button } from "@/components/button";
-import { useSchema } from "@/contexts/SchemaProvider";
+import { useTable } from "@/contexts/TableProvider";
 import { notify } from "@/utils";
 import { Select } from "@/components/select";
 import { ColumnTypes, createColumn, type Column } from "@/models";
 
 export default function FormColumn() {
   const { activeDatabase } = useDatabase()
-  const { activeSchema } = useSchema()
+  const { activeTable } = useTable()
   const [column, setColumn] = useState<Column>(createColumn())
 
   async function handleSubmit() {
-    if (!activeSchema) return
+    if (!activeTable) return
 
     const values = { ...column, length: column.length === "" ? undefined : Number(column.length) }
-    const payload = { table: activeSchema.name, column: values }
+    const payload = { table: activeTable.name, column: values }
 
     try {
       const res = await fetch(`${API_URL}/api/table/column`, {

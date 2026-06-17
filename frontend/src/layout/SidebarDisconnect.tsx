@@ -1,10 +1,14 @@
 import { API_URL } from "@/api"
 import { Button } from "@/components/button"
 import { useConnection } from "@/contexts/ConnectionProvider"
+import { useDatabase } from "@/contexts/DatabaseProvider"
+import { useTable } from "@/contexts/TableProvider"
 import { useNavigate } from "react-router-dom"
 
 export function SidebarDisconnect() {
   const { activeConnection, setActiveConnection } = useConnection()
+  const { setActiveDatabase } = useDatabase()
+  const { setActiveTable } = useTable()
   const navigate = useNavigate()
 
   async function disconnect() {
@@ -12,6 +16,8 @@ export function SidebarDisconnect() {
 
     if (res.ok) {
       setActiveConnection(null)
+      setActiveDatabase(null)
+      setActiveTable(null)
       navigate("/connect", { replace: true })
     }
   }

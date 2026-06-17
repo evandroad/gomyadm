@@ -10,7 +10,7 @@ import { SidebarDisconnect } from "@/layout/SidebarDisconnect"
 import { useDatabase } from "@/contexts/DatabaseProvider"
 import { ContentSQL } from "@/layout/ContentSQL"
 import FormData from "@/layout/FormItem"
-import { useSchema } from "@/contexts/SchemaProvider"
+import { useTable } from "@/contexts/TableProvider"
 import FormColumn from "@/layout/FormColumn"
 
 export type View = "data" | "structure" | "formData" | "formColumn" | "sql"
@@ -18,7 +18,7 @@ export type View = "data" | "structure" | "formData" | "formColumn" | "sql"
 export default function MainPage() {
   const { loading } = useConnection()
   const { activeDatabase } = useDatabase()
-  const { load } = useSchema()
+  const { load } = useTable()
   const [selectedTable, setSelectedTable] = useState<string | null>(null)
   const [view, setView] = useState<View>("data")
   const [sidebarWidth, setSidebarWidth] = useState(256)

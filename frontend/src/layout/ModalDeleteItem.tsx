@@ -3,7 +3,7 @@ import { Button } from "@/components/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/card"
 import { Label } from "@/components/label"
 import ModalBase from "@/components/modalBase"
-import { useSchema } from "@/contexts/SchemaProvider"
+import { useTable } from "@/contexts/TableProvider"
 import type { Column, Values } from "@/models"
 import { castValue } from "@/tableUtils"
 import { notify } from "@/utils"
@@ -16,14 +16,14 @@ type Props = {
 }
 
 export function ModalDeleteItem({ open, onClose, data }: Props) {
-  const { activeSchema } = useSchema()
+  const { activeTable } = useTable()
 
   async function saveConnection() {
-    if (!activeSchema) return
+    if (!activeTable) return
 
-    const primaryKeys = activeSchema.columns.filter((col: Column) => col.primary)
+    const primaryKeys = activeTable.columns.filter((col: Column) => col.primary)
     const payload = {
-      table: activeSchema.name,
+      table: activeTable.name,
       key: Object.fromEntries(
         primaryKeys.map((column: any) => [column.name, castValue(data[column.name], column.type)])
       )
