@@ -26,7 +26,7 @@ func NewColumnHandler(service *services.ColumnService) *ColumnHandler {
 // @Tags column
 // @Produce json
 // @Param table path string true "Tabela"
-// @Success 200 {object} models.TableSchema
+// @Success 200 {object} models.Table
 // @Router /table/column/{table} [get]
 func (h *ColumnHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	table := chi.URLParam(r, "table")

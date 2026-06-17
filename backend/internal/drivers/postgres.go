@@ -87,11 +87,11 @@ func (d PostgresDriver) GetAllTable(db *sql.DB) ([]string, error) {
 	return tables, nil
 }
 
-func (d PostgresDriver) CreateTable(db *sql.DB, table string, columns []models.ColumnDefinition) error {
-	definitions := make([]string, 0, len(columns))
+func (d PostgresDriver) CreateTable(db *sql.DB, table models.Table) error {
+	definitions := make([]string, 0, len(table.Columns))
 	primaryKeys := make([]string, 0)
 
-	for _, column := range columns {
+	for _, column := range table.Columns {
 		definitions = append(definitions, buildColumnDefinitionPostgres(column))
 
 		if column.Primary {
@@ -112,7 +112,7 @@ func (d PostgresDriver) CreateTable(db *sql.DB, table string, columns []models.C
 		)
 	}
 
-	query := fmt.Sprintf(`CREATE TABLE "%s" (%s)`, table, strings.Join(definitions, ", "))
+	query := fmt.Sprintf(`CREATE TABLE "%s" (%s)`, table.Name, strings.Join(definitions, ", "))
 	_, err := db.Exec(query)
 	return err
 }
@@ -248,7 +248,7 @@ func (d PostgresDriver) DeleteItem(db *sql.DB, table string, key map[string]any)
 
 // COLUMN
 
-func (d PostgresDriver) GetAllColumn(db *sql.DB, table string) (*models.TableSchema, error) {
+func (d PostgresDriver) GetAllColumn(db *sql.DB, table string) (*models.Table, error) {
 	query := `
 		SELECT
 			c.column_name,
@@ -279,12 +279,12 @@ func (d PostgresDriver) GetAllColumn(db *sql.DB, table string) (*models.TableSch
 	}
 	defer rows.Close()
 
-	schema := &models.TableSchema{
+	schema := &models.Table{
 		Name: table,
 	}
 
 	for rows.Next() {
-		var col models.ColumnDefinition
+		var col models.Column
 		var nullable string
 		var key string
 		var isIdentity string
@@ -317,7 +317,7 @@ func (d PostgresDriver) GetAllColumn(db *sql.DB, table string) (*models.TableSch
 	return schema, nil
 }
 
-func (d PostgresDriver) CreateColumn(db *sql.DB, table string, column models.ColumnDefinition) error {
+func (d PostgresDriver) CreateColumn(db *sql.DB, table string, column models.Column) error {
 	query := fmt.Sprintf(`ALTER TABLE "%s" ADD COLUMN %s`, table, buildColumnDefinitionPostgres(column))
 
 	if _, err := db.Exec(query); err != nil {
@@ -349,7 +349,7 @@ func (d PostgresDriver) CreateColumn(db *sql.DB, table string, column models.Col
 	return nil
 }
 
-func (d PostgresDriver) UpdateColumn(db *sql.DB, table string, oldName string, column models.ColumnDefinition) error {
+func (d PostgresDriver) UpdateColumn(db *sql.DB, table string, oldName string, column models.Column) error {
 	if oldName != column.Name {
 		_, err := db.Exec(fmt.Sprintf(`ALTER TABLE "%s" RENAME COLUMN "%s" TO "%s"`, table, oldName, column.Name))
 		if err != nil {
@@ -441,7 +441,7 @@ func (d PostgresDriver) DeleteColumn(db *sql.DB, table string, column string) er
 	return err
 }
 
-func buildColumnDefinitionPostgres(column models.ColumnDefinition) string {
+func buildColumnDefinitionPostgres(column models.Column) string {
 	colType := strings.ToUpper(column.Type)
 
 	if column.AutoIncrement {

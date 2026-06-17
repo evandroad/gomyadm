@@ -5,6 +5,7 @@ import (
 
 	"github.com/evandroad/gomyadm/internal/db"
 	"github.com/evandroad/gomyadm/internal/logger"
+	"github.com/evandroad/gomyadm/internal/models"
 )
 
 type TableService struct {
@@ -31,4 +32,20 @@ func (s *TableService) GetAll() ([]string, error) {
 	}
 
 	return tables, nil
+}
+
+func (s *TableService) Create(req models.Table) error {
+	driver, conn, err := s.Connection.GetDriverAndConnection()
+	if err != nil {
+		logger.Error("Failed to get driver and connection: %v", err)
+		return err
+	}
+
+	err = driver.CreateTable(conn.DB, req)
+	if err != nil {
+		logger.Error("Failed to create data: %v", err)
+		return err
+	}
+
+	return nil
 }

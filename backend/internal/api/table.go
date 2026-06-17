@@ -1,11 +1,13 @@
 package api
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/evandroad/gomyadm/internal/logger"
-	"github.com/evandroad/gomyadm/internal/services"
+	"github.com/evandroad/gomyadm/internal/models"
 	. "github.com/evandroad/gomyadm/internal/respond"
+	"github.com/evandroad/gomyadm/internal/services"
 )
 
 type TableHandler struct {
@@ -40,8 +42,25 @@ func (h *TableHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 // @Tags table
 // @Accept json
 // @Produce json
-// @Param tabela body models.TableData true "Tabela nova"
+// @Param tabela body models.Table true "Tabela nova"
 // @Success 201 {object} respond.Response
 // @Router /table [post]
 func (h *TableHandler) Create(w http.ResponseWriter, r *http.Request) {
+	var req models.Table
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		logger.Error("Failed to decode request body: %v", err)
+		Error(w, http.StatusBadRequest, "Invalid request body", err.Error())
+		return
+	}
+
+	err = h.Service.Create(req)
+	if err != nil {
+		logger.Error("Failed to create table: %v", err)
+		Error(w, http.StatusInternalServerError, "Failed to create table: " + err.Error(), nil)
+		return
+	}
+
+	Success(w, http.StatusOK, "Tabela salva com sucesso.", nil)
 }

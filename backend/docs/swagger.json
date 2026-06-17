@@ -303,7 +303,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.TableData"
+                            "$ref": "#/definitions/models.Table"
                         }
                     }
                 ],
@@ -406,7 +406,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.TableSchema"
+                            "$ref": "#/definitions/models.Table"
                         }
                     }
                 }
@@ -574,7 +574,7 @@
         }
     },
     "definitions": {
-        "models.ColumnDefinition": {
+        "models.Column": {
             "type": "object",
             "properties": {
                 "autoIncrement": {
@@ -615,7 +615,7 @@
             "type": "object",
             "properties": {
                 "column": {
-                    "$ref": "#/definitions/models.ColumnDefinition"
+                    "$ref": "#/definitions/models.Column"
                 },
                 "oldName": {
                     "type": "string"
@@ -724,6 +724,20 @@
                 }
             }
         },
+        "models.Table": {
+            "type": "object",
+            "properties": {
+                "columns": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Column"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "models.TableData": {
             "type": "object",
             "properties": {
@@ -739,20 +753,6 @@
                         "type": "object",
                         "additionalProperties": {}
                     }
-                }
-            }
-        },
-        "models.TableSchema": {
-            "type": "object",
-            "properties": {
-                "columns": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.ColumnDefinition"
-                    }
-                },
-                "name": {
-                    "type": "string"
                 }
             }
         },

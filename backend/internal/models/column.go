@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 )
 
-type ColumnDefinition struct {
+type Column struct {
 	Name          string `json:"name" example:"teste"`
 	Type          string `json:"type" example:"INT"`
 	Length        *int   `json:"length,omitempty" example:"10"`
@@ -15,13 +15,13 @@ type ColumnDefinition struct {
 	DefaultValue  string `json:"defaultValue" example:""`
 }
 
-func (c *ColumnDefinition) ToString() string {
+func (c *Column) ToString() string {
 	v, _ := json.Marshal(c)
 	return string(v)
 }
 
 type ColumnRequest struct {
-	Table   string         	 `json:"table"`
-	OldName string           `json:"oldName"`
-	Column  ColumnDefinition `json:"column"`
+	Table   string `json:"table"`
+	OldName string `json:"oldName"`
+	Column  Column `json:"column"`
 }

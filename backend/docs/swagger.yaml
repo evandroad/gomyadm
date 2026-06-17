@@ -1,6 +1,6 @@
 basePath: /api/
 definitions:
-  models.ColumnDefinition:
+  models.Column:
     properties:
       autoIncrement:
         example: false
@@ -30,7 +30,7 @@ definitions:
   models.ColumnRequest:
     properties:
       column:
-        $ref: '#/definitions/models.ColumnDefinition'
+        $ref: '#/definitions/models.Column'
       oldName:
         type: string
       table:
@@ -104,6 +104,15 @@ definitions:
       query:
         type: string
     type: object
+  models.Table:
+    properties:
+      columns:
+        items:
+          $ref: '#/definitions/models.Column'
+        type: array
+      name:
+        type: string
+    type: object
   models.TableData:
     properties:
       columns:
@@ -115,15 +124,6 @@ definitions:
           additionalProperties: {}
           type: object
         type: array
-    type: object
-  models.TableSchema:
-    properties:
-      columns:
-        items:
-          $ref: '#/definitions/models.ColumnDefinition'
-        type: array
-      name:
-        type: string
     type: object
   respond.Response:
     properties:
@@ -330,7 +330,7 @@ paths:
         name: tabela
         required: true
         schema:
-          $ref: '#/definitions/models.TableData'
+          $ref: '#/definitions/models.Table'
       produces:
       - application/json
       responses:
@@ -399,7 +399,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.TableSchema'
+            $ref: '#/definitions/models.Table'
       summary: Listar colunas de uma tabela
       tags:
       - column

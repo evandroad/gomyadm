@@ -309,7 +309,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.TableData"
+                            "$ref": "#/definitions/models.Table"
                         }
                     }
                 ],
@@ -412,7 +412,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.TableSchema"
+                            "$ref": "#/definitions/models.Table"
                         }
                     }
                 }
@@ -580,7 +580,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "models.ColumnDefinition": {
+        "models.Column": {
             "type": "object",
             "properties": {
                 "autoIncrement": {
@@ -621,7 +621,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "column": {
-                    "$ref": "#/definitions/models.ColumnDefinition"
+                    "$ref": "#/definitions/models.Column"
                 },
                 "oldName": {
                     "type": "string"
@@ -730,6 +730,20 @@ const docTemplate = `{
                 }
             }
         },
+        "models.Table": {
+            "type": "object",
+            "properties": {
+                "columns": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Column"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "models.TableData": {
             "type": "object",
             "properties": {
@@ -745,20 +759,6 @@ const docTemplate = `{
                         "type": "object",
                         "additionalProperties": {}
                     }
-                }
-            }
-        },
-        "models.TableSchema": {
-            "type": "object",
-            "properties": {
-                "columns": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.ColumnDefinition"
-                    }
-                },
-                "name": {
-                    "type": "string"
                 }
             }
         },

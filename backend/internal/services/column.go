@@ -16,7 +16,7 @@ func NewColumnService(conn *db.ConnectionManager) *ColumnService {
 	}
 }
 
-func (s *ColumnService) GetAll(table string) (*models.TableSchema, error) {
+func (s *ColumnService) GetAll(table string) (*models.Table, error) {
 	driver, conn, err := s.Connection.GetDriverAndConnection()
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)

@@ -1,8 +1,8 @@
 package models
 
-type TableSchema struct {
-	Name    string             `json:"name"`
-	Columns []ColumnDefinition `json:"columns"`
+type Table struct {
+	Name    string   `json:"name" example:"teste"`
+	Columns []Column `json:"columns"`
 }
 
 type TableData struct {
