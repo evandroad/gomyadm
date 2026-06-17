@@ -1,18 +1,29 @@
-package queryService
+package services
 
 import (
 	"database/sql"
 	"strings"
 
+	"github.com/evandroad/gomyadm/internal/db"
 	"github.com/evandroad/gomyadm/internal/models"
 )
 
-func ExecuteQuery(db *sql.DB, query string) (*models.QueryResult, error) {
+type QueryService struct {
+	Connection *db.ConnectionManager
+}
+
+func NewQueryService(conn *db.ConnectionManager) *QueryService {
+	return &QueryService{
+		Connection: conn,
+	}
+}
+
+func (s *QueryService) ExecuteQuery(query string) (*models.QueryResult, error) {
 	if isQuery(query) {
-		return executeSelect(db, query)
+		return executeSelect(s.Connection.DB(), query)
 	}
 
-	return executeCommand(db, query)
+	return executeCommand(s.Connection.DB(), query)
 }
 
 func isQuery(sql string) bool {

@@ -1,4 +1,4 @@
-package tableService
+package services
 
 import (
 	"fmt"
@@ -7,8 +7,18 @@ import (
 	"github.com/evandroad/gomyadm/internal/logger"
 )
 
-func GetAll(m *db.ConnectionManager) ([]string, error) {
-	driver, conn, err := m.GetDriverAndConnection()
+type TableService struct {
+	Connection *db.ConnectionManager
+}
+
+func NewTableService(conn *db.ConnectionManager) *TableService {
+	return &TableService{
+		Connection: conn,
+	}
+}
+
+func (s *TableService) GetAll() ([]string, error) {
+	driver, conn, err := s.Connection.GetDriverAndConnection()
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
 		return []string{}, fmt.Errorf("Failed to get driver and connection")

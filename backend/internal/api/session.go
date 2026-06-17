@@ -6,15 +6,15 @@ import (
 
 	"github.com/evandroad/gomyadm/internal/logger"
 	"github.com/evandroad/gomyadm/internal/models"
-	"github.com/evandroad/gomyadm/internal/services/session"
+	"github.com/evandroad/gomyadm/internal/services"
 	. "github.com/evandroad/gomyadm/internal/respond"
 )
 
 type SessionHandler struct {
-	Service *sessionService.SessionService
+	Service *services.SessionService
 }
 
-func NewSessionHandler(service *sessionService.SessionService) *SessionHandler {
+func NewSessionHandler(service *services.SessionService) *SessionHandler {
 	return &SessionHandler{
 		Service: service,
 	}

@@ -3,14 +3,19 @@ package api
 import (
 	"net/http"
 
-	"github.com/evandroad/gomyadm/internal/db"
 	"github.com/evandroad/gomyadm/internal/logger"
+	"github.com/evandroad/gomyadm/internal/services"
 	. "github.com/evandroad/gomyadm/internal/respond"
-	"github.com/evandroad/gomyadm/internal/services/table"
 )
 
 type TableHandler struct {
-	Connection *db.ConnectionManager
+	Service *services.TableService
+}
+
+func NewTableHandler(service *services.TableService) *TableHandler {
+	return &TableHandler{
+		Service: service,
+	}
 }
 
 // @Summary Lista de tabelas
@@ -20,7 +25,7 @@ type TableHandler struct {
 // @Success 200 {array} string
 // @Router /table [get]
 func (h *TableHandler) GetAll(w http.ResponseWriter, r *http.Request) {
-	tables, err := tableService.GetAll(h.Connection)
+	tables, err := h.Service.GetAll()
 	if err != nil {
 		logger.Error("Failed to list tables: %v", err)
 		Error(w, http.StatusInternalServerError, "Failed to list tables: " + err.Error(), nil)

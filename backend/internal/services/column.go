@@ -1,4 +1,4 @@
-package columnService
+package services
 
 import (
 	"github.com/evandroad/gomyadm/internal/db"

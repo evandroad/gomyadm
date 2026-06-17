@@ -7,15 +7,15 @@ import (
 	"github.com/evandroad/gomyadm/internal/logger"
 	"github.com/evandroad/gomyadm/internal/models"
 	. "github.com/evandroad/gomyadm/internal/respond"
-	"github.com/evandroad/gomyadm/internal/services/column"
+	"github.com/evandroad/gomyadm/internal/services"
 	"github.com/go-chi/chi/v5"
 )
 
 type ColumnHandler struct {
-	Service *columnService.ColumnService
+	Service *services.ColumnService
 }
 
-func NewColumnHandler(service *columnService.ColumnService) *ColumnHandler {
+func NewColumnHandler(service *services.ColumnService) *ColumnHandler {
 	return &ColumnHandler{
 		Service: service,
 	}

@@ -4,14 +4,20 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/evandroad/gomyadm/internal/db"
 	"github.com/evandroad/gomyadm/internal/logger"
 	"github.com/evandroad/gomyadm/internal/models"
+	"github.com/evandroad/gomyadm/internal/services"
 	. "github.com/evandroad/gomyadm/internal/respond"
 )
 
 type DatabaseHandler struct {
-	Connection *db.ConnectionManager
+	Service *services.DatabaseService
+}
+
+func NewDatabaseHandler(service *services.DatabaseService) *DatabaseHandler {
+	return &DatabaseHandler{
+		Service: service,
+	}
 }
 
 // @Summary Seleciona um banco de dados
@@ -31,7 +37,7 @@ func (h *DatabaseHandler) SelectDatabase(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	
-	err = h.Connection.SelectDatabase(req.Database)
+	err = h.Service.Select(req.Database)
 	if err != nil {
 		logger.Error("Failed to select database: %v", err)
 		Error(w, http.StatusBadRequest, "Failed to select database", nil)

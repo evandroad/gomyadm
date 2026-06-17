@@ -7,17 +7,17 @@ import (
 	_ "github.com/evandroad/gomyadm/docs"
 	"github.com/evandroad/gomyadm/internal/logger"
 	"github.com/evandroad/gomyadm/internal/models"
-	"github.com/evandroad/gomyadm/internal/services/connection"
+	"github.com/evandroad/gomyadm/internal/services"
 	. "github.com/evandroad/gomyadm/internal/respond"
 
 	"github.com/go-chi/chi/v5"
 )
 
 type ConnectionHandler struct {
-	Service *connectionService.ConnectionsStore
+	Service *services.ConnectionsStore
 }
 
-func NewConnectionHandler(service *connectionService.ConnectionsStore) *ConnectionHandler {
+func NewConnectionHandler(service *services.ConnectionsStore) *ConnectionHandler {
 	return &ConnectionHandler{
 		Service: service,
 	}

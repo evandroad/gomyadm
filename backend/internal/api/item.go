@@ -4,15 +4,21 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/evandroad/gomyadm/internal/db"
 	"github.com/evandroad/gomyadm/internal/logger"
 	"github.com/evandroad/gomyadm/internal/models"
+	"github.com/evandroad/gomyadm/internal/services"
 	. "github.com/evandroad/gomyadm/internal/respond"
 	"github.com/go-chi/chi/v5"
 )
 
 type ItemHandler struct {
-	Connection *db.ConnectionManager
+	Service *services.ItemService
+}
+
+func NewItemHandler(service *services.ItemService) *ItemHandler {
+	return &ItemHandler{
+		Service: service,
+	}
 }
 
 // @Summary Lista colunas e itens
@@ -25,14 +31,7 @@ type ItemHandler struct {
 func (h *ItemHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	table := chi.URLParam(r, "table")
 
-	driver, conn, err := h.Connection.GetDriverAndConnection()
-	if err != nil {
-		logger.Error("Failed to get driver and connection: %v", err)
-		Error(w, http.StatusInternalServerError, "No connection established.", nil)
-		return
-	}
-
-	rows, err := driver.GetAllItem(conn.DB, table)
+	rows, err := h.Service.GetAll(table)
 	if err != nil {
 		logger.Error("Failed to select table: %v", err)
 		Error(w, http.StatusInternalServerError, "Failed to select table", nil)
@@ -60,17 +59,10 @@ func (h *ItemHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	driver, conn, err := h.Connection.GetDriverAndConnection()
-	if err != nil {
-		logger.Error("Failed to get driver and connection: %v", err)
-		Error(w, http.StatusInternalServerError, "No connection established.", nil)
-		return
-	}
-
-	err = driver.CreateItem(conn.DB, req.Table, req.Values)
+	err = h.Service.Create(req)
 	if err != nil {
 		logger.Error("Failed to insert data: %v", err)
-		Error(w, http.StatusInternalServerError, "Failed to insert data", nil)
+		Error(w, http.StatusInternalServerError, "Failed to insert data: " + err.Error(), nil)
 		return
 	}
 
@@ -95,14 +87,7 @@ func (h *ItemHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	driver, conn, err := h.Connection.GetDriverAndConnection()
-	if err != nil {
-		logger.Error("Failed to get driver and connection: %v", err)
-		Error(w, http.StatusInternalServerError, "No connection established.", nil)
-		return
-	}
-
-	err = driver.UpdateItem(conn.DB, req.Table, req.Key, req.Values)
+	err = h.Service.Update(req)
 	if err != nil {
 		logger.Error("Failed to update data: %v", err)
 		Error(w, http.StatusInternalServerError, "Failed to update data", nil)
@@ -129,14 +114,7 @@ func (h *ItemHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	driver, conn, err := h.Connection.GetDriverAndConnection()
-	if err != nil {
-		logger.Error("Failed to get driver and connection: %v", err)
-		Error(w, http.StatusInternalServerError, "No connection established.", nil)
-		return
-	}
-
-	err = driver.DeleteItem(conn.DB, req.Table, req.Key)
+	err = h.Service.Delete(req)
 	if err != nil {
 		logger.Error("Failed to delete data: %v", err)
 		Error(w, http.StatusInternalServerError, "Failed to delete data", nil)

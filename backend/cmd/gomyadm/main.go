@@ -8,11 +8,9 @@ import (
 
 	"github.com/evandroad/gomyadm/internal/api"
 	"github.com/evandroad/gomyadm/internal/db"
-	"github.com/evandroad/gomyadm/internal/router"
-	"github.com/evandroad/gomyadm/internal/services/column"
-	"github.com/evandroad/gomyadm/internal/services/connection"
-	"github.com/evandroad/gomyadm/internal/services/session"
 	. "github.com/evandroad/gomyadm/internal/respond"
+	"github.com/evandroad/gomyadm/internal/router"
+	"github.com/evandroad/gomyadm/internal/services"
 
 	_ "github.com/evandroad/gomyadm/docs"
 	"github.com/swaggo/http-swagger"
@@ -24,11 +22,10 @@ import (
 // @host localhost:8181
 // @BasePath /api/
 func main() {
-	err := connectionService.Init()
+	err := services.LoadConnections()
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	r := chi.NewRouter()
 	r.Use(router.CORS)
 	r.Use(router.Recovery)
@@ -36,17 +33,21 @@ func main() {
 
 	manager := db.NewConnectionManager()
 
-	sessionService := sessionService.NewSessionService(manager)
-	connectionService := connectionService.GetStore()
-	columnService := columnService.NewColumnService(manager)
+	sessionService    := services.NewSessionService(manager)
+	connectionService := services.NewConnectionStore()
+	databaseService   := services.NewDatabaseService(manager)
+	columnService     := services.NewColumnService(manager)
+	queryService      := services.NewQueryService(manager)
+	itemService       := services.NewItemService(manager)
+	tableService      := services.NewTableService(manager)
 	
-	sessionHandler := api.NewSessionHandler(sessionService)
+	sessionHandler    := api.NewSessionHandler(sessionService)
 	connectionHandler := api.NewConnectionHandler(connectionService)
-	databaseHandler := &api.DatabaseHandler{ Connection: manager }
-	tableHandler := &api.TableHandler{ Connection: manager }
-	itemHandler := &api.ItemHandler{ Connection: manager }
-	columnHandler := api.NewColumnHandler(columnService)
-	queryHandler := &api.QueryHandler{ Connection: manager }
+	databaseHandler   := api.NewDatabaseHandler(databaseService)
+	tableHandler      := api.NewTableHandler(tableService)
+	itemHandler       := api.NewItemHandler(itemService)
+	columnHandler     := api.NewColumnHandler(columnService)
+	queryHandler      := api.NewQueryHandler(queryService)
 
 	r.Get("/health", health)
 	r.Get("/swagger/*", httpSwagger.WrapHandler)

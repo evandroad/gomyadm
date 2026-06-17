@@ -4,15 +4,20 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/evandroad/gomyadm/internal/db"
 	"github.com/evandroad/gomyadm/internal/logger"
 	"github.com/evandroad/gomyadm/internal/models"
-	"github.com/evandroad/gomyadm/internal/services/query"
+	"github.com/evandroad/gomyadm/internal/services"
 	. "github.com/evandroad/gomyadm/internal/respond"
 )
 
 type QueryHandler struct {
-	Connection *db.ConnectionManager
+	Service *services.QueryService
+}
+
+func NewQueryHandler(service *services.QueryService) *QueryHandler {
+	return &QueryHandler{
+		Service: service,
+	}
 }
 
 // @Summary Executa query
@@ -31,14 +36,7 @@ func (h *QueryHandler) ExecuteQuery(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	conn, err := h.Connection.Get()
-	if err != nil {
-		logger.Error("Failed to get active connection: %v", err)
-		Error(w, http.StatusNotFound, "Connection not found", nil)
-		return
-	}
-
-	result, err := queryService.ExecuteQuery(conn.DB, req.Query)
+	result, err := h.Service.ExecuteQuery(req.Query)
 	if err != nil {
 		logger.Error("Failed to execute query: %v", err)
 		Error(w, http.StatusBadRequest, err.Error(), nil)

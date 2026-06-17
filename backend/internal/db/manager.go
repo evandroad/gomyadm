@@ -78,6 +78,12 @@ func (m *ConnectionManager) Get() (*models.Connection, error) {
 	return m.connection, nil
 }
 
+func (m *ConnectionManager) DB() *sql.DB {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	return m.connection.DB
+}
+
 func (m *ConnectionManager) Active() (models.ConnectionResponse, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()

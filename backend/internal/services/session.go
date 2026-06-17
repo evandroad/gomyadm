@@ -1,4 +1,4 @@
-package sessionService
+package services
 
 import (
 	"github.com/evandroad/gomyadm/internal/db"
