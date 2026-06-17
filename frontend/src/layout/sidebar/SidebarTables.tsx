@@ -40,7 +40,7 @@ export function SidebarTables({ selectedTable, setSelectedTable, setView }: Prop
     <div className="border-r border-zinc-800">
       <div className="overflow-auto">
         <div className="flex justify-end">
-          <Button sm className="m-1" variant="primary"><Plus size={16}/></Button>
+          <Button sm className="m-1" variant="primary" onClick={() => { setSelectedTable(null); setView("formTable") }}><Plus size={16}/></Button>
         </div>
         {activeDatabase && tables?.length > 0 ? (
           tables.map((table) => (

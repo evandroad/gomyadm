@@ -12,8 +12,9 @@ import { SectionContentSQL } from "@/layout/section/SectionContentSQL"
 import SectionFormItem from "@/layout/section/SectionFormItem"
 import { useTable } from "@/contexts/TableProvider"
 import SectionFormColumn from "@/layout/section/SectionFormColumn"
+import SectionFormTable from "@/layout/section/SectionFormTable"
 
-export type View = "data" | "structure" | "formData" | "formColumn" | "sql"
+export type View = "data" | "structure" | "formData" | "formColumn" | "formTable" | "sql"
 
 export default function MainPage() {
   const { loading } = useConnection()
@@ -47,6 +48,8 @@ export default function MainPage() {
         return renderTab()
       case "sql":
         return <SectionContentSQL />
+      case "formTable":
+        return <SectionFormTable />
       default:
         return null
     }
