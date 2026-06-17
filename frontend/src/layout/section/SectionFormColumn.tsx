@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { API_URL } from "../api";
+import { API_URL } from "@/api";
 import { useDatabase } from "@/contexts/DatabaseProvider";
 import { Input } from "@/components/input";
 import { Label } from "@/components/label";
@@ -9,7 +9,7 @@ import { notify } from "@/utils";
 import { Select } from "@/components/select";
 import { ColumnTypes, createColumn, type Column } from "@/models";
 
-export default function FormColumn() {
+export default function SectionFormColumn() {
   const { activeDatabase } = useDatabase()
   const { activeTable } = useTable()
   const [column, setColumn] = useState<Column>(createColumn())

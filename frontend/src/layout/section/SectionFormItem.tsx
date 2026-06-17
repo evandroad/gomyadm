@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { API_URL } from "../api";
+import { API_URL } from "@/api";
 import { useDatabase } from "@/contexts/DatabaseProvider";
 import { Input } from "@/components/input";
 import { Label } from "@/components/label";
@@ -9,7 +9,7 @@ import { useTable } from "@/contexts/TableProvider";
 import { notify } from "@/utils";
 import type { Column } from "@/models";
 
-export default function FormItem() {
+export default function SectionFormItem() {
   const { activeDatabase } = useDatabase()
   const { activeTable } = useTable()
   const [formData, setFormData] = useState<Record<string, string>>({})

@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react"
-import { API_URL } from "../api";
+import { API_URL } from "@/api";
 import { useDatabase } from "@/contexts/DatabaseProvider";
 import { Th } from "@/components/th";
 import { Td } from "@/components/td";
 import { Button } from "@/components/button";
 import { Pencil, Trash } from "lucide-react";
-import { ModalFormItem } from "./ModalFormItem";
+import { ModalFormItem } from "../modal/ModalFormItem";
 import type { TableData, Values } from "@/models";
-import { ModalDeleteItem } from "./ModalDeleteItem";
+import { ModalDeleteItem } from "../modal/ModalDeleteItem";
 
-export default function TablePreview({ table }: { table: string }) {
+export default function SectionTablePreview({ table }: { table: string }) {
   const [tableData, setTableData] = useState<TableData | null>(null)
   const [selectedRow, setSelectedRow] = useState<Values | null>(null)
   const [openForm, setOpenForm] = useState(false)

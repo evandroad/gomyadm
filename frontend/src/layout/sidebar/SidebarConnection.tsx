@@ -1,11 +1,11 @@
 import { useState } from "react"
-import { Button } from "../components/button"
-import { useConnection } from "../contexts/ConnectionProvider"
-import { useConnections } from "../contexts/ConnectionsProvider"
+import { Button } from "@/components/button"
+import { useConnection } from "@/contexts/ConnectionProvider"
+import { useConnections } from "@/contexts/ConnectionsProvider"
 import { Pencil, Trash } from "lucide-react"
-import { ModalFormConnection } from "./ModalFormConnection"
-import { ModalDeleteConnection } from "./ModalDeleteConnection"
-import { createConnection } from "../models"
+import { ModalFormConnection } from "../modal/ModalFormConnection"
+import { ModalDeleteConnection } from "../modal/ModalDeleteConnection"
+import { createConnection } from "@/models"
 
 export default function SidebarConnection() {
   const { activeConnection } = useConnection()

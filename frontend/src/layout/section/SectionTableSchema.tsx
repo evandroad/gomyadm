@@ -6,10 +6,10 @@ import { useTable } from "@/contexts/TableProvider";
 import { Button } from "@/components/button";
 import { Pencil, Trash } from "lucide-react";
 import { useState } from "react";
-import { ModalFormColumn } from "./ModalFormColumn";
-import { ModalDeleteColumn } from "./ModalDeleteColumn";
+import { ModalFormColumn } from "../modal/ModalFormColumn";
+import { ModalDeleteColumn } from "../modal/ModalDeleteColumn";
 
-export default function TableSchema() {
+export default function SectionTableSchema() {
   const { activeDatabase } = useDatabase()
   const { activeTable } = useTable()
   const [selectedRow, setSelectedRow] = useState<Column | null>(null)

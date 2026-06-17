@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react"
-import TablePreview from "@/layout/TablePreview"
-import SidebarConnection from "@/layout/SidebarConnection"
+import SectionTablePreview from "@/layout/section/SectionTablePreview"
+import SidebarConnection from "@/layout/sidebar/SidebarConnection"
 import { useConnection } from "@/contexts/ConnectionProvider"
-import { SidebarDatabase } from "@/layout/SidebarDatabase"
-import { SidebarTables } from "@/layout/SidebarTables"
+import { SidebarDatabase } from "@/layout/sidebar/SidebarDatabase"
+import { SidebarTables } from "@/layout/sidebar/SidebarTables"
 import { Toolbar } from "@/layout/Toolbar"
-import TableSchema from "@/layout/TableSchema"
-import { SidebarDisconnect } from "@/layout/SidebarDisconnect"
+import SectionTableSchema from "@/layout/section/SectionTableSchema"
+import { SidebarDisconnect } from "@/layout/sidebar/SidebarDisconnect"
 import { useDatabase } from "@/contexts/DatabaseProvider"
-import { ContentSQL } from "@/layout/ContentSQL"
-import FormData from "@/layout/FormItem"
+import { SectionContentSQL } from "@/layout/section/SectionContentSQL"
+import SectionFormItem from "@/layout/section/SectionFormItem"
 import { useTable } from "@/contexts/TableProvider"
-import FormColumn from "@/layout/FormColumn"
+import SectionFormColumn from "@/layout/section/SectionFormColumn"
 
 export type View = "data" | "structure" | "formData" | "formColumn" | "sql"
 
@@ -46,7 +46,7 @@ export default function MainPage() {
         }
         return renderTab()
       case "sql":
-        return <ContentSQL />
+        return <SectionContentSQL />
       default:
         return null
     }
@@ -70,16 +70,16 @@ export default function MainPage() {
 
     switch (view) {
       case "data":
-        content = <TablePreview table={selectedTable} />
+        content = <SectionTablePreview table={selectedTable} />
         break
       case "structure":
-        content = <TableSchema />
+        content = <SectionTableSchema />
         break
       case "formData":
-        content = <FormData />
+        content = <SectionFormItem />
         break
       case "formColumn":
-        content = <FormColumn />
+        content = <SectionFormColumn />
         break
     }
 

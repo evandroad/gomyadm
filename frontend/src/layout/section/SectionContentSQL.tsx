@@ -2,7 +2,7 @@ import { API_URL } from "@/api"
 import { Button } from "@/components/button"
 import { useState } from "react"
 
-export function ContentSQL() {
+export function SectionContentSQL() {
   const [query, setQuery] = useState("")
   const [result, setResult] = useState("")
 
