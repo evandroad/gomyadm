@@ -4,6 +4,7 @@ import MainPage from "./pages/MainPage"
 import ConnectionGuard from "./guard/ConnectionGuard"
 import GuestGuard from "./guard/GuestGuard"
 import Notification from "./components/notification"
+import NotFound from "./pages/NotFound"
 
 export default function App() {
   return (
@@ -20,6 +21,8 @@ export default function App() {
           <Route path="/" element={<Navigate to="/app" replace />} />
           <Route path="/app" element={<MainPage />} />
         </Route>
+
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   )

@@ -1,8 +1,11 @@
 package main
 
 import (
+	"embed"
+	"io/fs"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 
@@ -16,6 +19,9 @@ import (
 	"github.com/swaggo/http-swagger"
 )
 
+//go:embed all:web
+var webFS embed.FS
+
 // @title Database Manager API
 // @version 1.0
 // @description API para gerenciamento de bancos de dados.
@@ -26,6 +32,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	r := chi.NewRouter()
 	r.Use(router.CORS)
 	r.Use(router.Recovery)
@@ -90,9 +97,12 @@ func main() {
 		})
 
 		r.Post("/query", queryHandler.ExecuteQuery)
+
+		r.NotFound(func(w http.ResponseWriter, r *http.Request) { notFound(w, r) })
 	})
 
-	r.NotFound(func(w http.ResponseWriter, r *http.Request) { notFound(w, r) })
+	sub, _ := fs.Sub(webFS, "web")
+	r.Get("/*", spaHandler(sub))
 
 	port := ":8181"
 	log.Println("server running at http://localhost" + port)
@@ -109,4 +119,21 @@ func health(w http.ResponseWriter, r *http.Request) {
 
 func notFound(w http.ResponseWriter, r *http.Request) {
 	Error(w, http.StatusNotFound, "rota não encontrada", H{ "path": r.URL.Path })
+}
+
+func spaHandler(sub fs.FS) http.HandlerFunc {
+	fileServer := http.FileServer(http.FS(sub))
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		path := strings.TrimPrefix(r.URL.Path, "/")
+
+		if f, err := sub.Open(path); err == nil {
+			f.Close()
+			fileServer.ServeHTTP(w, r)
+			return
+		}
+
+		r.URL.Path = "/"
+		fileServer.ServeHTTP(w, r)
+	}
 }

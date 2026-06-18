@@ -20,3 +20,7 @@ createRoot(document.getElementById('root')!).render(
     </ConnectionProvider>
   </StrictMode>,
 )
+
+if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+  document.documentElement.classList.add("dark")
+}
