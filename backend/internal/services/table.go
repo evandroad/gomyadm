@@ -49,3 +49,19 @@ func (s *TableService) Create(req models.Table) error {
 
 	return nil
 }
+
+func (s *TableService) Update(oldName, newName string) error {
+	driver, conn, err := s.Connection.GetDriverAndConnection()
+	if err != nil {
+		logger.Error("Failed to get driver and connection: %v", err)
+		return err
+	}
+
+	err = driver.RenameTable(conn.DB, oldName, newName)
+	if err != nil {
+		logger.Error("Failed to create data: %v", err)
+		return err
+	}
+
+	return nil
+}

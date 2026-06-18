@@ -117,6 +117,17 @@ func (d PostgresDriver) CreateTable(db *sql.DB, table models.Table) error {
 	return err
 }
 
+func (d PostgresDriver) RenameTable(db *sql.DB, oldName, newName string) error {
+	query := fmt.Sprintf(
+		`ALTER TABLE "%s" RENAME TO "%s"`,
+		oldName,
+		newName,
+	)
+
+	_, err := db.Exec(query)
+	return err
+}
+
 // ITEM
 
 func (d PostgresDriver) GetAllItem(db *sql.DB, table string) (*models.TableData, error) {

@@ -13,6 +13,7 @@ type Driver interface {
 	
 	GetAllTable(db *sql.DB) ([]string, error)
 	CreateTable(db *sql.DB, table models.Table) error
+	RenameTable(db *sql.DB, oldName, newName string) error
 	
 	GetAllItem(db *sql.DB, table string) (*models.TableData, error)
 	CreateItem(db *sql.DB, table string, data map[string]any) error
@@ -21,6 +22,6 @@ type Driver interface {
 	
 	GetAllColumn(db *sql.DB, table string) (*models.Table, error)
 	CreateColumn(db *sql.DB, table string, column models.Column) error
-	UpdateColumn(db *sql.DB, table string, oldName string, column models.Column) error
+	UpdateColumn(db *sql.DB, table, oldName string, column models.Column) error
 	DeleteColumn(db *sql.DB, table string, column string) error
 }

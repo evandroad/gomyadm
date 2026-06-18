@@ -8,6 +8,7 @@ import (
 	"github.com/evandroad/gomyadm/internal/models"
 	. "github.com/evandroad/gomyadm/internal/respond"
 	"github.com/evandroad/gomyadm/internal/services"
+	"github.com/go-chi/chi/v5"
 )
 
 type TableHandler struct {
@@ -63,4 +64,27 @@ func (h *TableHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	Success(w, http.StatusOK, "Tabela salva com sucesso.", nil)
+}
+
+// @Summary Altera tabela
+// @Description Altera uma tabela
+// @Tags table
+// @Accept json
+// @Produce json
+// @Param oldName path string true "Nome atual"
+// @Param newName path string true "Nome novo"
+// @Success 200 {object} respond.Response
+// @Router /table/{oldName}/{newName} [put]
+func (h *TableHandler) Update(w http.ResponseWriter, r *http.Request) {
+	oldName := chi.URLParam(r, "oldName")
+	newName := chi.URLParam(r, "newName")
+
+	err := h.Service.Update(oldName, newName)
+	if err != nil {
+		logger.Error("Failed to update table: %v", err)
+		Error(w, http.StatusInternalServerError, "Failed to update table: " + err.Error(), nil)
+		return
+	}
+
+	Success(w, http.StatusOK, "Tabela alterada com sucesso.", nil)
 }

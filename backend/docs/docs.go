@@ -577,6 +577,45 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/table/{oldName}/{newName}": {
+            "put": {
+                "description": "Altera uma tabela",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "table"
+                ],
+                "summary": "Altera tabela",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Nome atual",
+                        "name": "oldName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Nome novo",
+                        "name": "newName",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/respond.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -740,7 +779,8 @@ const docTemplate = `{
                     }
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "teste"
                 }
             }
         },

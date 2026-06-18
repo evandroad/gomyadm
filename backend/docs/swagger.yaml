@@ -111,6 +111,7 @@ definitions:
           $ref: '#/definitions/models.Column'
         type: array
       name:
+        example: teste
         type: string
     type: object
   models.TableData:
@@ -339,6 +340,32 @@ paths:
           schema:
             $ref: '#/definitions/respond.Response'
       summary: Cria tabela
+      tags:
+      - table
+  /table/{oldName}/{newName}:
+    put:
+      consumes:
+      - application/json
+      description: Altera uma tabela
+      parameters:
+      - description: Nome atual
+        in: path
+        name: oldName
+        required: true
+        type: string
+      - description: Nome novo
+        in: path
+        name: newName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respond.Response'
+      summary: Altera tabela
       tags:
       - table
   /table/column:
