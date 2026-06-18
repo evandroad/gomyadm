@@ -7,3 +7,7 @@ export const notify = (msg: string, type: NotificationType = 'success') => {
 }
 
 export const setNotifyHandler = (fn: typeof showFn) => showFn = fn
+
+export function getStatus(value: boolean): string {
+  return value ? '✅' : '❌'
+}

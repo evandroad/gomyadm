@@ -12,11 +12,13 @@ import { useEffect, useState } from "react"
 
 type Props = {
   open: boolean
+  toApi: boolean
   onClose: () => void
+  onSave: (column: Column) => void
   data: Column | null
 }
 
-export function ModalFormColumn({ open, onClose, data }: Props) {
+export function ModalFormColumn({ open, toApi, onClose, onSave, data }: Props) {
   const { activeTable } = useTable()
   const [column, setColumn] = useState<Column>(createColumn())
   const [oldName, setOldName] = useState<string>('')
@@ -46,6 +48,12 @@ export function ModalFormColumn({ open, onClose, data }: Props) {
     } finally {
       onClose()
     }
+  }
+
+  function save() {
+    const value: Column = { ...column, length: Number(column.length) }
+    onSave(value)
+    setColumn(createColumn())
   }
 
   useEffect(() => {
@@ -125,7 +133,8 @@ export function ModalFormColumn({ open, onClose, data }: Props) {
           </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={handleSubmit} variant="primary">Salvar</Button>
+          {toApi && <Button onClick={handleSubmit} variant="primary">Salvar</Button>}
+          {!toApi && <Button onClick={save} variant="primary">Salvar</Button>}
           <Button onClick={onClose}>Cancelar</Button>
         </CardFooter>
       </Card>

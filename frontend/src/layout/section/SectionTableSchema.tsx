@@ -8,6 +8,9 @@ import { Pencil, Trash } from "lucide-react";
 import { useState } from "react";
 import { ModalFormColumn } from "../modal/ModalFormColumn";
 import { ModalDeleteColumn } from "../modal/ModalDeleteColumn";
+import { getStatus } from "@/utils";
+
+export const COLUMNS_LABEL = ['Nome', 'Tipo', 'Tamanho', 'Nulo', 'Chave', 'Exclusivo', 'Auto Inc.','Padrão', 'Ações']
 
 export default function SectionTableSchema() {
   const { activeDatabase } = useDatabase()
@@ -16,15 +19,13 @@ export default function SectionTableSchema() {
   const [openForm, setOpenForm] = useState(false)
   const [openDelete, setOpenDelete] = useState(false)
 
-  const COLUMNS_LABEL = ['Nome', 'Tipo', 'Tamanho', 'Nulo', 'Chave', 'Exclusivo', 'Auto Inc.','Padrão', 'Ações']
-
   if (!activeTable) {
     return <div className="text-zinc-500">{ activeDatabase ? 'Carregando schema...' : 'Selecione uma base de dados' }</div>
   }
 
   return (
     <>
-      <ModalFormColumn open={openForm} onClose={() => setOpenForm(false)} data={selectedRow} />
+      <ModalFormColumn open={openForm} toApi={true} onClose={() => setOpenForm(false)} onSave={() => {}} data={selectedRow} />
       <ModalDeleteColumn open={openDelete} onClose={() => setOpenDelete(false)} data={selectedRow} />
 
       <div>
@@ -40,10 +41,10 @@ export default function SectionTableSchema() {
                 <Td>{row.name}</Td>
                 <Td>{row.type}</Td>
                 <Td>{row.length ?? ''}</Td>
-                <Td>{row.nullable ? 'V' : ''}</Td>
-                <Td>{row.primary ? 'V' : ''}</Td>
-                <Td>{row.unique ? 'V' : ''}</Td>
-                <Td>{row.autoIncrement ? 'V' : ''}</Td>
+                <Td>{getStatus(row.nullable)}</Td>
+                <Td>{getStatus(row.primary)}</Td>
+                <Td>{getStatus(row.unique)}</Td>
+                <Td>{getStatus(row.autoIncrement)}</Td>
                 <Td>{row.defaultValue}</Td>
                 <Td>
                   <div className="space-x-2">

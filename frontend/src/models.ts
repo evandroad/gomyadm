@@ -1,3 +1,4 @@
+export const ColumnTypes = ["VARCHAR", "TEXT", "INT", "BIGINT", "DECIMAL", "BOOLEAN", "DATE", "DATETIME"]
 export type Values = Record<string, any>
 
 export type Connection = {
@@ -30,7 +31,7 @@ export function createConnection(data?: Partial<Connection>): Connection {
 export type Column = {
   name: string
   type: string
-  length?: string
+  length?: string | number
   nullable: boolean
   primary: boolean
   unique: boolean
@@ -52,11 +53,18 @@ export function createColumn(data?: Partial<Column>): Column {
   }
 }
 
-export const ColumnTypes = ["VARCHAR", "TEXT", "INT", "BIGINT", "DECIMAL", "BOOLEAN", "DATE", "DATETIME"]
 
 export type Table = {
   name:    string
   columns: Column[]
+}
+
+export function createTable(data?: Partial<Table>): Table {
+  return {
+    name: '',
+    columns: [],
+    ...data
+  }
 }
 
 export type TableData = {
