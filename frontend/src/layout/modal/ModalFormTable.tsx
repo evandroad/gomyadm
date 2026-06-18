@@ -10,15 +10,15 @@ import { useEffect, useState } from "react"
 type Props = {
   open: boolean
   onClose: () => void
-  oldName: string
+  tableName: string
 }
 
-export function ModalFormTable({ open, onClose, oldName }: Props) {
+export function ModalFormTable({ open, onClose, tableName }: Props) {
   const [newName, setNewName] = useState<string>('')
 
   async function handleSubmit() {  
     try {
-      const res = await fetch(`${API_URL}/api/table/${oldName}/${newName}`, {
+      const res = await fetch(`${API_URL}/api/table/${tableName}/${newName}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" }
       })

@@ -6,6 +6,7 @@ import type { View } from "@/pages/MainPage"
 import { Pencil, Plus, Trash } from "lucide-react"
 import { useEffect, useState } from "react"
 import { ModalFormTable } from "../modal/ModalFormTable"
+import { ModalDeleteTable } from "../modal/ModalDeleteTable"
 
 type Props = {
   selectedTable: string | null
@@ -17,7 +18,8 @@ export function SidebarTables({ selectedTable, setSelectedTable, setView }: Prop
   const { activeDatabase } = useDatabase()
   const { activeConnection } = useConnection()
   const [tables, setTables] = useState<string[]>([])
-  const [tableToEdit, setTableToEdit] = useState<string | null>(null)
+  const [tableToUpdate, setTableToUpdate] = useState<string | null>(null)
+  const [tableToDelete, setTableToDelete] = useState<string | null>(null)
 
   useEffect(() => {
     if (!activeConnection) {
@@ -48,13 +50,11 @@ export function SidebarTables({ selectedTable, setSelectedTable, setView }: Prop
     setView("formTable")
   }
 
-  function showUpdate(tableName: string) {
-    setTableToEdit(tableName)
-  }
-
   return (
     <>
-      <ModalFormTable open={tableToEdit != null} onClose={() => setTableToEdit(null)} oldName={tableToEdit ?? ''} />
+      <ModalFormTable open={tableToUpdate != null} onClose={() => setTableToUpdate(null)} tableName={tableToUpdate ?? ''} />
+      <ModalDeleteTable open={tableToDelete != null} onClose={() => setTableToDelete(null)} tableName={tableToDelete ?? ''} />
+
       <div className="border-r border-zinc-800">
         <div className="overflow-auto">
           <div className="flex justify-end">
@@ -66,13 +66,13 @@ export function SidebarTables({ selectedTable, setSelectedTable, setView }: Prop
                 <button
                   key={table}
                   onClick={() => { setSelectedTable(table); setView("data") }}
-                  className={`w-30 text-left px-1 py-1 rounded-md hover:bg-zinc-950 cursor-pointer ${selectedTable === table ? "bg-zinc-800" : ""}`}
+                  className={`text-left px-1 py-1 rounded-md hover:bg-zinc-950 cursor-pointer ${selectedTable === table ? "bg-zinc-800" : ""}`}
                 >
                   {table}
                 </button>
                 <div className="space-x-1">
-                  <Button sm variant="primary" onClick={() => showUpdate(table)}><Pencil size={16} /></Button>
-                  <Button sm variant="danger"><Trash size={16} /></Button>
+                  <Button sm variant="primary" onClick={() => setTableToUpdate(table)}><Pencil size={16} /></Button>
+                  <Button sm variant="danger" onClick={() => setTableToDelete(table)}><Trash size={16} /></Button>
                 </div>
               </div>
             ))

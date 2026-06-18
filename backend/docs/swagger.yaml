@@ -368,6 +368,27 @@ paths:
       summary: Altera tabela
       tags:
       - table
+  /table/{table}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove uma tabela
+      parameters:
+      - description: Nome da tabela
+        in: path
+        name: table
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respond.Response'
+      summary: Remove tabela
+      tags:
+      - table
   /table/column:
     post:
       consumes:

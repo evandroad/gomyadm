@@ -72,6 +72,7 @@ func main() {
 			r.Get("/", tableHandler.GetAll)
 			r.Post("/", tableHandler.Create)
 			r.Put("/{oldName}/{newName}", tableHandler.Update)
+			r.Delete("/{table}", tableHandler.Delete)
 			
 			r.Route("/item", func(r chi.Router) {
 				r.Get("/{table}", itemHandler.GetAll)

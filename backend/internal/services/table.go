@@ -43,7 +43,7 @@ func (s *TableService) Create(req models.Table) error {
 
 	err = driver.CreateTable(conn.DB, req)
 	if err != nil {
-		logger.Error("Failed to create data: %v", err)
+		logger.Error("Failed to create table: %v", err)
 		return err
 	}
 
@@ -57,9 +57,25 @@ func (s *TableService) Update(oldName, newName string) error {
 		return err
 	}
 
-	err = driver.RenameTable(conn.DB, oldName, newName)
+	err = driver.UpdateTable(conn.DB, oldName, newName)
 	if err != nil {
-		logger.Error("Failed to create data: %v", err)
+		logger.Error("Failed to update table: %v", err)
+		return err
+	}
+
+	return nil
+}
+
+func (s *TableService) Delete(table string) error {
+	driver, conn, err := s.Connection.GetDriverAndConnection()
+	if err != nil {
+		logger.Error("Failed to get driver and connection: %v", err)
+		return err
+	}
+
+	err = driver.DeleteTable(conn.DB, table)
+	if err != nil {
+		logger.Error("Failed to delete table: %v", err)
 		return err
 	}
 

@@ -105,11 +105,21 @@ func (d MySQLDriver) CreateTable(db *sql.DB, table models.Table) error {
 	return err
 }
 
-func (d MySQLDriver) RenameTable(db *sql.DB, oldName, newName string) error {
+func (d MySQLDriver) UpdateTable(db *sql.DB, oldName, newName string) error {
 	query := fmt.Sprintf(
 		"ALTER TABLE `%s` RENAME TO `%s`",
 		oldName,
 		newName,
+	)
+
+	_, err := db.Exec(query)
+	return err
+}
+
+func (d MySQLDriver) DeleteTable(db *sql.DB, table string) error {
+	query := fmt.Sprintf(
+		"DROP TABLE `%s`",
+		table,
 	)
 
 	_, err := db.Exec(query)

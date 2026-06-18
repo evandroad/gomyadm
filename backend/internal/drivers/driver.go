@@ -13,7 +13,8 @@ type Driver interface {
 	
 	GetAllTable(db *sql.DB) ([]string, error)
 	CreateTable(db *sql.DB, table models.Table) error
-	RenameTable(db *sql.DB, oldName, newName string) error
+	UpdateTable(db *sql.DB, oldName, newName string) error
+	DeleteTable(db *sql.DB, table string) error
 	
 	GetAllItem(db *sql.DB, table string) (*models.TableData, error)
 	CreateItem(db *sql.DB, table string, data map[string]any) error

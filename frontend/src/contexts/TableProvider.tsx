@@ -18,6 +18,7 @@ export function TableProvider({ children }: { children: ReactNode }) {
   async function load(table: string) {
     if (!activeDatabase) return
     if (table === activeTable?.name) return
+    if (table == '') return
 
     const res = await fetch(`${API_URL}/api/table/column/${table}`)
     if (!res.ok) {

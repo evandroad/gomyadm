@@ -610,6 +610,38 @@
                     }
                 }
             }
+        },
+        "/table/{table}": {
+            "delete": {
+                "description": "Remove uma tabela",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "table"
+                ],
+                "summary": "Remove tabela",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Nome da tabela",
+                        "name": "table",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/respond.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {

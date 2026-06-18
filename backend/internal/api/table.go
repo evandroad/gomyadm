@@ -88,3 +88,24 @@ func (h *TableHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	Success(w, http.StatusOK, "Tabela alterada com sucesso.", nil)
 }
+
+// @Summary Remove tabela
+// @Description Remove uma tabela
+// @Tags table
+// @Accept json
+// @Produce json
+// @Param table path string true "Nome da tabela"
+// @Success 200 {object} respond.Response
+// @Router /table/{table} [delete]
+func (h *TableHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	table := chi.URLParam(r, "table")
+
+	err := h.Service.Delete(table)
+	if err != nil {
+		logger.Error("Failed to delete table: %v", err)
+		Error(w, http.StatusInternalServerError, "Failed to delete table: " + err.Error(), nil)
+		return
+	}
+
+	Success(w, http.StatusOK, "Tabela removida com sucesso.", nil)
+}
