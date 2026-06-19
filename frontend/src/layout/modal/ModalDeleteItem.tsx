@@ -59,7 +59,7 @@ export function ModalDeleteItem({ open, onClose, data }: Props) {
     <ModalBase open={open} onClose={onClose} className="p-2 w-96">
       <Card className="bg-zinc-900">
         <CardHeader>
-          <CardTitle>Excluir Item</CardTitle>
+          <CardTitle onClose={onClose}>Excluir Item</CardTitle>
         </CardHeader>
         <CardContent>
           {Object.entries(data).map(([key, value]) => <Label key={key}><span>{key}</span><span>{value}</span></Label>)}

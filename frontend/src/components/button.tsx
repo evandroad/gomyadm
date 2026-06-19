@@ -1,8 +1,8 @@
 const variants = {
-  default: "bg-zinc-800 hover:bg-zinc-700",
-  success: "bg-green-600 hover:bg-green-700",
-  danger: "bg-red-700 hover:bg-red-800",
-  primary: "bg-blue-700 hover:bg-blue-800",
+  default: "bg-zinc-800 text-gray-300 hover:bg-zinc-700",
+  success: "bg-green-600 hover:bg-green-700 dark:bg-green-600/20 dark:text-green-400 dark:hover:bg-green-600/30",
+  danger: "bg-red-700 hover:bg-red-800 dark:bg-red-600/20 dark:text-red-400 dark:hover:bg-red-600/30",
+  primary: "bg-blue-700 hover:bg-blue-800 dark:bg-blue-600/20 dark:text-blue-400 dark:hover:bg-blue-600/30",
 }
 
 type variantsType = "default" | "success" | "danger" | "primary"

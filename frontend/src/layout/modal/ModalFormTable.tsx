@@ -48,7 +48,7 @@ export function ModalFormTable({ open, onClose, tableName }: Props) {
     <ModalBase open={open} onClose={onClose} className="p-2 w-96">
       <Card className="bg-zinc-900">
         <CardHeader>
-          <CardTitle>Salvar Dados</CardTitle>
+          <CardTitle onClose={onClose}>Salvar Dados</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="p-2 w-full space-y-4">

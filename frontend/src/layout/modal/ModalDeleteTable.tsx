@@ -42,7 +42,7 @@ export function ModalDeleteTable({ open, onClose, tableName }: Props) {
     <ModalBase open={open} onClose={onClose} className="p-2 w-96">
       <Card className="bg-zinc-900">
         <CardHeader>
-          <CardTitle>Excluir Item</CardTitle>
+          <CardTitle onClose={onClose}>Excluir Item</CardTitle>
         </CardHeader>
         <CardContent>
           Tem certeza que deseja remover a tabela <b>{tableName}</b>?

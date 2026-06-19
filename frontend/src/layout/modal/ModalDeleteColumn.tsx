@@ -49,7 +49,7 @@ export function ModalDeleteColumn({ open, onClose, data }: Props) {
     <ModalBase open={open} onClose={onClose} className="p-2 w-96">
       <Card className="bg-zinc-900">
         <CardHeader>
-          <CardTitle>Excluir Item</CardTitle>
+          <CardTitle onClose={onClose}>Excluir Item</CardTitle>
         </CardHeader>
         <CardContent>
           <Label><span>Nome:</span><span>{data?.name}</span></Label>

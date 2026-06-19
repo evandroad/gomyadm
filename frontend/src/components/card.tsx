@@ -1,6 +1,7 @@
 import * as React from "react"
 import { useState } from "react"
-import { ChevronDown } from "lucide-react"
+import { ChevronDown, X } from "lucide-react"
+import { Button } from "./button"
 
 type CardProps = React.ComponentProps<"div"> & {
   size?: "default" | "sm"
@@ -15,7 +16,7 @@ export function Card({ className = "", size = "default", title, collapsible = fa
     <div
       data-slot="card"
       data-size={size}
-      className={`group/card flex flex-col gap-4 overflow-hidden rounded-xl bg-card text-sm ring-1 ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl text-white ${className}`}
+      className={`group/card flex flex-col gap-4 overflow-hidden rounded-xl bg-card text-sm ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl text-white ${className}`}
       {...props}
     >
       {(title || collapsible) && (
@@ -44,13 +45,18 @@ export function CardHeader({ className = "", ...props }: React.ComponentProps<"d
   )
 }
 
-export function CardTitle({ className = "", ...props }: React.ComponentProps<"div">) {
+export function CardTitle({ className = "", onClose, ...props }: React.ComponentProps<"div"> & { onClose?: () => void }) {
   return (
     <div
       data-slot="card-title"
-      className={`font-heading text-base leading-snug font-medium group-data-[size=sm]/card:text-sm ${className}`}
+      className={`flex justify-between items-center font-heading text-base leading-snug font-medium group-data-[size=sm]/card:text-sm ${className}`}
       {...props}
-    />
+    >
+      {props.children}
+      {onClose && (
+        <Button onClick={onClose}><X size={12} strokeWidth={6} /></Button>
+      )}
+    </div>
   )
 }
 

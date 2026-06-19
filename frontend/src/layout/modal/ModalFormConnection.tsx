@@ -49,7 +49,7 @@ export function ModalFormConnection({ open, onClose, data, edit }: Props) {
     <ModalBase open={open} onClose={onClose} className="p-2 w-96">
       <Card className="bg-zinc-900">
         <CardHeader>
-          <CardTitle>Salvar conexão</CardTitle>
+          <CardTitle onClose={onClose}>Salvar conexão</CardTitle>
         </CardHeader>
         <CardContent>
           <Label>Nome da conexão</Label>
