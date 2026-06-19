@@ -32,6 +32,8 @@ func (d MySQLDriver) BuildDSN(cfg models.ConnectionConfig) string {
 	)
 }
 
+// DATABASE
+
 func (d MySQLDriver) GetAllDatabase(db *sql.DB) ([]string, error) {
 	rows, err := db.Query(`SHOW DATABASES`)
 	if err != nil {
@@ -52,6 +54,16 @@ func (d MySQLDriver) GetAllDatabase(db *sql.DB) ([]string, error) {
 	}
 
 	return databases, nil
+}
+
+func (d MySQLDriver) CreateDatabase(db *sql.DB, name string) error {
+	query := fmt.Sprintf(
+		"CREATE DATABASE `%s`",
+		name,
+	)
+
+	_, err := db.Exec(query)
+	return err
 }
 
 // TABLE

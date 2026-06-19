@@ -73,7 +73,11 @@ func main() {
 			r.Delete("/{id}", connectionHandler.Delete)	
 		})
 
-		r.Post("/database/select", databaseHandler.SelectDatabase)
+		r.Route("/database", func(r chi.Router) {
+			r.Get("/", databaseHandler.GetAll)
+			r.Post("/select", databaseHandler.Select)
+			r.Post("/", databaseHandler.Create)
+		})
 
 		r.Route("/table", func(r chi.Router) {
 			r.Get("/", tableHandler.GetAll)

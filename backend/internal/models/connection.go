@@ -29,10 +29,6 @@ type ConnectionResponse struct {
 	Databases []string `json:"databases"`
 }
 
-type DatabaseRequest struct {
-	Database string `json:"database" example:"my_system"`
-}
-
 func (c *Connection) Matches(cfg ConnectionConfig) bool {
 	return c.Config.Driver == cfg.Driver &&
 		c.Config.Host == cfg.Host &&

@@ -33,6 +33,8 @@ func (d PostgresDriver) BuildDSN(cfg models.ConnectionConfig) string {
 	)
 }
 
+// DATABASE
+
 func (d PostgresDriver) GetAllDatabase(db *sql.DB) ([]string, error) {
 	rows, err := db.Query(`
 		SELECT datname
@@ -57,6 +59,16 @@ func (d PostgresDriver) GetAllDatabase(db *sql.DB) ([]string, error) {
 	}
 
 	return databases, nil
+}
+
+func (d PostgresDriver) CreateDatabase(db *sql.DB, name string) error {
+	query := fmt.Sprintf(
+		"CREATE DATABASE `%s`",
+		name,
+	)
+
+	_, err := db.Exec(query)
+	return err
 }
 
 // TABLE

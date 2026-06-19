@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+
 	"github.com/evandroad/gomyadm/internal/db"
 	"github.com/evandroad/gomyadm/internal/logger"
 	"github.com/evandroad/gomyadm/internal/models"
@@ -23,6 +25,11 @@ func (s *ColumnService) GetAll(table string) (*models.Table, error) {
 		return nil, err
 	}
 
+	if s.Connection.GetDatabase() == "" {
+		logger.Error("No database selected.")
+		return nil, fmt.Errorf("No database selected.")
+	}
+
 	schema, err := driver.GetAllColumn(conn.DB, table)
 	if err != nil {
 		logger.Error("Failed to describe table: %v", err)
@@ -37,6 +44,11 @@ func (s *ColumnService) Create(req models.ColumnRequest) error {
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
 		return err
+	}
+
+	if s.Connection.GetDatabase() == "" {
+		logger.Error("No database selected.")
+		return fmt.Errorf("No database selected.")
 	}
 
 	err = driver.CreateColumn(conn.DB, req.Table, req.Column)
@@ -55,6 +67,11 @@ func (s *ColumnService) Update(req models.ColumnRequest) error {
 		return err
 	}
 
+	if s.Connection.GetDatabase() == "" {
+		logger.Error("No database selected.")
+		return fmt.Errorf("No database selected.")
+	}
+
 	err = driver.UpdateColumn(conn.DB, req.Table, req.OldName, req.Column)
 	if err != nil {
 		logger.Error("Failed to update data: %v", err)
@@ -69,6 +86,11 @@ func (s *ColumnService) Delete(table, column string) error {
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
 		return err
+	}
+
+	if s.Connection.GetDatabase() == "" {
+		logger.Error("No database selected.")
+		return fmt.Errorf("No database selected.")
 	}
 
 	err = driver.DeleteColumn(conn.DB, table, column)

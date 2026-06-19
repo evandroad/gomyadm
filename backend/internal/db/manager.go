@@ -143,11 +143,6 @@ func (m *ConnectionManager) GetDriverAndConnection() (drivers.Driver, *models.Co
 		return nil, nil, fmt.Errorf("unsupported driver: %s", conn.Config.Driver)
 	}
 
-	if m.GetDatabase() == "" {
-		logger.Error("No database selected.")
-		return nil, nil, fmt.Errorf("No database selected.")
-	}
-
 	return driver, conn, nil
 }
 

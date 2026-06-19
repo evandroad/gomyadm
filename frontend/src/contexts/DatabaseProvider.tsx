@@ -16,7 +16,7 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
     const res = await fetch(`${API_URL}/api/database/select`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ database }),
+      body: JSON.stringify({ name: database }),
     })
 
     if (!res.ok) return

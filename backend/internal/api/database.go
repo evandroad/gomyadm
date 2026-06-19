@@ -20,6 +20,24 @@ func NewDatabaseHandler(service *services.DatabaseService) *DatabaseHandler {
 	}
 }
 
+// @Summary Lista de banco de dados
+// @Description Retorna todas os bancos de dados
+// @Tags database
+// @Accept json
+// @Produce json
+// @Success 200 {array} string
+// @Router /database [get]
+func (h *DatabaseHandler) GetAll(w http.ResponseWriter, r *http.Request) {
+	tables, err := h.Service.GetAll()
+	if err != nil {
+		logger.Error("Failed to list tables: %v", err)
+		Error(w, http.StatusInternalServerError, "Failed to list tables: " + err.Error(), nil)
+		return
+	}
+
+	JSON(w, http.StatusOK, tables)
+}
+
 // @Summary Seleciona um banco de dados
 // @Tags database
 // @Accept json
@@ -27,7 +45,35 @@ func NewDatabaseHandler(service *services.DatabaseService) *DatabaseHandler {
 // @Param database body models.DatabaseRequest true "Banco de Dados"
 // @Success 200
 // @Router /database/select [post]
-func (h *DatabaseHandler) SelectDatabase(w http.ResponseWriter, r *http.Request) {
+func (h *DatabaseHandler) Select(w http.ResponseWriter, r *http.Request) {
+	var req models.DatabaseRequest
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		logger.Error("Failed to decode request body: %v", err)
+		Error(w, http.StatusBadRequest, "Invalid request body: " + err.Error(), nil)
+		return
+	}
+	
+	err = h.Service.Select(req.Name)
+	if err != nil {
+		logger.Error("Failed to select database: %v", err)
+		Error(w, http.StatusBadRequest, "Failed to select database: " + err.Error(), nil)
+		return
+	}
+
+	Success(w, http.StatusOK, "Database " + req.Name + " selected successfully.", nil)
+}
+
+// @Summary Cria banco de dados
+// @Description Cria um banco de dados
+// @Tags database
+// @Accept json
+// @Produce json
+// @Param database body models.DatabaseRequest true "Banco de Dados"
+// @Success 201
+// @Router /database [post]
+func (h *DatabaseHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var req models.DatabaseRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -37,12 +83,12 @@ func (h *DatabaseHandler) SelectDatabase(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	
-	err = h.Service.Select(req.Database)
+	err = h.Service.Create(req)
 	if err != nil {
-		logger.Error("Failed to select database: %v", err)
-		Error(w, http.StatusBadRequest, "Failed to select database", nil)
+		logger.Error("Failed to create database: %v", err)
+		Error(w, http.StatusBadRequest, "Failed to create database: " + err.Error(), nil)
 		return
 	}
 
-	Success(w, http.StatusOK, "Database " + req.Database + " selected successfully.", nil)
+	Success(w, http.StatusOK, "Database " + req.Name + " created successfully.", nil)
 }

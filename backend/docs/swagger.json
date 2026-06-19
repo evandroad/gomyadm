@@ -128,6 +128,61 @@
                 }
             }
         },
+        "/database": {
+            "get": {
+                "description": "Retorna todas os bancos de dados",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "database"
+                ],
+                "summary": "Lista de banco de dados",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Cria um banco de dados",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "database"
+                ],
+                "summary": "Cria banco de dados",
+                "parameters": [
+                    {
+                        "description": "Banco de Dados",
+                        "name": "database",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.DatabaseRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                }
+            }
+        },
         "/database/select": {
             "post": {
                 "consumes": [
@@ -765,9 +820,17 @@
         "models.DatabaseRequest": {
             "type": "object",
             "properties": {
-                "database": {
+                "name": {
                     "type": "string",
                     "example": "my_system"
+                },
+                "newName": {
+                    "type": "string",
+                    "example": "db_teste1"
+                },
+                "oldName": {
+                    "type": "string",
+                    "example": "db_teste"
                 }
             }
         },

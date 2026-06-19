@@ -84,8 +84,14 @@ definitions:
     type: object
   models.DatabaseRequest:
     properties:
-      database:
+      name:
         example: my_system
+        type: string
+      newName:
+        example: db_teste1
+        type: string
+      oldName:
+        example: db_teste
         type: string
     type: object
   models.ItemRequest:
@@ -220,6 +226,42 @@ paths:
       summary: Remove conexão
       tags:
       - connection
+  /database:
+    get:
+      consumes:
+      - application/json
+      description: Retorna todas os bancos de dados
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Lista de banco de dados
+      tags:
+      - database
+    post:
+      consumes:
+      - application/json
+      description: Cria um banco de dados
+      parameters:
+      - description: Banco de Dados
+        in: body
+        name: database
+        required: true
+        schema:
+          $ref: '#/definitions/models.DatabaseRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      summary: Cria banco de dados
+      tags:
+      - database
   /database/select:
     post:
       consumes:

@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+
 	"github.com/evandroad/gomyadm/internal/db"
 	"github.com/evandroad/gomyadm/internal/logger"
 	"github.com/evandroad/gomyadm/internal/models"
@@ -23,6 +25,11 @@ func (s *ItemService) GetAll(table string) (*models.TableData, error) {
 		return nil, err
 	}
 
+	if s.Connection.GetDatabase() == "" {
+		logger.Error("No database selected.")
+		return nil, fmt.Errorf("No database selected.")
+	}
+
 	rows, err := driver.GetAllItem(conn.DB, table)
 	if err != nil {
 		logger.Error("Failed to select table: %v", err)
@@ -37,6 +44,11 @@ func (s *ItemService) Create(req models.ItemRequest) error {
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
 		return err
+	}
+
+	if s.Connection.GetDatabase() == "" {
+		logger.Error("No database selected.")
+		return fmt.Errorf("No database selected.")
 	}
 
 	err = driver.CreateItem(conn.DB, req.Table, req.Values)
@@ -55,6 +67,11 @@ func (s *ItemService) Update(req models.ItemRequest) error {
 		return err
 	}
 
+	if s.Connection.GetDatabase() == "" {
+		logger.Error("No database selected.")
+		return fmt.Errorf("No database selected.")
+	}
+
 	err = driver.UpdateItem(conn.DB, req.Table, req.Key, req.Values)
 	if err != nil {
 		logger.Error("Failed to update data: %v", err)
@@ -69,6 +86,11 @@ func (s *ItemService) Delete(req models.ItemRequest) error {
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
 		return err
+	}
+
+	if s.Connection.GetDatabase() == "" {
+		logger.Error("No database selected.")
+		return fmt.Errorf("No database selected.")
 	}
 
 	err = driver.DeleteItem(conn.DB, req.Table, req.Key)

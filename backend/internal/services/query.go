@@ -2,6 +2,7 @@ package services
 
 import (
 	"database/sql"
+	"fmt"
 	"strings"
 
 	"github.com/evandroad/gomyadm/internal/db"
@@ -19,6 +20,10 @@ func NewQueryService(conn *db.ConnectionManager) *QueryService {
 }
 
 func (s *QueryService) ExecuteQuery(query string) (*models.QueryResult, error) {
+	if s.Connection.GetDatabase() == "" {
+		return nil, fmt.Errorf("No database selected.")
+	}
+
 	if isQuery(query) {
 		return executeSelect(s.Connection.DB(), query)
 	}
