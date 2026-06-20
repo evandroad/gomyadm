@@ -12,8 +12,8 @@ type Driver interface {
 
 	GetAllDatabase(db *sql.DB) ([]string, error)
 	CreateDatabase(db *sql.DB, name string) error
-	// UpdateDatabase(db *sql.DB, oldName, newName string) error
-	// DeleteDatabase(db *sql.DB, name string) error
+	UpdateDatabase(db *sql.DB, oldName, newName string) error
+	DeleteDatabase(db *sql.DB, name string) error
 
 	GetAllTable(db *sql.DB) ([]string, error)
 	CreateTable(db *sql.DB, table models.Table) error

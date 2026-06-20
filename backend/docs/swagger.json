@@ -153,6 +153,35 @@
                     }
                 }
             },
+            "put": {
+                "description": "Altera um banco de dados",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "database"
+                ],
+                "summary": "Altera banco de dados",
+                "parameters": [
+                    {
+                        "description": "Banco de Dados",
+                        "name": "database",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.DatabaseRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
             "post": {
                 "description": "Cria um banco de dados",
                 "consumes": [
@@ -622,6 +651,38 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.TableData"
+                        }
+                    }
+                }
+            }
+        },
+        "/table/{name}": {
+            "delete": {
+                "description": "Remove o banco de dados",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "table"
+                ],
+                "summary": "Remove o banco de dados",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Nome da tabela",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/respond.Response"
                         }
                     }
                 }

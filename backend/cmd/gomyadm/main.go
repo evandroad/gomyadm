@@ -77,6 +77,8 @@ func main() {
 			r.Get("/", databaseHandler.GetAll)
 			r.Post("/select", databaseHandler.Select)
 			r.Post("/", databaseHandler.Create)
+			r.Put("/", databaseHandler.Update)
+			r.Delete("/{name}", databaseHandler.Delete)
 		})
 
 		r.Route("/table", func(r chi.Router) {

@@ -66,6 +66,65 @@ func (d MySQLDriver) CreateDatabase(db *sql.DB, name string) error {
 	return err
 }
 
+func (d MySQLDriver) UpdateDatabase(db *sql.DB, oldName, newName string) error {
+	// cria a nova base
+	_, err := db.Exec(fmt.Sprintf("CREATE DATABASE `%s`", newName))
+	if err != nil {
+		return err
+	}
+
+	// lista as tabelas da base antiga
+	rows, err := db.Query(fmt.Sprintf("SHOW TABLES FROM `%s`", oldName))
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	var renames []string
+
+	for rows.Next() {
+		var table string
+
+		if err := rows.Scan(&table); err != nil {
+			return err
+		}
+
+		renames = append(
+			renames,
+			fmt.Sprintf("`%s`.`%s` TO `%s`.`%s`", oldName, table, newName, table),
+		)
+	}
+
+	if err := rows.Err(); err != nil {
+		return err
+	}
+
+	// move todas as tabelas
+	if len(renames) > 0 {
+		query := "RENAME TABLE " + strings.Join(renames, ", ")
+
+		_, err = db.Exec(query)
+		if err != nil {
+			return err
+		}
+	}
+
+	// remove a base antiga
+	_, err = db.Exec(fmt.Sprintf("DROP DATABASE `%s`", oldName))
+
+	return err
+}
+
+func (d MySQLDriver) DeleteDatabase(db *sql.DB, name string) error {
+	query := fmt.Sprintf(
+		"DROP DATABASE `%s`",
+		name,
+	)
+
+	_, err := db.Exec(query)
+	return err
+}
+
 // TABLE
 
 func (d MySQLDriver) GetAllTable(db *sql.DB) ([]string, error) {

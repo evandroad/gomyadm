@@ -262,6 +262,25 @@ paths:
       summary: Cria banco de dados
       tags:
       - database
+    put:
+      consumes:
+      - application/json
+      description: Altera um banco de dados
+      parameters:
+      - description: Banco de Dados
+        in: body
+        name: database
+        required: true
+        schema:
+          $ref: '#/definitions/models.DatabaseRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Altera banco de dados
+      tags:
+      - database
   /database/select:
     post:
       consumes:
@@ -382,6 +401,27 @@ paths:
           schema:
             $ref: '#/definitions/respond.Response'
       summary: Cria tabela
+      tags:
+      - table
+  /table/{name}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove o banco de dados
+      parameters:
+      - description: Nome da tabela
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respond.Response'
+      summary: Remove o banco de dados
       tags:
       - table
   /table/{oldName}/{newName}:

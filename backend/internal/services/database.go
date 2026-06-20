@@ -56,3 +56,35 @@ func (s *DatabaseService) Create(req models.DatabaseRequest) error {
 
 	return nil
 }
+
+func (s *DatabaseService) Update(req models.DatabaseRequest) error {
+	driver, conn, err := s.Connection.GetDriverAndConnection()
+	if err != nil {
+		logger.Error("Failed to get driver and connection: %v", err)
+		return err
+	}
+
+	err = driver.UpdateDatabase(conn.DB, req.OldName, req.NewName)
+	if err != nil {
+		logger.Error("Failed to update database: %v", err)
+		return err
+	}
+
+	return nil
+}
+
+func (s *DatabaseService) Delete(name string) error {
+	driver, conn, err := s.Connection.GetDriverAndConnection()
+	if err != nil {
+		logger.Error("Failed to get driver and connection: %v", err)
+		return err
+	}
+
+	err = driver.DeleteDatabase(conn.DB, name)
+	if err != nil {
+		logger.Error("Failed to delete database: %v", err)
+		return err
+	}
+
+	return nil
+}

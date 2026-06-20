@@ -71,6 +71,27 @@ func (d PostgresDriver) CreateDatabase(db *sql.DB, name string) error {
 	return err
 }
 
+func (d PostgresDriver) UpdateDatabase(db *sql.DB, oldName, newName string) error {
+	query := fmt.Sprintf(
+		"ALTER DATABASE `%s`RENAME TO `%s`",
+		oldName,
+		newName,
+	)
+
+	_, err := db.Exec(query)
+	return err
+}
+
+func (d PostgresDriver) DeleteDatabase(db *sql.DB, name string) error {
+	query := fmt.Sprintf(
+		"DROP DATABASE `%s`",
+		name,
+	)
+
+	_, err := db.Exec(query)
+	return err
+}
+
 // TABLE
 
 func (d PostgresDriver) GetAllTable(db *sql.DB) ([]string, error) {
