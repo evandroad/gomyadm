@@ -91,6 +91,7 @@ func (s *DatabaseService) Delete(name string) error {
 	}
 
 	s.Connection.DeleteDatabase(name)
+	s.Connection.SetDatabase()
 
 	return nil
 }

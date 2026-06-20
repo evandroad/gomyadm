@@ -106,6 +106,12 @@ func (m *ConnectionManager) GetDatabase() string {
 	return m.connection.Config.Database
 }
 
+func (m *ConnectionManager) SetDatabase() {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.connection.Config.Database = ""
+}
+
 func (m *ConnectionManager) SelectDatabase(name string) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()

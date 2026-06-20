@@ -1,16 +1,19 @@
 import { API_URL } from "@/api"
-import { createContext, useContext, useState, type ReactNode } from "react"
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
 
 type DatabaseContextType = {
   activeDatabase: string | null
+  databases: string[]
   setActiveDatabase: (database: string | null) => void
   changeDatabase: (database: string) => Promise<void>
+  getDatabases: () => Promise<void>
 }
 
 const DatabaseContext = createContext<DatabaseContextType | undefined>(undefined)
 
 export function DatabaseProvider({ children }: { children: ReactNode }) {
   const [activeDatabase, setActiveDatabase] = useState<string | null>(null)
+  const [databases, setDatabases] = useState<string[]>([])
 
   async function changeDatabase(database: string) {
     const res = await fetch(`${API_URL}/api/database/select`, {
@@ -24,8 +27,26 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
     setActiveDatabase(database)
   }
 
+  async function getDatabases() {
+    const res = await fetch(`${API_URL}/api/database`)
+
+    if (!res.ok) {
+      return
+    }
+
+    const data = await res.json()
+    if (data) {
+      setActiveDatabase(data.active)
+      setDatabases(data.databases)
+    }
+  }
+
+  useEffect(() => {
+    getDatabases()
+  }, [])
+
   return (
-    <DatabaseContext.Provider value={{ activeDatabase, setActiveDatabase, changeDatabase }}>
+    <DatabaseContext.Provider value={{ activeDatabase, databases, setActiveDatabase, changeDatabase, getDatabases }}>
       {children}
     </DatabaseContext.Provider>
   )

@@ -1,16 +1,13 @@
 import { Button } from "@/components/button";
 import { Select } from "@/components/select";
-import { useConnection } from "@/contexts/ConnectionProvider";
 import { useDatabase } from "@/contexts/DatabaseProvider";
-import { Pencil, Plus, Trash } from "lucide-react";
+import { Pencil, Plus, RefreshCcw, Trash } from "lucide-react";
 import { useState } from "react";
 import { ModalFormDatabase } from "../modal/ModalFormDatabase";
 import { ModalDeleteDatabase } from "../modal/ModalDeleteDatabase";
 
 export function SidebarDatabase() {
-  const { activeConnection } = useConnection()
-  const { activeDatabase, changeDatabase } = useDatabase()
-  const databases = activeConnection?.databases || []
+  const { activeDatabase, databases, changeDatabase, getDatabases } = useDatabase()
   const [openForm, setOpenForm] = useState<boolean>(false)
   const [openDelete, setopenDelete] = useState<boolean>(false)
 
@@ -30,6 +27,7 @@ export function SidebarDatabase() {
               </>
             }
             <Button sm variant="success" onClick={() => setOpenForm(true)}><Plus size={16} /></Button>
+            <Button sm onClick={getDatabases}><RefreshCcw size={16} /></Button>
           </div>
         </div>
         <div className="space-y-4 mt-2">
