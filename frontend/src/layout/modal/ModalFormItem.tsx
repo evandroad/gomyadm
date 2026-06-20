@@ -13,40 +13,41 @@ import { useEffect, useState } from "react"
 type Props = {
   open: boolean
   onClose: () => void
-  data: Values
+  data: Values | null
 }
 
 export function ModalFormItem({ open, onClose, data }: Props) {
-  const [formData, setFormData] = useState<Values>({})
+  const [formData, setFormData] = useState<Values | null>(null)
   const { activeTable } = useTable()
+  const method = data == null ? 'POST' : 'PUT'
 
   async function handleSubmit() {
     if (!activeTable) return
     const primaryKeys = activeTable.columns.filter((col: Column) => col.primary)
     const payload = {
       table: activeTable.name,
-      key: Object.fromEntries(primaryKeys.map((column: Column) => [column.name, castValue(formData[column.name], column.type)])),
+      key: Object.fromEntries(primaryKeys.map((column: Column) => [column.name, castValue(formData?.[column.name], column.type)])),
       values: Object.fromEntries(
         activeTable.columns
           .filter((col: any) => col.key !== "PRI")
-          .map((column: any) => [column.name, castValue(formData[column.name], column.type)])
+          .map((column: any) => [column.name, castValue(formData?.[column.name], column.type)])
       )
     }
     
     try {
       const res = await fetch(`${API_URL}/api/table/item`, {
-        method: "PUT",
+        method: method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       })
 
+      const data = await res.json()
       if (!res.ok) {
-        const data = await res.json()
         notify(`Erro: ${data.message || 'Falha ao alterar o dado'}`, 'error')
         return
       }
 
-      notify("Dado alterado com sucesso!")
+      notify(data.message)
       setFormData({})
     } catch (err: any) {
       console.error(err)
@@ -76,7 +77,7 @@ export function ModalFormItem({ open, onClose, data }: Props) {
                   type={getInputType(column.type)}
                   required={!column.nullable}
                   disabled={column.autoIncrement}
-                  value={formData[column.name] || ""}
+                  value={formData?.[column.name] || ""}
                   onChange={(e) => setFormData(prev => ({ ...prev, [column.name]: e.target.value }))}
                 />
               </div>

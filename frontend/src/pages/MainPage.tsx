@@ -9,12 +9,14 @@ import SectionTableSchema from "@/layout/section/SectionTableSchema"
 import { SidebarDisconnect } from "@/layout/sidebar/SidebarDisconnect"
 import { useDatabase } from "@/contexts/DatabaseProvider"
 import { SectionContentSQL } from "@/layout/section/SectionContentSQL"
-import SectionFormItem from "@/layout/section/SectionFormItem"
 import { useTable } from "@/contexts/TableProvider"
 import SectionFormColumn from "@/layout/section/SectionFormColumn"
 import SectionFormTable from "@/layout/section/SectionFormTable"
+import { Button } from "@/components/button"
+import { Plus, RefreshCcw } from "lucide-react"
+import { ModalFormItem } from "@/layout/modal/ModalFormItem"
 
-export type View = "data" | "structure" | "formData" | "formColumn" | "formTable" | "sql"
+export type View = "data" | "structure" | "formColumn" | "formTable" | "sql"
 
 export default function MainPage() {
   const { loading } = useConnection()
@@ -23,6 +25,7 @@ export default function MainPage() {
   const [selectedTable, setSelectedTable] = useState<string | null>(null)
   const [view, setView] = useState<View>("data")
   const [sidebarWidth, setSidebarWidth] = useState(256)
+  const [openFormItem, setOpenFormItem] = useState<boolean>(false)
 
   useEffect(() => {load(selectedTable || '')}, [selectedTable])
 
@@ -38,7 +41,6 @@ export default function MainPage() {
     switch (view) {
       case "data":
       case "structure":
-      case "formData":
       case "formColumn":
         if (!selectedTable) {
           return (
@@ -58,16 +60,31 @@ export default function MainPage() {
   function renderTab() {
     if (!selectedTable) return null
 
-    const tabs = (<div className="flex w-fit border-b border-zinc-800 mb-2">
-      <button onClick={() => setView("data")} className={getTabClass("data")}>Dados</button>
-      <button onClick={() => setView("structure")} className={getTabClass("structure")}>Estrutura</button>
-      {(view == 'data' || view == 'formData') && 
-        <button onClick={() => setView("formData")} className={getTabClass("formData")}>Novo Item</button>
-      }
-      {(view == 'structure' || view == 'formColumn') && 
-        <button onClick={() => setView("formColumn")} className={getTabClass("formColumn")}>Nova Coluna</button>
-      }
-    </div>)
+    const tabs = (
+      <div className="flex flex-row justify-between items-center">
+        <div className="flex w-fit border-b border-zinc-800 mb-2">
+          <button onClick={() => setView("data")} className={getTabClass("data")}>Dados</button>
+          <button onClick={() => setView("structure")} className={getTabClass("structure")}>Estrutura</button>
+          {(view == 'structure' || view == 'formColumn') && 
+            <button onClick={() => setView("formColumn")} className={getTabClass("formColumn")}>Nova Coluna</button>
+          }
+        </div>
+        <div className="space-x-1">
+          {view == 'data' &&
+            <>
+              <Button variant="success" onClick={() => setOpenFormItem(true)}><Plus size={16}/></Button>
+              <Button><RefreshCcw size={16}/></Button>
+            </>
+          }
+          {view == 'structure' &&
+            <>
+              <Button variant="success" onClick={() => setView("structure")}><Plus size={16}/></Button>
+              <Button><RefreshCcw size={16}/></Button>
+            </>
+          }
+        </div>
+      </div>
+    )
 
     let content = <div>Conteúdo não encontrado</div>
 
@@ -77,9 +94,6 @@ export default function MainPage() {
         break
       case "structure":
         content = <SectionTableSchema />
-        break
-      case "formData":
-        content = <SectionFormItem />
         break
       case "formColumn":
         content = <SectionFormColumn />
@@ -118,6 +132,8 @@ export default function MainPage() {
 
   return (
     <div className="min-h-screen flex bg-zinc-950 text-white">
+      <ModalFormItem open={openFormItem} onClose={() => setOpenFormItem(false)} data={null} />
+
       <aside className="bg-zinc-900 border-r border-zinc-800 flex flex-col relative" style={{ width: sidebarWidth }}>
         <div className="py-4 px-3 font-semibold text-lg border-b border-zinc-800">Gomyadm</div>
         <SidebarConnection />
@@ -133,7 +149,7 @@ export default function MainPage() {
       <main className="flex-1 flex flex-col">
         <Toolbar view={view} table={selectedTable} setView={setView} setSelectedTable={setSelectedTable} />
         {activeDatabase && (
-          <div className="flex flex-col h-full p-2">
+          <div className="flex flex-col h-full px-2">
             { renderView() }
           </div>
         )}
