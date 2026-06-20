@@ -3,7 +3,7 @@ import { Button } from "@/components/button"
 import { useConnection } from "@/contexts/ConnectionProvider"
 import { useDatabase } from "@/contexts/DatabaseProvider"
 import type { View } from "@/pages/MainPage"
-import { Pencil, Plus, Trash } from "lucide-react"
+import { Pencil, Plus, RefreshCcw, Trash } from "lucide-react"
 import { useEffect, useState } from "react"
 import { ModalFormTable } from "../modal/ModalFormTable"
 import { ModalDeleteTable } from "../modal/ModalDeleteTable"
@@ -59,7 +59,10 @@ export function SidebarTables({ selectedTable, setSelectedTable, setView }: Prop
         <div className="overflow-auto">
           <div className="flex flex-row justify-between mb-3">
             <span className="font-bold">Tabelas</span>
-            <Button sm variant="success" onClick={showFormNewTable}><Plus size={16}/></Button>
+            <div className="space-x-1">
+              <Button sm variant="success" onClick={showFormNewTable}><Plus size={16}/></Button>
+              <Button sm onClick={loadTables}><RefreshCcw size={16}/></Button>
+            </div>
           </div>
           {activeDatabase && tables?.length > 0 ? (
             tables.map((table) => (

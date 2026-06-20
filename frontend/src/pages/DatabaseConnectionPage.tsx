@@ -9,6 +9,7 @@ import { Select } from "@/components/select"
 import { createConnection, type Connection } from "@/models"
 import { useConnection } from "@/contexts/ConnectionProvider"
 import { useConnections } from "@/contexts/ConnectionsProvider"
+import { useDatabase } from "@/contexts/DatabaseProvider"
 
 const DB_DRIVERS = [
   { value: "mysql", text: "MySQL" },
@@ -23,6 +24,7 @@ export default function DatabaseConnectionPage() {
   const navigate = useNavigate()
   const { setActiveConnection } = useConnection()
   const { connections } = useConnections()
+  const { getDatabases } = useDatabase()
 
   async function handleConnect(connArg?: Connection) {
     setLoading(true)
@@ -50,6 +52,7 @@ export default function DatabaseConnectionPage() {
       data.username = conn.username
       data.password = conn.password
       setActiveConnection(data)
+      getDatabases()
       navigate("/app", { replace: true })
     } catch (err: any) {
       setError(err.message)
