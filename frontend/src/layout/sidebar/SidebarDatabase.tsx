@@ -1,18 +1,41 @@
+import { Button } from "@/components/button";
 import { Select } from "@/components/select";
 import { useConnection } from "@/contexts/ConnectionProvider";
 import { useDatabase } from "@/contexts/DatabaseProvider";
+import { Pencil, Plus, Trash } from "lucide-react";
+import { useState } from "react";
+import { ModalFormDatabase } from "../modal/ModalFormDatabase";
+import { ModalDeleteDatabase } from "../modal/ModalDeleteDatabase";
 
 export function SidebarDatabase() {
   const { activeConnection } = useConnection()
   const { activeDatabase, changeDatabase } = useDatabase()
   const databases = activeConnection?.databases || []
+  const [openForm, setOpenForm] = useState<boolean>(false)
+  const [openDelete, setopenDelete] = useState<boolean>(false)
 
   return (
-    <div className="p-3 font-bold border-b border-zinc-800">
-      Banco de dados
-      <div className="space-y-4 mt-2">
-        <Select value={activeDatabase || ''} onChange={(e) => changeDatabase(e.target.value)} options={databases}/>
+    <>
+      <ModalFormDatabase open={openForm} onClose={() => setOpenForm(false)} oldName={activeDatabase ?? undefined} />
+      <ModalDeleteDatabase open={openDelete} onClose={() => setopenDelete(false)} name={activeDatabase ?? ''} />
+
+      <div className="p-3 border-b border-zinc-800">
+        <div className="flex flex-row justify-between">
+          <span className="font-bold">Banco de dados</span>
+          <div className="space-x-1">
+            {activeDatabase &&
+              <>
+                <Button sm variant="primary" onClick={() => setOpenForm(true)}><Pencil size={16} /></Button>
+                <Button sm variant="danger"  onClick={() => setopenDelete(true)}><Trash size={16} /></Button>
+              </>
+            }
+            <Button sm variant="success" onClick={() => setOpenForm(true)}><Plus size={16} /></Button>
+          </div>
+        </div>
+        <div className="space-y-4 mt-2">
+          <Select value={activeDatabase || ''} onChange={(e) => changeDatabase(e.target.value)} options={databases}/>
+        </div>
       </div>
-    </div>
+    </>
   )
 }

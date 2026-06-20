@@ -54,6 +54,8 @@ func (s *DatabaseService) Create(req models.DatabaseRequest) error {
 		return err
 	}
 
+	s.Connection.CreateDatabase(req.Name)
+
 	return nil
 }
 
@@ -70,6 +72,8 @@ func (s *DatabaseService) Update(req models.DatabaseRequest) error {
 		return err
 	}
 
+	s.Connection.UpdateDatabase(req.OldName, req.NewName)
+
 	return nil
 }
 
@@ -85,6 +89,8 @@ func (s *DatabaseService) Delete(name string) error {
 		logger.Error("Failed to delete database: %v", err)
 		return err
 	}
+
+	s.Connection.DeleteDatabase(name)
 
 	return nil
 }

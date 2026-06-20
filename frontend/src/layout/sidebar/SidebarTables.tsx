@@ -55,18 +55,19 @@ export function SidebarTables({ selectedTable, setSelectedTable, setView }: Prop
       <ModalFormTable open={tableToUpdate != null} onClose={() => setTableToUpdate(null)} tableName={tableToUpdate ?? ''} />
       <ModalDeleteTable open={tableToDelete != null} onClose={() => setTableToDelete(null)} tableName={tableToDelete ?? ''} />
 
-      <div className="border-r border-zinc-800">
+      <div className="border-r border-zinc-800 p-3">
         <div className="overflow-auto">
-          <div className="flex justify-end">
-            <Button sm className="m-1" variant="primary" onClick={showFormNewTable}><Plus size={16}/></Button>
+          <div className="flex flex-row justify-between mb-3">
+            <span className="font-bold">Tabelas</span>
+            <Button sm variant="success" onClick={showFormNewTable}><Plus size={16}/></Button>
           </div>
           {activeDatabase && tables?.length > 0 ? (
             tables.map((table) => (
-              <div key={table} className="flex items-center m-2 gap-2 justify-between">
+              <div key={table} className="flex items-center gap-2 justify-between mb-2">
                 <button
                   key={table}
                   onClick={() => { setSelectedTable(table); setView("data") }}
-                  className={`text-left px-1 py-1 rounded-md hover:bg-zinc-950 cursor-pointer ${selectedTable === table ? "bg-zinc-800" : ""}`}
+                  className={`text-left px-3 rounded-md hover:bg-zinc-950 cursor-pointer ${selectedTable === table ? "bg-zinc-800" : ""}`}
                 >
                   {table}
                 </button>
@@ -77,7 +78,7 @@ export function SidebarTables({ selectedTable, setSelectedTable, setView }: Prop
               </div>
             ))
           ) : (
-            <div className="p-3 text-zinc-500 text-sm">Nenhuma tabela encontrada</div>
+            <div className="text-zinc-500 text-sm">Nenhuma tabela encontrada</div>
           )}
         </div>
       </div>

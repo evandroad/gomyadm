@@ -131,6 +131,43 @@ func (m *ConnectionManager) SelectDatabase(name string) error {
 	return nil
 }
 
+func (m *ConnectionManager) CreateDatabase(name string) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	if m.connection == nil {
+		return
+	}
+
+	m.connection.DBs = append(m.connection.DBs, name)
+}
+
+func (m *ConnectionManager) UpdateDatabase(oldName, newName string) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	if m.connection == nil {
+		return
+	}
+
+	for i, db := range m.connection.DBs {
+		if db == oldName {
+			if db == oldName {
+				m.connection.DBs[i] = newName
+				break
+			}
+		}
+	}
+}
+
+func (m *ConnectionManager) DeleteDatabase(name string) {
+	for i, v := range m.connection.DBs {
+		if v == name {
+			m.connection.DBs = append(m.connection.DBs[:i], m.connection.DBs[i+1:]...)
+		}
+	}
+}
+
 func (m *ConnectionManager) GetDriverAndConnection() (drivers.Driver, *models.Connection, error) {
 	conn, err := m.Get()
 	if err != nil {

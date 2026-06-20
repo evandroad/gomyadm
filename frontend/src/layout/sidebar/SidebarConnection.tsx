@@ -23,7 +23,7 @@ export default function SidebarConnection() {
       <div className="p-3 border-b border-zinc-800 flex items-center justify-between">
         <div className="text-zinc-400">{activeConnection?.name || "Nova Conexão"}</div>
         {alreadySaved ?
-          <div className="space-x-2">
+          <div className="space-x-1">
             <Button onClick={() => setOpenForm(true)} variant="primary" sm><Pencil size={16} /></Button>
             <Button onClick={() => setOpenDelete(true)} variant="danger" sm><Trash size={16} /></Button>
           </div> :
