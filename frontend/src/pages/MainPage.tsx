@@ -16,7 +16,7 @@ import { Button } from "@/components/button"
 import { Plus, RefreshCcw } from "lucide-react"
 import { ModalFormItem } from "@/layout/modal/ModalFormItem"
 
-export type View = "data" | "structure" | "formColumn" | "formTable" | "sql"
+export type View = "data" | "struct" | "formColumn" | "formTable" | "sql"
 
 export default function MainPage() {
   const { loading } = useConnection()
@@ -40,7 +40,7 @@ export default function MainPage() {
   function renderView() {
     switch (view) {
       case "data":
-      case "structure":
+      case "struct":
       case "formColumn":
         if (!selectedTable) {
           return (
@@ -64,8 +64,8 @@ export default function MainPage() {
       <div className="flex flex-row justify-between items-center">
         <div className="flex w-fit border-b border-zinc-800 mb-2">
           <button onClick={() => setView("data")} className={getTabClass("data")}>Dados</button>
-          <button onClick={() => setView("structure")} className={getTabClass("structure")}>Estrutura</button>
-          {(view == 'structure' || view == 'formColumn') && 
+          <button onClick={() => setView("struct")} className={getTabClass("structure")}>Estrutura</button>
+          {(view == 'struct' || view == 'formColumn') && 
             <button onClick={() => setView("formColumn")} className={getTabClass("formColumn")}>Nova Coluna</button>
           }
         </div>
@@ -76,9 +76,9 @@ export default function MainPage() {
               <Button><RefreshCcw size={16}/></Button>
             </>
           }
-          {view == 'structure' &&
+          {view == 'struct' &&
             <>
-              <Button variant="success" onClick={() => setView("structure")}><Plus size={16}/></Button>
+              <Button variant="success" onClick={() => setView("struct")}><Plus size={16}/></Button>
               <Button><RefreshCcw size={16}/></Button>
             </>
           }
@@ -92,7 +92,7 @@ export default function MainPage() {
       case "data":
         content = <SectionTablePreview table={selectedTable} />
         break
-      case "structure":
+      case "struct":
         content = <SectionTableSchema />
         break
       case "formColumn":
