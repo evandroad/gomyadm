@@ -4,7 +4,7 @@
   "outputfilename": "gomyadm",
   "frontend:install": "npm install",
   "frontend:build": "npm run build -- --mode wails",
-  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:watcher": "npm run dev -- --mode wails",
   "frontend:dev:serverUrl": "auto",
   "author": {
     "name": "evandroad",

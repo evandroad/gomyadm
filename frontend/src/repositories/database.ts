@@ -1,12 +1,12 @@
-import { WailsConnectionRepository } from "./wails/connection";
-import { ApiConnectionRepository } from "./api/connection";
+import { WailsDatabaseRepository } from "./wails/database";
+import { ApiDatabaseRepository } from "./api/database";
 
 export function createDatabaseRepository(): DatabaseRepository {
   if (import.meta.env.VITE_RUNTIME === "wails") {
-    return new WailsConnectionRepository()
+    return new WailsDatabaseRepository()
   }
 
-  return new ApiConnectionRepository()
+  return new ApiDatabaseRepository()
 }
 
 export interface DatabaseRepository {

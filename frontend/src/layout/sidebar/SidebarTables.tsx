@@ -1,12 +1,12 @@
 import { API_URL } from "@/api"
 import { Button } from "@/components/button"
-import { useConnection } from "@/contexts/ConnectionProvider"
 import type { View } from "@/pages/MainPage"
 import { Pencil, Plus, RefreshCcw, Trash } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 import { ModalFormTable } from "../modal/ModalFormTable"
 import { ModalDeleteTable } from "../modal/ModalDeleteTable"
 import { useDatabase } from "@/contexts/DatabaseContext";
+import { useConnection } from "@/contexts/ConectionContext";
 
 type Props = {
   selectedTable: string | null

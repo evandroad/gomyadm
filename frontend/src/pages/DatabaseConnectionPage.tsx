@@ -7,9 +7,9 @@ import { Label } from "@/components/label"
 import { Input } from "@/components/input"
 import { Select } from "@/components/select"
 import { createConnection, type Connection } from "@/models"
-import { useConnection } from "@/contexts/ConnectionProvider"
 import { useConnections } from "@/contexts/ConnectionsContext"
 import { useDatabase } from "@/contexts/DatabaseContext";
+import { useConnection } from "@/contexts/ConectionContext";
 
 const DB_DRIVERS = [
   { value: "mysql", text: "MySQL" },

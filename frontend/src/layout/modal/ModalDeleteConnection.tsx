@@ -3,7 +3,7 @@ import { Button } from "@/components/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/card"
 import { Label } from "@/components/label"
 import ModalBase from "@/components/modalBase"
-import { useConnection } from "@/contexts/ConnectionProvider"
+import { useConnection } from "@/contexts/ConectionContext";
 import { useConnections } from "@/contexts/ConnectionsContext"
 import type { Connection } from "@/models"
 import { useEffect } from "react"

@@ -41,6 +41,10 @@ definitions:
       database:
         example: ""
         type: string
+      databases:
+        items:
+          type: string
+        type: array
       driver:
         example: mysql
         type: string

@@ -5,6 +5,7 @@ import (
 	"gomyadm/internal/bindings"
 	"gomyadm/internal/db"
 	"gomyadm/internal/services"
+	"log"
 )
 
 type App struct {
@@ -17,17 +18,24 @@ type ContextAware interface {
 }
 
 func NewApp() *App {
+	err := services.LoadConnections()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	manager := db.NewConnectionManager()
 
-	appService := services.NewAppService()
+	appService        := services.NewAppService()
 	connectionService := services.NewConnectionStore()
 	databaseService   := services.NewDatabaseService(manager)
+	sessionService    := services.NewSessionService(manager)
 
 	return &App{
 		binds: []any{
 			bindings.NewApp(appService),
 			bindings.NewConnection(connectionService),
 			bindings.NewDatabase(databaseService),
+			bindings.NewSession(sessionService),
 		},
 	}
 }

@@ -1,11 +1,12 @@
 import { createConnectionRepository } from "./connection";
 import { createAppRepository } from "./app";
 import { createDatabaseRepository } from "./database";
+import { createSessionRepository } from "./session";
 
 export const repositories = {
   app: createAppRepository(),
   connection: createConnectionRepository(),
-  // session: createSessionRepository(),
+  session: createSessionRepository(),
   database: createDatabaseRepository(),
   // table: createTableRepository(),
   // column: createColumnRepository(),

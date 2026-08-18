@@ -1,5 +1,5 @@
+import { useConnection } from "@/contexts/ConectionContext";
 import { Navigate, Outlet } from "react-router-dom"
-import { useConnection } from "@/contexts/ConnectionProvider"
 
 export default function ConnectionGuard() {
   const { activeConnection, loading } = useConnection()

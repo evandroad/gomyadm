@@ -848,6 +848,12 @@ const docTemplate = `{
                     "type": "string",
                     "example": ""
                 },
+                "databases": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "driver": {
                     "type": "string",
                     "example": "mysql"

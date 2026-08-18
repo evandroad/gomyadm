@@ -1,6 +1,6 @@
 import { API_URL } from "@/api"
 import { Button } from "@/components/button"
-import { useConnection } from "@/contexts/ConnectionProvider"
+import { useConnection } from "@/contexts/ConectionContext";
 import { useDatabase } from "@/contexts/DatabaseContext";
 import { useTable } from "@/contexts/TableContext";
 import { useNavigate } from "react-router-dom"

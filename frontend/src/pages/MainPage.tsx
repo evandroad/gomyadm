@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
 import SectionTablePreview from "@/layout/section/SectionTablePreview"
 import SidebarConnection from "@/layout/sidebar/SidebarConnection"
-import { useConnection } from "@/contexts/ConnectionProvider"
 import { SidebarDatabase } from "@/layout/sidebar/SidebarDatabase"
 import { SidebarTables } from "@/layout/sidebar/SidebarTables"
 import { Toolbar } from "@/layout/Toolbar"
@@ -16,6 +15,7 @@ import { ModalFormItem } from "@/layout/modal/ModalFormItem"
 import { repositories } from '@/repositories'
 import { useDatabase } from "@/contexts/DatabaseContext";
 import { useTable } from "@/contexts/TableContext";
+import { useConnection } from "@/contexts/ConectionContext";
 
 export type View = "data" | "struct" | "formColumn" | "formTable" | "sql"
 
