@@ -13,6 +13,11 @@ Diferente de aplicações desktop como DBeaver ou MySQL Workbench, o Gomyadm rod
 - Suporte a múltiplos bancos de dados
 - API simples e extensível
 
+## Instalar swagger
+```
+go install github.com/swaggo/swag/cmd/swag@latest
+```
+
 ## Stack inicial
 
 ### Backend
