@@ -1,13 +1,13 @@
 import { useState } from "react"
 import { API_URL } from "@/api";
-import { useDatabase } from "@/contexts/DatabaseProvider";
 import { Input } from "@/components/input";
 import { Label } from "@/components/label";
 import { Button } from "@/components/button";
-import { useTable } from "@/contexts/TableProvider";
 import { notify } from "@/utils";
 import { Select } from "@/components/select";
 import { ColumnTypes, createColumn, type Column } from "@/models";
+import { useDatabase } from "@/contexts/DatabaseContext";
+import { useTable } from "@/contexts/TableContext";
 
 export default function SectionFormColumn() {
   const { activeDatabase } = useDatabase()

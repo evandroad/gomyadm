@@ -3,7 +3,7 @@ import { Button } from "@/components/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/card"
 import { Label } from "@/components/label"
 import ModalBase from "@/components/modalBase"
-import { useTable } from "@/contexts/TableProvider"
+import { useTable } from "@/contexts/TableContext";
 import type { Column, Values } from "@/models"
 import { castValue } from "@/tableUtils"
 import { notify } from "@/utils"

@@ -3,12 +3,11 @@ import { Input } from "@/components/input";
 import { Label } from "@/components/label";
 import { createColumn, createTable, type Column, type Table } from "@/models";
 import { useState } from "react";
-import { COLUMNS_LABEL } from "./SectionTableSchema";
 import { Th } from "@/components/th";
 import { Td } from "@/components/td";
 import { ModalFormColumn } from "../modal/ModalFormColumn";
 import { Trash } from "lucide-react";
-import { getStatus, notify } from "@/utils";
+import { COLUMNS_LABEL, getStatus, notify } from "@/utils";
 import { API_URL } from "@/api";
 
 export default function SectionFormTable() {

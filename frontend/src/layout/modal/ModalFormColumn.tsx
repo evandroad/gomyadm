@@ -5,7 +5,7 @@ import { Input } from "@/components/input"
 import { Label } from "@/components/label"
 import ModalBase from "@/components/modalBase"
 import { Select } from "@/components/select"
-import { useTable } from "@/contexts/TableProvider"
+import { useTable } from "@/contexts/TableContext";
 import { ColumnTypes, createColumn, type Column } from "@/models"
 import { notify } from "@/utils"
 import { useEffect, useState } from "react"
@@ -59,10 +59,11 @@ export function ModalFormColumn({ open, toApi, onClose, onSave, data }: Props) {
   useEffect(() => {
     if (!open) return
     if (data) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setColumn(data)
       setOldName(data.name)
     }
-  }, [open])
+  }, [open, data])
 
   return (
     <ModalBase open={open} onClose={onClose} className="p-2 w-96">

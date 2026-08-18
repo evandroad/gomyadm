@@ -7,15 +7,15 @@ import { SidebarTables } from "@/layout/sidebar/SidebarTables"
 import { Toolbar } from "@/layout/Toolbar"
 import SectionTableSchema from "@/layout/section/SectionTableSchema"
 import { SidebarDisconnect } from "@/layout/sidebar/SidebarDisconnect"
-import { useDatabase } from "@/contexts/DatabaseProvider"
 import { SectionContentSQL } from "@/layout/section/SectionContentSQL"
-import { useTable } from "@/contexts/TableProvider"
 import SectionFormColumn from "@/layout/section/SectionFormColumn"
 import SectionFormTable from "@/layout/section/SectionFormTable"
 import { Button } from "@/components/button"
 import { Plus, RefreshCcw } from "lucide-react"
 import { ModalFormItem } from "@/layout/modal/ModalFormItem"
 import { repositories } from '@/repositories'
+import { useDatabase } from "@/contexts/DatabaseContext";
+import { useTable } from "@/contexts/TableContext";
 
 export type View = "data" | "struct" | "formColumn" | "formTable" | "sql"
 

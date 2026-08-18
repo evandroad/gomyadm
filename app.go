@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"gomyadm/internal/bindings"
+	"gomyadm/internal/db"
 	"gomyadm/internal/services"
 )
 
@@ -16,13 +17,17 @@ type ContextAware interface {
 }
 
 func NewApp() *App {
+	manager := db.NewConnectionManager()
+
 	appService := services.NewAppService()
 	connectionService := services.NewConnectionStore()
+	databaseService   := services.NewDatabaseService(manager)
 
 	return &App{
 		binds: []any{
 			bindings.NewApp(appService),
 			bindings.NewConnection(connectionService),
+			bindings.NewDatabase(databaseService),
 		},
 	}
 }

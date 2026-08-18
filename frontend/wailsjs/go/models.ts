@@ -28,6 +28,20 @@ export namespace models {
 	        this.databases = source["databases"];
 	    }
 	}
+	export class DatabaseResponse {
+	    active: string;
+	    databases: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new DatabaseResponse(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.active = source["active"];
+	        this.databases = source["databases"];
+	    }
+	}
 
 }
 

@@ -1,8 +1,8 @@
 import { API_URL } from "@/api"
 import { Button } from "@/components/button"
 import { useConnection } from "@/contexts/ConnectionProvider"
-import { useDatabase } from "@/contexts/DatabaseProvider"
-import { useTable } from "@/contexts/TableProvider"
+import { useDatabase } from "@/contexts/DatabaseContext";
+import { useTable } from "@/contexts/TableContext";
 import { useNavigate } from "react-router-dom"
 
 export function SidebarDisconnect() {

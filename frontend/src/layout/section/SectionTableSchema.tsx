@@ -1,16 +1,14 @@
-import { useDatabase } from "@/contexts/DatabaseProvider";
 import { Th } from "@/components/th";
 import { Td } from "@/components/td";
 import type { Column } from "@/models";
-import { useTable } from "@/contexts/TableProvider";
 import { Button } from "@/components/button";
 import { Pencil, Trash } from "lucide-react";
 import { useState } from "react";
 import { ModalFormColumn } from "../modal/ModalFormColumn";
 import { ModalDeleteColumn } from "../modal/ModalDeleteColumn";
-import { getStatus } from "@/utils";
-
-export const COLUMNS_LABEL = ['Nome', 'Tipo', 'Tamanho', 'Nulo', 'Chave', 'Exclusivo', 'Auto Inc.','Padrão', 'Ações']
+import { COLUMNS_LABEL, getStatus } from "@/utils";
+import { useDatabase } from "@/contexts/DatabaseContext";
+import { useTable } from "@/contexts/TableContext";
 
 export default function SectionTableSchema() {
   const { activeDatabase } = useDatabase()

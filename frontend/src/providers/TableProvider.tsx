@@ -1,15 +1,8 @@
 import { API_URL } from "@/api"
 import type { Table } from "@/models"
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
-import { useDatabase } from "./DatabaseProvider"
-
-type TableContextType = {
-  activeTable: Table | null
-  setActiveTable: (table: Table | null) => void
-  load: (table: string) => void
-}
-
-const TableContext = createContext<TableContextType | undefined>(undefined)
+import { useEffect, useState, type ReactNode } from "react"
+import { TableContext } from "@/contexts/TableContext";
+import { useDatabase } from "@/contexts/DatabaseContext";
 
 export function TableProvider({ children }: { children: ReactNode }) {
   const { activeDatabase } = useDatabase()
@@ -30,6 +23,7 @@ export function TableProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!activeDatabase) setActiveTable(null)
   }, [activeDatabase])
 
@@ -38,14 +32,4 @@ export function TableProvider({ children }: { children: ReactNode }) {
       {children}
     </TableContext.Provider>
   )
-}
-
-export function useTable() {
-  const context = useContext(TableContext)
-
-  if (!context) {
-    throw new Error("useTable deve ser usado dentro do TableProvider")
-  }
-
-  return context
 }

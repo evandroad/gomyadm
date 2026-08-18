@@ -1,5 +1,5 @@
 import { Button } from "@/components/button"
-import { useDatabase } from "@/contexts/DatabaseProvider"
+import { useDatabase } from "@/contexts/DatabaseContext";
 import type { View } from "@/pages/MainPage"
 
 type Props = {

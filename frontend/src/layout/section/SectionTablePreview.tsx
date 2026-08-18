@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react"
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useCallback, useEffect, useState } from "react"
 import { API_URL } from "@/api";
-import { useDatabase } from "@/contexts/DatabaseProvider";
 import { Th } from "@/components/th";
 import { Td } from "@/components/td";
 import { Button } from "@/components/button";
@@ -8,6 +8,7 @@ import { Pencil, Trash } from "lucide-react";
 import { ModalFormItem } from "../modal/ModalFormItem";
 import type { TableData, Values } from "@/models";
 import { ModalDeleteItem } from "../modal/ModalDeleteItem";
+import { useDatabase } from "@/contexts/DatabaseContext";
 
 export default function SectionTablePreview({ table }: { table: string }) {
   const [tableData, setTableData] = useState<TableData | null>(null)
@@ -16,10 +17,7 @@ export default function SectionTablePreview({ table }: { table: string }) {
   const [openDelete, setOpenDelete] = useState(false)
   const { activeDatabase } = useDatabase()
 
-  useEffect(() => {loadTableData()}, [table])
-  useEffect(() => {setTableData(null)}, [activeDatabase])
-
-  async function loadTableData() {
+  const loadTableData = useCallback(async () => {
     if (!activeDatabase) return
     const res = await fetch(`${API_URL}/api/table/item/${table}`)
     if (!res.ok) {
@@ -28,7 +26,10 @@ export default function SectionTablePreview({ table }: { table: string }) {
     }
     const data = await res.json()
     setTableData(data)
-  }
+  }, [activeDatabase, table])
+
+  useEffect(() => {loadTableData()}, [table, loadTableData])
+  useEffect(() => {setTableData(null)}, [activeDatabase])
 
   if (!tableData) {
     return <div className="text-zinc-500">{ activeDatabase ? 'Carregando schema...' : 'Selecione uma base de dados' }</div>

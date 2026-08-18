@@ -1,15 +1,7 @@
 import { API_URL } from "@/api"
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
-
-type DatabaseContextType = {
-  activeDatabase: string | null
-  databases: string[]
-  setActiveDatabase: (database: string | null) => void
-  changeDatabase: (database: string) => Promise<void>
-  getDatabases: () => Promise<void>
-}
-
-const DatabaseContext = createContext<DatabaseContextType | undefined>(undefined)
+import { DatabaseContext } from "@/contexts/DatabaseContext";
+import { repositories } from "@/repositories";
+import { useCallback, useEffect, useState, type ReactNode } from "react"
 
 export function DatabaseProvider({ children }: { children: ReactNode }) {
   const [activeDatabase, setActiveDatabase] = useState<string | null>(null)
@@ -27,37 +19,23 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
     setActiveDatabase(database)
   }
 
-  async function getDatabases() {
-    const res = await fetch(`${API_URL}/api/database`)
+  const getDatabases = useCallback(async () => {
+    const data = await repositories.database.getAll()
 
-    if (!res.ok) {
-      return
-    }
-
-    const data = await res.json()
     if (data) {
       setActiveDatabase(data.active)
       setDatabases(data.databases)
     }
-  }
+  }, [])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     getDatabases()
-  }, [])
+  }, [getDatabases])
 
   return (
     <DatabaseContext.Provider value={{ activeDatabase, databases, setActiveDatabase, changeDatabase, getDatabases }}>
       {children}
     </DatabaseContext.Provider>
   )
-}
-
-export function useDatabase() {
-  const context = useContext(DatabaseContext)
-
-  if (!context) {
-    throw new Error("useDatabase deve ser usado dentro do DatabaseProvider")
-  }
-
-  return context
 }

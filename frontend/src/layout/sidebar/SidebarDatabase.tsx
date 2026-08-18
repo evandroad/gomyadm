@@ -1,10 +1,10 @@
 import { Button } from "@/components/button";
 import { Select } from "@/components/select";
-import { useDatabase } from "@/contexts/DatabaseProvider";
 import { Pencil, Plus, RefreshCcw, Trash } from "lucide-react";
 import { useState } from "react";
 import { ModalFormDatabase } from "../modal/ModalFormDatabase";
 import { ModalDeleteDatabase } from "../modal/ModalDeleteDatabase";
+import { useDatabase } from "@/contexts/DatabaseContext";
 
 export function SidebarDatabase() {
   const { activeDatabase, databases, changeDatabase, getDatabases } = useDatabase()

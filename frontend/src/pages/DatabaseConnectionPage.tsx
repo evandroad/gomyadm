@@ -9,7 +9,7 @@ import { Select } from "@/components/select"
 import { createConnection, type Connection } from "@/models"
 import { useConnection } from "@/contexts/ConnectionProvider"
 import { useConnections } from "@/contexts/ConnectionsContext"
-import { useDatabase } from "@/contexts/DatabaseProvider"
+import { useDatabase } from "@/contexts/DatabaseContext";
 
 const DB_DRIVERS = [
   { value: "mysql", text: "MySQL" },

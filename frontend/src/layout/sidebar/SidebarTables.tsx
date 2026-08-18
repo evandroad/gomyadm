@@ -1,12 +1,12 @@
 import { API_URL } from "@/api"
 import { Button } from "@/components/button"
 import { useConnection } from "@/contexts/ConnectionProvider"
-import { useDatabase } from "@/contexts/DatabaseProvider"
 import type { View } from "@/pages/MainPage"
 import { Pencil, Plus, RefreshCcw, Trash } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { ModalFormTable } from "../modal/ModalFormTable"
 import { ModalDeleteTable } from "../modal/ModalDeleteTable"
+import { useDatabase } from "@/contexts/DatabaseContext";
 
 type Props = {
   selectedTable: string | null
@@ -21,24 +21,25 @@ export function SidebarTables({ selectedTable, setSelectedTable, setView }: Prop
   const [tableToUpdate, setTableToUpdate] = useState<string | null>(null)
   const [tableToDelete, setTableToDelete] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (!activeConnection) {
-      setSelectedTable(null)
-      setTables([])
-      return
-    }
-
-    loadTables()
-  }, [activeDatabase])
-
-  async function loadTables() {
+  const loadTables = useCallback(async () => {
     if (!activeConnection || !activeDatabase) return
 
     const res = await fetch(`${API_URL}/api/table`)
     const data = await res.json()
     setTables(data)
     setSelectedTable(null)
-  }
+  }, [activeConnection, activeDatabase, setSelectedTable])
+
+  useEffect(() => {
+    if (!activeConnection) {
+      setSelectedTable(null)
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setTables([])
+      return
+    }
+
+    loadTables()
+  }, [activeDatabase, activeConnection, loadTables, setSelectedTable])
 
   function showFormNewTable() {
     if (!activeDatabase) {

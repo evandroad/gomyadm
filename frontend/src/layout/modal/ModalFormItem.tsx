@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Input } from "@/components/input"
 import { Label } from "@/components/label"
 import ModalBase from "@/components/modalBase"
-import { useTable } from "@/contexts/TableProvider"
+import { useTable } from "@/contexts/TableContext";
 import type { Column, Values } from "@/models"
 import { castValue, getInputType } from "@/tableUtils"
 import { notify } from "@/utils"
@@ -59,8 +59,9 @@ export function ModalFormItem({ open, onClose, data }: Props) {
 
   useEffect(() => {
     if (!open) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFormData(data)
-  }, [open])
+  }, [open, data])
 
   return (
     <ModalBase open={open} onClose={onClose} className="p-2 w-96">
