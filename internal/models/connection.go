@@ -9,14 +9,15 @@ type Connection struct {
 }
 
 type ConnectionConfig struct {
-	ID       string `json:"id" example:""`
-	Name     string `json:"name" example:""`
-	Driver   string `json:"driver" example:"mysql"`
-	Host     string `json:"host" example:"127.0.0.1"`
-	Port     int    `json:"port" example:"3306"`
-	Username string `json:"username" example:"admin"`
-	Password string `json:"password" example:"senha123"`
-	Database string `json:"database" example:""`
+	ID        string   `json:"id" example:""`
+	Name      string   `json:"name" example:""`
+	Driver    string   `json:"driver" example:"mysql"`
+	Host      string   `json:"host" example:"127.0.0.1"`
+	Port      int      `json:"port" example:"3306"`
+	Username  string   `json:"username" example:"admin"`
+	Password  string   `json:"password" example:"senha123"`
+	Database  string   `json:"database" example:""`
+	Databases []string `json:"databases"`
 }
 
 type ConnectionResponse struct {

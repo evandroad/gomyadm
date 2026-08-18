@@ -8,7 +8,7 @@ import { Input } from "@/components/input"
 import { Select } from "@/components/select"
 import { createConnection, type Connection } from "@/models"
 import { useConnection } from "@/contexts/ConnectionProvider"
-import { useConnections } from "@/contexts/ConnectionsProvider"
+import { useConnections } from "@/contexts/ConnectionsContext"
 import { useDatabase } from "@/contexts/DatabaseProvider"
 
 const DB_DRIVERS = [

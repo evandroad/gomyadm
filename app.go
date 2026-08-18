@@ -17,10 +17,12 @@ type ContextAware interface {
 
 func NewApp() *App {
 	appService := services.NewAppService()
+	connectionService := services.NewConnectionStore()
 
 	return &App{
 		binds: []any{
 			bindings.NewApp(appService),
+			bindings.NewConnection(connectionService),
 		},
 	}
 }

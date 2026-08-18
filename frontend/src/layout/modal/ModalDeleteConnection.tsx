@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Label } from "@/components/label"
 import ModalBase from "@/components/modalBase"
 import { useConnection } from "@/contexts/ConnectionProvider"
-import { useConnections } from "@/contexts/ConnectionsProvider"
+import { useConnections } from "@/contexts/ConnectionsContext"
 import type { Connection } from "@/models"
 import { useEffect } from "react"
 

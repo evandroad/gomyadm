@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Button } from "@/components/button"
 import { useConnection } from "@/contexts/ConnectionProvider"
-import { useConnections } from "@/contexts/ConnectionsProvider"
+import { useConnections } from "@/contexts/ConnectionsContext"
 import { Pencil, Trash } from "lucide-react"
 import { ModalFormConnection } from "../modal/ModalFormConnection"
 import { ModalDeleteConnection } from "../modal/ModalDeleteConnection"

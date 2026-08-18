@@ -20,6 +20,9 @@ wails:
 wails-dev:
 	wails dev -ldflags="$(LDFLAGS)" -tags webkit2_41
 
+version:
+	sed -i 's/^Version:.*/Version: $(VERSION)/' deb-pkg/DEBIAN/control
+
 deb: version wails
 	cp build/bin/gomyadm deb-pkg/usr/local/bin/
 	rm -f gomyadm*.deb
