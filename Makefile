@@ -21,6 +21,10 @@ wails:
 	wails build -ldflags "-s -w -X gomyadm/internal/services.Version=$(VERSION)" -tags webkit2_41
 	cp build/bin/gomyadm deb-pkg/usr/local/bin/
 
-deb: build
-	rm -f container-manager*.deb
-	dpkg-deb --build deb-pkg container-manager_$(VERSION)_amd64.deb
+deb: version wails
+	rm -f gomyadm*.deb
+	rm -rf .deb-build
+	cp -a deb-pkg .deb-build
+	find .deb-build -name .keep -delete
+	dpkg-deb --build .deb-build gomyadm_$(VERSION)_amd64.deb
+	rm -rf .deb-build
