@@ -47,6 +47,7 @@ func main() {
 	queryService      := services.NewQueryService(manager)
 	itemService       := services.NewItemService(manager)
 	tableService      := services.NewTableService(manager)
+	appService        := services.NewAppService()
 	
 	sessionHandler    := api.NewSessionHandler(sessionService)
 	connectionHandler := api.NewConnectionHandler(connectionService)
@@ -55,11 +56,14 @@ func main() {
 	itemHandler       := api.NewItemHandler(itemService)
 	columnHandler     := api.NewColumnHandler(columnService)
 	queryHandler      := api.NewQueryHandler(queryService)
+	appHandler        := api.NewAppHandler(appService)
 
 	r.Get("/health", health)
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
-
+	
 	r.Route("/api", func(r chi.Router) {
+		r.Get("/version", appHandler.Version)
+
 		r.Route("/session", func(r chi.Router) {
 			r.Post("/", sessionHandler.Connect)
 			r.Delete("/", sessionHandler.Disconnect)

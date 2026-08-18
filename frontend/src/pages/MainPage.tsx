@@ -15,7 +15,7 @@ import SectionFormTable from "@/layout/section/SectionFormTable"
 import { Button } from "@/components/button"
 import { Plus, RefreshCcw } from "lucide-react"
 import { ModalFormItem } from "@/layout/modal/ModalFormItem"
-import { Version } from '../../wailsjs/go/bindings/AppBinding'
+import { repositories } from '@/repositories'
 
 export type View = "data" | "struct" | "formColumn" | "formTable" | "sql"
 
@@ -33,8 +33,7 @@ export default function MainPage() {
 
   useEffect(() => {
     async function fetchVersion() {
-      const res = await Version()
-      console.log(res)
+      const res = await repositories.app.version()
       setVersion(res)
     }
 

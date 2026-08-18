@@ -638,4 +638,19 @@ paths:
       summary: Lista colunas e itens
       tags:
       - item
+  /version:
+    get:
+      description: Retorna a versão
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Obtem a versão
+      tags:
+      - app
 swagger: "2.0"
