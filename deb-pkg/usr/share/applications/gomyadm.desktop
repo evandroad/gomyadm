@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Gomyadm
+Comment=Aplicativo gerenciador de banco de dados
+Exec=gomyadm
+Icon=gomyadm
+Terminal=false
+Type=Application
+Categories=Development;Utility;
+StartupNotify=true

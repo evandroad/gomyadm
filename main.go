@@ -23,10 +23,8 @@ func main() {
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
-		OnStartup:        app.startup,
-		Bind: []any{
-			app,
-		},
+		OnStartup: app.startup,
+		Bind:      app.Bindings(),
 	})
 
 	if err != nil {

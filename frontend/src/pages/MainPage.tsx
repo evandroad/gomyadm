@@ -15,6 +15,7 @@ import SectionFormTable from "@/layout/section/SectionFormTable"
 import { Button } from "@/components/button"
 import { Plus, RefreshCcw } from "lucide-react"
 import { ModalFormItem } from "@/layout/modal/ModalFormItem"
+import { Version } from '../../wailsjs/go/bindings/AppBinding'
 
 export type View = "data" | "struct" | "formColumn" | "formTable" | "sql"
 
@@ -26,8 +27,19 @@ export default function MainPage() {
   const [view, setView] = useState<View>("data")
   const [sidebarWidth, setSidebarWidth] = useState(256)
   const [openFormItem, setOpenFormItem] = useState<boolean>(false)
+  const [version, setVersion] = useState<string>('')
 
-  useEffect(() => {load(selectedTable || '')}, [selectedTable])
+  useEffect(() => {load(selectedTable || '')}, [selectedTable, load])
+
+  useEffect(() => {
+    async function fetchVersion() {
+      const res = await Version()
+      console.log(res)
+      setVersion(res)
+    }
+
+    fetchVersion()
+  })
 
   if (loading) {
     return (
@@ -135,7 +147,10 @@ export default function MainPage() {
       <ModalFormItem open={openFormItem} onClose={() => setOpenFormItem(false)} data={null} />
 
       <aside className="bg-zinc-900 border-r border-zinc-800 flex flex-col relative" style={{ width: sidebarWidth }}>
-        <div className="py-4 px-3 font-semibold text-lg border-b border-zinc-800">Gomyadm</div>
+        <div className="py-4 px-3 font-semibold text-lg border-b border-zinc-800">
+          Gomyadm
+          <p className="text-sm text-zinc-400 font-light">{version}</p>
+        </div>
         <SidebarConnection />
         <SidebarDatabase />
         <SidebarTables selectedTable={selectedTable} setSelectedTable={setSelectedTable} setView={setView} />
