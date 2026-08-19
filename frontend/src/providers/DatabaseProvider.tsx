@@ -1,4 +1,3 @@
-import { API_URL } from "@/api"
 import { DatabaseContext } from "@/contexts/DatabaseContext";
 import { repositories } from "@/repositories";
 import { useCallback, useEffect, useState, type ReactNode } from "react"
@@ -8,13 +7,12 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
   const [databases, setDatabases] = useState<string[]>([])
 
   async function changeDatabase(database: string) {
-    const res = await fetch(`${API_URL}/api/database/select`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: database }),
-    })
+    const res = await repositories.database.select(database)
 
-    if (!res.ok) return
+    if (!res.ok) {
+      console.error(res.error)
+      return
+    }
 
     setActiveDatabase(database)
   }

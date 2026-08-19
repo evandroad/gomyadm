@@ -1,5 +1,5 @@
 import type { Result } from '..';
-import { GetAll } from '../../../wailsjs/go/bindings/DatabaseBinding'
+import { GetAll, Select } from '../../../wailsjs/go/bindings/DatabaseBinding'
 import type { DatabaseRepository } from '../database';
 
 export class WailsDatabaseRepository implements DatabaseRepository {
@@ -7,6 +7,19 @@ export class WailsDatabaseRepository implements DatabaseRepository {
     try {
       return {
         ok: true, data: await GetAll()
+      }
+    } catch (error) {
+      return {
+        ok: false, error: error instanceof Error ? error.message : "Erro ao conectar"
+      }
+    }
+  }
+
+  async select(database: string): Promise<Result<void>> {
+    try {
+      await Select(database)
+      return {
+        ok: true, data: undefined
       }
     } catch (error) {
       return {

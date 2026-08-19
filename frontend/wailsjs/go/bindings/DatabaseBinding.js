@@ -5,3 +5,7 @@
 export function GetAll() {
   return window['go']['bindings']['DatabaseBinding']['GetAll']();
 }
+
+export function Select(arg1) {
+  return window['go']['bindings']['DatabaseBinding']['Select'](arg1);
+}

@@ -16,3 +16,7 @@ func NewDatabase(s *services.DatabaseService) *DatabaseBinding {
 func (a *DatabaseBinding) GetAll() (models.DatabaseResponse, error) {
 	return a.service.GetAll()
 }
+
+func (a *DatabaseBinding) Select(database string) error {
+	return a.service.Select(database)
+}

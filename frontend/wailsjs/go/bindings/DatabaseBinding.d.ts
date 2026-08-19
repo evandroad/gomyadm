@@ -3,3 +3,5 @@
 import {models} from '../models';
 
 export function GetAll():Promise<models.DatabaseResponse>;
+
+export function Select(arg1:string):Promise<void>;
