@@ -20,3 +20,7 @@ func (a *SessionBinding) Active() (models.ConnectionResponse, error) {
 func (a *SessionBinding) Connect(con models.ConnectionConfig) (models.ConnectionResponse, error) {
 	return a.service.Connect(con)
 }
+
+func (a *SessionBinding) Disconnect() error {
+	return a.service.Disconnect()
+}

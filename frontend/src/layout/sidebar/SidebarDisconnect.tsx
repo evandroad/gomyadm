@@ -1,8 +1,8 @@
-import { API_URL } from "@/api"
 import { Button } from "@/components/button"
 import { useConnection } from "@/contexts/ConectionContext";
 import { useDatabase } from "@/contexts/DatabaseContext";
 import { useTable } from "@/contexts/TableContext";
+import { repositories } from "@/repositories";
 import { useNavigate } from "react-router-dom"
 
 export function SidebarDisconnect() {
@@ -12,13 +12,14 @@ export function SidebarDisconnect() {
   const navigate = useNavigate()
 
   async function disconnect() {
-    const res = await fetch(`${API_URL}/api/session`, { method: "DELETE" })
-
-    if (res.ok) {
+    try {
+      await repositories.session.disconnect()
       setActiveConnection(null)
       setActiveDatabase(null)
       setActiveTable(null)
       navigate("/connect", { replace: true })
+    } catch (error) {
+      console.error(error)
     }
   }
 

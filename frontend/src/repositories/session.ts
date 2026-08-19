@@ -12,4 +12,5 @@ export function createSessionRepository(): SessionRepository {
 export interface SessionRepository {
   active(): Promise<any>
   connect(con: any): Promise<any>
+  disconnect(): Promise<any>
 }

@@ -5,3 +5,5 @@ import {models} from '../models';
 export function Active():Promise<models.ConnectionResponse>;
 
 export function Connect(arg1:models.ConnectionConfig):Promise<models.ConnectionResponse>;
+
+export function Disconnect():Promise<void>;

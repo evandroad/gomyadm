@@ -9,3 +9,7 @@ export function Active() {
 export function Connect(arg1) {
   return window['go']['bindings']['SessionBinding']['Connect'](arg1);
 }
+
+export function Disconnect() {
+  return window['go']['bindings']['SessionBinding']['Disconnect']();
+}

@@ -1,4 +1,4 @@
-import { Active, Connect } from '../../../wailsjs/go/bindings/SessionBinding'
+import { Active, Connect, Disconnect } from '../../../wailsjs/go/bindings/SessionBinding'
 import type { SessionRepository } from "../session";
 
 export class WailsSessionRepository implements SessionRepository {
@@ -8,5 +8,9 @@ export class WailsSessionRepository implements SessionRepository {
 
   async connect(conn: any) {
     return Connect(conn)
+  }
+
+  async disconnect() {
+    return Disconnect()
   }
 }
