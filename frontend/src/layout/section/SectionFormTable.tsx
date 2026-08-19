@@ -8,33 +8,23 @@ import { Td } from "@/components/td";
 import { ModalFormColumn } from "../modal/ModalFormColumn";
 import { Trash } from "lucide-react";
 import { COLUMNS_LABEL, getStatus, notify } from "@/utils";
-import { API_URL } from "@/api";
+import { repositories } from "@/repositories";
 
 export default function SectionFormTable() {
   const [table, setTable] = useState<Table>(createTable())
   const [openForm, setOpenForm] = useState<boolean>(false)
 
   async function handleSubmit() {
-    try {
-      const res = await fetch(`${API_URL}/api/table`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(table),
-      })
+    const res = await repositories.table.create(table)
 
-      if (!res.ok) {
-        const data = await res.json()
-        notify(`Erro: ${data.message || 'Falha ao alterar o dado'}`, 'error')
-        return
-      }
-
+    if (!res.ok) {
+      console.error(res.error)
+      notify(`Erro: ${res.error || 'Falha ao alterar o dado'}`, 'error')
+    } else {
       notify("Dado alterado com sucesso!")
-    } catch (err: any) {
-      console.error(err)
-      notify(`Erro: ${err.message || 'Falha ao alterar o dado'}`, 'error')
-    } finally {
-      setTable(createTable())
     }
+
+    setTable(createTable())
   }
 
   function addCol(column: Column) {

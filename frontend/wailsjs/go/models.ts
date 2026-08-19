@@ -1,5 +1,31 @@
 export namespace models {
 	
+	export class Column {
+	    name: string;
+	    type: string;
+	    length?: number;
+	    nullable: boolean;
+	    primary: boolean;
+	    unique: boolean;
+	    autoIncrement: boolean;
+	    defaultValue: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Column(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.type = source["type"];
+	        this.length = source["length"];
+	        this.nullable = source["nullable"];
+	        this.primary = source["primary"];
+	        this.unique = source["unique"];
+	        this.autoIncrement = source["autoIncrement"];
+	        this.defaultValue = source["defaultValue"];
+	    }
+	}
 	export class ConnectionConfig {
 	    id: string;
 	    name: string;
@@ -81,6 +107,38 @@ export namespace models {
 	        this.active = source["active"];
 	        this.databases = source["databases"];
 	    }
+	}
+	export class Table {
+	    name: string;
+	    columns: Column[];
+	
+	    static createFrom(source: any = {}) {
+	        return new Table(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.columns = this.convertValues(source["columns"], Column);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 
 }

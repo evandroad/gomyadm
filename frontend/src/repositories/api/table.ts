@@ -17,4 +17,23 @@ export class ApiTableRepository implements TableRepository {
       ok: true, data: await response.json()
     }
   }
+
+  async create(table: any): Promise<Result<void>> {
+    const response = await fetch(`${API_URL}/api/table`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(table),
+    })
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => null)
+      return {
+        ok: false, error: error?.error ?? "Erro ao buscar versão"
+      }
+    }
+
+    return {
+      ok: true, data: undefined
+    }
+  }
 }

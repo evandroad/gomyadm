@@ -4,6 +4,7 @@ import { WailsTableRepository } from "./wails/table";
 
 export interface TableRepository {
   getAll(): Promise<Result<string[]>>
+  create(table: any): Promise<Result<void>>
 }
 
 export function createTableRepository(): TableRepository {
