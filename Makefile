@@ -9,7 +9,8 @@ frontend:
 	cd frontend/ && bun install && bun run build -- --mode web
 
 api: frontend
-	swag init -g cmd/server/main.go 
+	swag init -g cmd/server/main.go
+	rm -r cmd/server/web 
 	cp -r frontend/web cmd/server
 	go build -ldflags="$(LDFLAGS)" -o build/api/gomyadm ./cmd/server
 
