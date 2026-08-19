@@ -22,18 +22,23 @@ export function ModalFormConnection({ open, onClose, data, edit }: Props) {
   const [connection, setConnection] = useState<Connection>(data)
 
   async function saveConnection() {
-    try {
-      const res = edit ? { ok: false } : await repositories.connection.create(connection)
+    const res = edit ? 
+      await repositories.connection.update(connection.id, connection) : 
+      await repositories.connection.create(connection)
 
-      if (res.ok) {
-        setActiveConnection(connection)
-        if (edit) { updateConnection(connection.id, connection) } else { insertConnection(connection) }
+    if (res.ok) {
+      setActiveConnection(connection)
+
+      if (edit) {
+        updateConnection(connection.id, connection)
+      } else {
+        insertConnection(connection)
       }
-    } catch (err) {
-      console.error(err)
-    } finally {
-      onClose()
+    } else {
+      console.error(res.error)
     }
+
+    onClose()
   }
 
   useEffect(() => {

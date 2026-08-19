@@ -20,3 +20,7 @@ func (a *ConnectionBinding) GetAll() []models.ConnectionConfig {
 func (a *ConnectionBinding) Create(con models.ConnectionConfig) error {
 	return a.service.Create(con)
 }
+
+func (a *ConnectionBinding) Update(id string, con models.ConnectionConfig) error {
+	return a.service.Update(id, con)
+}

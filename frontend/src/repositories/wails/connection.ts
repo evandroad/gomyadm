@@ -1,5 +1,5 @@
 import type { Connection } from '@/models';
-import { GetAll, Create } from '../../../wailsjs/go/bindings/ConnectionBinding'
+import { GetAll, Create, Update } from '../../../wailsjs/go/bindings/ConnectionBinding'
 import type { ConnectionRepository } from "../connection";
 import type { Result } from '..';
 
@@ -18,8 +18,22 @@ export class WailsConnectionRepository implements ConnectionRepository {
 
   async create(con: any): Promise<Result<void>> {
     try {
+      await Create(con)
       return {
-        ok: true, data: await Create(con)
+        ok: true, data: undefined
+      }
+    } catch (error) {
+      return {
+        ok: false, error: error instanceof Error ? error.message : "Erro ao conectar"
+      }
+    }
+  }
+
+  async update(id: string, con: any): Promise<Result<void>> {
+    try {
+      await Update(id, con)
+      return {
+        ok: true, data: undefined
       }
     } catch (error) {
       return {

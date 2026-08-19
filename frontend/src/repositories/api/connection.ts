@@ -39,4 +39,23 @@ export class ApiConnectionRepository implements ConnectionRepository {
       ok: true, data: await response.json()
     }
   }
+
+  async update(con: any): Promise<Result<void>> {
+    const response = await fetch(`${API_URL}/api/connection`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(con),
+    })
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => null)
+      return {
+        ok: false, error: error?.message ?? "Erro ao editar conexão"
+      }
+    }
+
+    return {
+      ok: true, data: await response.json()
+    }
+  }
 }
