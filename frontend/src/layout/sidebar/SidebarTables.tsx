@@ -1,4 +1,3 @@
-import { API_URL } from "@/api"
 import { Button } from "@/components/button"
 import type { View } from "@/pages/MainPage"
 import { Pencil, Plus, RefreshCcw, Trash } from "lucide-react"
@@ -7,6 +6,7 @@ import { ModalFormTable } from "../modal/ModalFormTable"
 import { ModalDeleteTable } from "../modal/ModalDeleteTable"
 import { useDatabase } from "@/contexts/DatabaseContext";
 import { useConnection } from "@/contexts/ConectionContext";
+import { repositories } from "@/repositories"
 
 type Props = {
   selectedTable: string | null
@@ -24,9 +24,8 @@ export function SidebarTables({ selectedTable, setSelectedTable, setView }: Prop
   const loadTables = useCallback(async () => {
     if (!activeConnection || !activeDatabase) return
 
-    const res = await fetch(`${API_URL}/api/table`)
-    const data = await res.json()
-    setTables(data)
+    const res = await repositories.table.getAll()
+    if (res.ok) setTables(res.data)
     setSelectedTable(null)
   }, [activeConnection, activeDatabase, setSelectedTable])
 

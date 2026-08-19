@@ -29,6 +29,7 @@ func NewApp() *App {
 	connectionService := services.NewConnectionStore()
 	databaseService   := services.NewDatabaseService(manager)
 	sessionService    := services.NewSessionService(manager)
+	tableService      := services.NewTableService(manager)
 
 	return &App{
 		binds: []any{
@@ -36,6 +37,7 @@ func NewApp() *App {
 			bindings.NewConnection(connectionService),
 			bindings.NewDatabase(databaseService),
 			bindings.NewSession(sessionService),
+			bindings.NewTable(tableService),
 		},
 	}
 }
