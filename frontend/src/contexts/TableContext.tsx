@@ -1,10 +1,13 @@
-import type { Table } from "@/models";
+import type { Table, TableData } from "@/models";
 import { createContext, useContext } from "react";
 
 type TableContextType = {
   activeTable: Table | null
   setActiveTable: (table: Table | null) => void
-  load: (table: string) => void
+  load: (table: string | null) => void
+  tableData: TableData | null
+  setTableData: (tableData: TableData | null) => void
+  loadTableData: (table: string | null) => void
 }
 
 export const TableContext = createContext<TableContextType | undefined>(undefined)

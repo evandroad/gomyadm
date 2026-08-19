@@ -1,4 +1,3 @@
-import { API_URL } from "@/api"
 import { Button } from "@/components/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/card"
 import { Input } from "@/components/input"
@@ -7,6 +6,7 @@ import ModalBase from "@/components/modalBase"
 import { Select } from "@/components/select"
 import { useTable } from "@/contexts/TableContext";
 import { ColumnTypes, createColumn, type Column } from "@/models"
+import { repositories } from "@/repositories"
 import { notify } from "@/utils"
 import { useEffect, useState } from "react"
 
@@ -27,27 +27,16 @@ export function ModalFormColumn({ open, toApi, onClose, onSave, data }: Props) {
     if (!activeTable) return
     const value = { ...column, length: Number(column.length) }
     const payload = { table: activeTable.name, oldName, column: value }
-    
-    try {
-      const res = await fetch(`${API_URL}/api/table/column`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      })
+    const res = await repositories.column.update(payload)
 
-      if (!res.ok) {
-        const data = await res.json()
-        notify(`Erro: ${data.message || 'Falha ao alterar o dado'}`, 'error')
-        return
-      }
-
+    if (!res.ok) {
+      console.error(res.error)
+      notify(`Erro: ${res.error || 'Falha ao alterar o dado'}`, 'error')
+    } else {
       notify("Dado alterado com sucesso!")
-    } catch (err: any) {
-      console.error(err)
-      notify(`Erro: ${err.message || 'Falha ao alterar o dado'}`, 'error')
-    } finally {
-      onClose()
     }
+
+    onClose()
   }
 
   function save() {

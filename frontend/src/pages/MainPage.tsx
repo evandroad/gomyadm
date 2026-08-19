@@ -22,14 +22,15 @@ export type View = "data" | "struct" | "formColumn" | "formTable" | "sql"
 export default function MainPage() {
   const { loading } = useConnection()
   const { activeDatabase } = useDatabase()
-  const { load } = useTable()
+  const { load, loadTableData } = useTable()
   const [selectedTable, setSelectedTable] = useState<string | null>(null)
   const [view, setView] = useState<View>("data")
   const [sidebarWidth, setSidebarWidth] = useState(256)
   const [openFormItem, setOpenFormItem] = useState<boolean>(false)
   const [version, setVersion] = useState<string>('')
 
-  useEffect(() => {load(selectedTable || '')}, [selectedTable, load])
+  useEffect(() => {load(selectedTable)}, [selectedTable, load])
+  useEffect(() => {loadTableData(selectedTable)} ,[selectedTable, loadTableData])
 
   useEffect(() => {
     async function fetchVersion() {
@@ -84,7 +85,7 @@ export default function MainPage() {
           {view == 'data' &&
             <>
               <Button variant="success" onClick={() => setOpenFormItem(true)}><Plus size={16}/></Button>
-              <Button><RefreshCcw size={16}/></Button>
+              <Button onClick={() => loadTableData(selectedTable)}><RefreshCcw size={16}/></Button>
             </>
           }
           {view == 'struct' &&
@@ -101,7 +102,7 @@ export default function MainPage() {
 
     switch (view) {
       case "data":
-        content = <SectionTablePreview table={selectedTable} />
+        content = <SectionTablePreview />
         break
       case "struct":
         content = <SectionTableSchema />

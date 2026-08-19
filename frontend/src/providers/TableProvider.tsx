@@ -1,26 +1,40 @@
-import { API_URL } from "@/api"
-import type { Table } from "@/models"
-import { useEffect, useState, type ReactNode } from "react"
+import type { Table, TableData } from "@/models"
+import { useCallback, useEffect, useState, type ReactNode } from "react"
 import { TableContext } from "@/contexts/TableContext";
 import { useDatabase } from "@/contexts/DatabaseContext";
+import { repositories } from "@/repositories";
 
 export function TableProvider({ children }: { children: ReactNode }) {
   const { activeDatabase } = useDatabase()
   const [activeTable, setActiveTable] = useState<Table | null>(null)
+  const [tableData, setTableData] = useState<TableData | null>(null)
 
-  async function load(table: string) {
+  const load = useCallback(async (table: string | null) => {
     if (!activeDatabase) return
-    if (table === activeTable?.name) return
-    if (table == '') return
+    if (table == '' || table == null) return
 
-    const res = await fetch(`${API_URL}/api/table/column/${table}`)
+    const res = await repositories.column.getAll(table)
     if (!res.ok) {
       setActiveTable(null)
       return
     }
-    const data = await res.json()
-    setActiveTable(data)
-  }
+    
+    setActiveTable(res.data)
+  }, [activeDatabase])
+
+  const loadTableData = useCallback(async (table: string | null) => {
+    if (!activeDatabase) return
+    if (table == '' || table == null) return
+
+    const res = await repositories.item.getAll(table)
+    
+    if (!res.ok) {
+      setTableData(null)
+      return
+    }
+
+    setTableData(res.data)
+  }, [activeDatabase])
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -28,7 +42,7 @@ export function TableProvider({ children }: { children: ReactNode }) {
   }, [activeDatabase])
 
   return (
-    <TableContext.Provider value={{ activeTable, setActiveTable, load }}>
+    <TableContext.Provider value={{ activeTable, setActiveTable, load, tableData, setTableData, loadTableData }}>
       {children}
     </TableContext.Provider>
   )

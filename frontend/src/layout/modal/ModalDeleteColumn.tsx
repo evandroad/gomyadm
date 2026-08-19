@@ -1,10 +1,10 @@
-import { API_URL } from "@/api"
 import { Button } from "@/components/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/card"
 import { Label } from "@/components/label"
 import ModalBase from "@/components/modalBase"
 import { useTable } from "@/contexts/TableContext";
 import type { Column } from "@/models"
+import { repositories } from "@/repositories"
 import { notify } from "@/utils"
 import { useEffect } from "react"
 
@@ -20,25 +20,16 @@ export function ModalDeleteColumn({ open, onClose, data }: Props) {
   async function saveConnection() {
     if (!activeTable) return
 
-    try {
-      const res = await fetch(`${API_URL}/api/table/column/${activeTable.name}/${data?.name}`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" }
-      })
+    const res = await repositories.column.delete(activeTable.name, data?.name ?? '')
 
-      if (!res.ok) {
-        const data = await res.json()
-        notify(`Erro: ${data.message || 'Falha ao remover o dado'}`, 'error')
-        return
-      }
-
+    if (!res.ok) {
+      console.error(res.error)
+      notify(`Erro: ${res.error || 'Falha ao remover o dado'}`, 'error')
+    } else {
       notify("Dado removido com sucesso!")
-    } catch (err: any) {
-      console.error(err)
-      notify(`Erro: ${err.message || 'Falha ao remover o dado'}`, 'error')
-    } finally {
-      onClose()
     }
+
+    onClose()
   }
 
   useEffect(() => {

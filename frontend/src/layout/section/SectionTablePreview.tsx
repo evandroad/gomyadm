@@ -1,37 +1,20 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-import { useCallback, useEffect, useState } from "react"
+import { useState } from "react"
 import { Th } from "@/components/th";
 import { Td } from "@/components/td";
 import { Button } from "@/components/button";
 import { Pencil, Trash } from "lucide-react";
 import { ModalFormItem } from "../modal/ModalFormItem";
-import type { TableData, Values } from "@/models";
+import type { Values } from "@/models";
 import { ModalDeleteItem } from "../modal/ModalDeleteItem";
 import { useDatabase } from "@/contexts/DatabaseContext";
-import { repositories } from "@/repositories";
+import { useTable } from "@/contexts/TableContext";
 
-export default function SectionTablePreview({ table }: { table: string }) {
-  const [tableData, setTableData] = useState<TableData | null>(null)
+export default function SectionTablePreview() {
   const [selectedRow, setSelectedRow] = useState<Values | null>(null)
   const [openForm, setOpenForm] = useState(false)
   const [openDelete, setOpenDelete] = useState(false)
   const { activeDatabase } = useDatabase()
-
-  const loadTableData = useCallback(async () => {
-    if (!activeDatabase) return
-
-    const res = await repositories.item.getAll(table)
-    
-    if (!res.ok) {
-      setTableData(null)
-      return
-    }
-
-    setTableData(res.data)
-  }, [activeDatabase, table])
-
-  useEffect(() => {loadTableData()}, [table, loadTableData])
-  useEffect(() => {setTableData(null)}, [activeDatabase])
+  const { tableData } = useTable()
 
   if (!tableData) {
     return <div className="text-zinc-500">{ activeDatabase ? 'Carregando schema...' : 'Selecione uma base de dados' }</div>

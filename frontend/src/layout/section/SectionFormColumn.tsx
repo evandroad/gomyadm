@@ -1,5 +1,4 @@
 import { useState } from "react"
-import { API_URL } from "@/api";
 import { Input } from "@/components/input";
 import { Label } from "@/components/label";
 import { Button } from "@/components/button";
@@ -8,6 +7,7 @@ import { Select } from "@/components/select";
 import { ColumnTypes, createColumn, type Column } from "@/models";
 import { useDatabase } from "@/contexts/DatabaseContext";
 import { useTable } from "@/contexts/TableContext";
+import { repositories } from "@/repositories";
 
 export default function SectionFormColumn() {
   const { activeDatabase } = useDatabase()
@@ -19,25 +19,15 @@ export default function SectionFormColumn() {
 
     const values = { ...column, length: column.length === "" ? undefined : Number(column.length) }
     const payload = { table: activeTable.name, column: values }
+    const res = await repositories.column.create(payload)
 
-    try {
-      const res = await fetch(`${API_URL}/api/table/column`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      })
-
-      if (!res.ok) {
-        const data = await res.json()
-        notify(`Erro: ${data.message || 'Falha ao inserir dados'}`, 'error')
-        return
-      }
-
-      notify("Dados inseridos com sucesso!")
-      setColumn(createColumn())
-    } catch (err: any) {
-      notify(`Erro: ${err.message || 'Falha ao inserir dados'}`, 'error')
+    if (!res.ok) {
+      notify(`Erro: ${res.error || 'Falha ao inserir dados'}`, 'error')
+      return
     }
+
+    notify("Dados inseridos com sucesso!")
+    setColumn(createColumn())
   }
 
   if (!activeDatabase) {
