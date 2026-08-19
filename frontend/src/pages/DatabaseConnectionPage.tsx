@@ -1,5 +1,4 @@
 import { useState } from "react"
-import { API_URL } from "@/api"
 import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/button"
 import { Card, CardContent, CardTitle } from "@/components/card"
@@ -10,6 +9,7 @@ import { createConnection, type Connection } from "@/models"
 import { useConnections } from "@/contexts/ConnectionsContext"
 import { useDatabase } from "@/contexts/DatabaseContext";
 import { useConnection } from "@/contexts/ConectionContext";
+import { repositories } from "@/repositories";
 
 const DB_DRIVERS = [
   { value: "mysql", text: "MySQL" },
@@ -35,20 +35,9 @@ export default function DatabaseConnectionPage() {
         ...connection,
         port: parseInt(connection.port as string, 10),
       }
-      const res = await fetch( API_URL + "/api/session", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(conn),
-      })
 
-      const data = await res.json()
+      const data = await repositories.session.connect(conn)
 
-      if (!res.ok) {
-        throw new Error(data.message || "Falha ao conectar")
-      }
-      
       data.username = conn.username
       data.password = conn.password
       setActiveConnection(data)

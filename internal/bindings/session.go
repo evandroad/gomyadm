@@ -16,3 +16,7 @@ func NewSession(s *services.SessionService) *SessionBinding {
 func (a *SessionBinding) Active() (models.ConnectionResponse, error) {
 	return a.service.Active()
 }
+
+func (a *SessionBinding) Connect(con models.ConnectionConfig) (models.ConnectionResponse, error) {
+	return a.service.Connect(con)
+}

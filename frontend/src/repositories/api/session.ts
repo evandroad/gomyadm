@@ -10,8 +10,23 @@ export class ApiSessionRepository implements SessionRepository {
       return ''
     }
 
-    const data = await response.json()
+    return await response.json()
+  }
 
-    return data
+  async connect(conn: any): Promise<string> {
+    const response = await fetch( API_URL + "/api/session", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(conn),
+    })
+
+    if (!response.ok) {
+      console.error("Erro ao buscar session")
+      return ''
+    }
+
+    return await response.json()
   }
 }

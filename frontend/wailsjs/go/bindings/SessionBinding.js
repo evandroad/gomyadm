@@ -5,3 +5,7 @@
 export function Active() {
   return window['go']['bindings']['SessionBinding']['Active']();
 }
+
+export function Connect(arg1) {
+  return window['go']['bindings']['SessionBinding']['Connect'](arg1);
+}
