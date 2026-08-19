@@ -4,6 +4,8 @@ import {models} from '../models';
 
 export function Create(arg1:models.DatabaseRequest):Promise<void>;
 
+export function Delete(arg1:string):Promise<void>;
+
 export function GetAll():Promise<models.DatabaseResponse>;
 
 export function Select(arg1:string):Promise<void>;

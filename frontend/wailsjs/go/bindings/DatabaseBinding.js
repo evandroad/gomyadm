@@ -6,6 +6,10 @@ export function Create(arg1) {
   return window['go']['bindings']['DatabaseBinding']['Create'](arg1);
 }
 
+export function Delete(arg1) {
+  return window['go']['bindings']['DatabaseBinding']['Delete'](arg1);
+}
+
 export function GetAll() {
   return window['go']['bindings']['DatabaseBinding']['GetAll']();
 }

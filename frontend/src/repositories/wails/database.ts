@@ -1,5 +1,5 @@
 import type { Result } from '..';
-import { GetAll, Select, Create, Update } from '../../../wailsjs/go/bindings/DatabaseBinding'
+import { GetAll, Select, Create, Update, Delete } from '../../../wailsjs/go/bindings/DatabaseBinding'
 import type { DatabaseRepository } from '../database';
 
 export class WailsDatabaseRepository implements DatabaseRepository {
@@ -44,6 +44,19 @@ export class WailsDatabaseRepository implements DatabaseRepository {
   async update(database: any): Promise<Result<void>> {
     try {
       await Update(database)
+      return {
+        ok: true, data: undefined
+      }
+    } catch (error) {
+      return {
+        ok: false, error: error instanceof Error ? error.message : "Erro ao conectar"
+      }
+    }
+  }
+
+  async delete(database: string): Promise<Result<void>> {
+    try {
+      await Delete(database)
       return {
         ok: true, data: undefined
       }

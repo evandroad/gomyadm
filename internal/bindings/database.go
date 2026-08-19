@@ -28,3 +28,7 @@ func (a *DatabaseBinding) Create(database models.DatabaseRequest) error {
 func (a *DatabaseBinding) Update(database models.DatabaseRequest) error {
 	return a.service.Update(database)
 }
+
+func (a *DatabaseBinding) Delete(name string) error {
+	return a.service.Delete(name)
+}

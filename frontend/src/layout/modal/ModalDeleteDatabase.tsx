@@ -1,7 +1,7 @@
-import { API_URL } from "@/api"
 import { Button } from "@/components/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/card"
 import ModalBase from "@/components/modalBase"
+import { repositories } from "@/repositories"
 import { notify } from "@/utils"
 
 type Props = {
@@ -12,25 +12,16 @@ type Props = {
 
 export function ModalDeleteDatabase({ open, onClose, name }: Props) {
   async function saveConnection() {
-    try {
-      const res = await fetch(`${API_URL}/api/database/${name}`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-      })
+    const res = await repositories.database.delete(name)
 
-      if (!res.ok) {
-        const data = await res.json()
-        notify(`Erro: ${data.message || 'Falha ao remover o dado'}`, 'error')
-        return
-      }
-
+    if (!res.ok) {
+      console.error(res.error)
+      notify(`Erro: ${res.error || 'Falha ao remover o dado'}`, 'error')
+    } else {
       notify("Dado removido com sucesso!")
-    } catch (err: any) {
-      console.error(err)
-      notify(`Erro: ${err.message || 'Falha ao remover o dado'}`, 'error')
-    } finally {
-      onClose()
     }
+
+    onClose()
   }
 
   return (

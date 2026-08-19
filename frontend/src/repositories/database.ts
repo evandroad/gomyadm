@@ -15,4 +15,5 @@ export interface DatabaseRepository {
   select(database: string): Promise<Result<void>>
   create(database: any): Promise<Result<void>>
   update(database: any): Promise<Result<void>>
+  delete(database: string): Promise<Result<void>>
 }
