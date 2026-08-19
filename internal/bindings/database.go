@@ -20,3 +20,11 @@ func (a *DatabaseBinding) GetAll() (models.DatabaseResponse, error) {
 func (a *DatabaseBinding) Select(database string) error {
 	return a.service.Select(database)
 }
+
+func (a *DatabaseBinding) Create(database models.DatabaseRequest) error {
+	return a.service.Create(database)
+}
+
+func (a *DatabaseBinding) Update(database models.DatabaseRequest) error {
+	return a.service.Update(database)
+}

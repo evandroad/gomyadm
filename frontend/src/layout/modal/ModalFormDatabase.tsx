@@ -1,9 +1,9 @@
-import { API_URL } from "@/api"
 import { Button } from "@/components/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/card"
 import { Input } from "@/components/input"
 import { Label } from "@/components/label"
 import ModalBase from "@/components/modalBase"
+import { repositories } from "@/repositories"
 import { notify } from "@/utils"
 import { useEffect, useState } from "react"
 
@@ -16,36 +16,26 @@ type Props = {
 export function ModalFormDatabase({ open, onClose, oldName }: Props) {
   const [newName, setNewName] = useState<string>('')
   const isEditing = !!oldName
-  const method = isEditing ? 'PUT' : 'POST'
 
   async function handleSubmit() {
-    const payload = isEditing ? { oldName, newName } : { name: newName }
+    const res = isEditing ?
+      await repositories.database.update({ oldName, newName }) :
+      await repositories.database.create({ name: newName })
 
-    try {
-      const res = await fetch(`${API_URL}/api/database`, {
-        method: method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      })
-
-      if (!res.ok) {
-        const data = await res.json()
-        notify(`Erro: ${data.message || 'Falha ao salvar o dado'}`, 'error')
-        return
-      }
-
+    if (!res.ok) {
+      console.error(res.error)
+      notify(`Erro: ${res.error || 'Falha ao salvar o dado'}`, 'error')
+    } else {
       notify("Dado salvo com sucesso!")
       setNewName('')
-    } catch (err: any) {
-      console.error(err)
-      notify(`Erro: ${err.message || 'Falha ao alterar o dado'}`, 'error')
-    } finally {
-      onClose()
     }
+
+    onClose()
   }
 
   useEffect(() => {
     if (!open) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setNewName('')
   }, [open, oldName])
 

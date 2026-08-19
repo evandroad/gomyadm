@@ -13,4 +13,6 @@ export function createDatabaseRepository(): DatabaseRepository {
 export interface DatabaseRepository {
   getAll(): Promise<Result<any>>
   select(database: string): Promise<Result<void>>
+  create(database: any): Promise<Result<void>>
+  update(database: any): Promise<Result<void>>
 }

@@ -52,6 +52,22 @@ export namespace models {
 	        this.databases = source["databases"];
 	    }
 	}
+	export class DatabaseRequest {
+	    name?: string;
+	    oldName?: string;
+	    newName?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new DatabaseRequest(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.oldName = source["oldName"];
+	        this.newName = source["newName"];
+	    }
+	}
 	export class DatabaseResponse {
 	    active: string;
 	    databases: string[];

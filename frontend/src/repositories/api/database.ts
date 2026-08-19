@@ -28,7 +28,45 @@ export class ApiDatabaseRepository implements DatabaseRepository {
     if (!response.ok) {
       const error = await response.json().catch(() => null)
       return {
-        ok: false, error: error?.message ?? "Erro ao buscar databases"
+        ok: false, error: error?.message ?? "Erro ao selecionar database"
+      }
+    }
+
+    return {
+      ok: true, data: undefined
+    }
+  }
+
+  async create(database: any): Promise<Result<void>> {
+    const response = await fetch(`${API_URL}/api/database`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(database),
+    })
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => null)
+      return {
+        ok: false, error: error?.message ?? "Erro ao criar database"
+      }
+    }
+
+    return {
+      ok: true, data: undefined
+    }
+  }
+
+  async update(database: any): Promise<Result<void>> {
+    const response = await fetch(`${API_URL}/api/database`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(database),
+    })
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => null)
+      return {
+        ok: false, error: error?.message ?? "Erro ao editar database"
       }
     }
 
