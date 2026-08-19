@@ -6,6 +6,7 @@ export interface TableRepository {
   getAll(): Promise<Result<string[]>>
   create(table: any): Promise<Result<void>>
   update(oldName: string, newName: string): Promise<Result<void>>
+  delete(table: string): Promise<Result<void>>
 }
 
 export function createTableRepository(): TableRepository {

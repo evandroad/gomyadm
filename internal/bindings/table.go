@@ -24,3 +24,7 @@ func (a *TableBinding) Create(table models.Table) error {
 func (a *TableBinding) Update(oldName, newName string) error {
 	return a.service.Update(oldName, newName)
 }
+
+func (a *TableBinding) Delete(table string) error {
+	return a.service.Delete(table)
+}

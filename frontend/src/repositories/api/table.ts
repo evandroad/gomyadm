@@ -54,4 +54,22 @@ export class ApiTableRepository implements TableRepository {
       ok: true, data: undefined
     }
   }
+
+  async delete(table: string): Promise<Result<void>> {
+    const response = await fetch(`${API_URL}/api/table/${table}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" }
+    })
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => null)
+      return {
+        ok: false, error: error?.error ?? "Erro ao buscar versão"
+      }
+    }
+
+    return {
+      ok: true, data: undefined
+    }
+  }
 }
