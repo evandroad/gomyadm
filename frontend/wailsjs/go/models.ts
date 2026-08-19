@@ -108,6 +108,22 @@ export namespace models {
 	        this.databases = source["databases"];
 	    }
 	}
+	export class ItemRequest {
+	    table: string;
+	    key?: Record<string, any>;
+	    values?: Record<string, any>;
+	
+	    static createFrom(source: any = {}) {
+	        return new ItemRequest(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.table = source["table"];
+	        this.key = source["key"];
+	        this.values = source["values"];
+	    }
+	}
 	export class Table {
 	    name: string;
 	    columns: Column[];

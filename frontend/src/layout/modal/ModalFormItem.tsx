@@ -1,4 +1,3 @@
-import { API_URL } from "@/api"
 import { Button } from "@/components/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/card"
 import { Input } from "@/components/input"
@@ -6,6 +5,7 @@ import { Label } from "@/components/label"
 import ModalBase from "@/components/modalBase"
 import { useTable } from "@/contexts/TableContext";
 import type { Column, Values } from "@/models"
+import { repositories } from "@/repositories"
 import { castValue, getInputType } from "@/tableUtils"
 import { notify } from "@/utils"
 import { useEffect, useState } from "react"
@@ -19,7 +19,6 @@ type Props = {
 export function ModalFormItem({ open, onClose, data }: Props) {
   const [formData, setFormData] = useState<Values | null>(null)
   const { activeTable } = useTable()
-  const method = data == null ? 'POST' : 'PUT'
 
   async function handleSubmit() {
     if (!activeTable) return
@@ -34,27 +33,20 @@ export function ModalFormItem({ open, onClose, data }: Props) {
       )
     }
     
-    try {
-      const res = await fetch(`${API_URL}/api/table/item`, {
-        method: method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      })
+    const res = data == null ?
+      await repositories.item.create(payload) :
+      await repositories.item.update(payload)
 
-      const data = await res.json()
-      if (!res.ok) {
-        notify(`Erro: ${data.message || 'Falha ao alterar o dado'}`, 'error')
-        return
-      }
-
-      notify(data.message)
+    if (!res.ok) {
+      console.error(res.error)
+      notify(`Erro: ${res.error || 'Falha ao alterar o dado'}`, 'error')
+      return
+    } else {
+      notify("Item salvo com sucesso")
       setFormData({})
-    } catch (err: any) {
-      console.error(err)
-      notify(`Erro: ${err.message || 'Falha ao alterar o dado'}`, 'error')
-    } finally {
-      onClose()
     }
+
+    onClose()
   }
 
   useEffect(() => {

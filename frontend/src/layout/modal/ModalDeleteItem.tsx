@@ -1,10 +1,10 @@
-import { API_URL } from "@/api"
 import { Button } from "@/components/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/card"
 import { Label } from "@/components/label"
 import ModalBase from "@/components/modalBase"
 import { useTable } from "@/contexts/TableContext";
 import type { Column, Values } from "@/models"
+import { repositories } from "@/repositories"
 import { castValue } from "@/tableUtils"
 import { notify } from "@/utils"
 import { useEffect } from "react"
@@ -29,26 +29,17 @@ export function ModalDeleteItem({ open, onClose, data }: Props) {
       )
     }
 
-    try {
-      const res = await fetch(`${API_URL}/api/table/item`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      })
+    const res = await repositories.item.delete(payload)
 
-      if (!res.ok) {
-        const data = await res.json()
-        notify(`Erro: ${data.message || 'Falha ao remover o dado'}`, 'error')
-        return
-      }
-
+    if (!res.ok) {
+      console.error(res.error)
+      notify(`Erro: ${res.error || 'Falha ao remover o dado'}`, 'error')
+      return
+    } else {
       notify("Dado removido com sucesso!")
-    } catch (err: any) {
-      console.error(err)
-      notify(`Erro: ${err.message || 'Falha ao remover o dado'}`, 'error')
-    } finally {
-      onClose()
     }
+
+    onClose()
   }
 
   useEffect(() => {

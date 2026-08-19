@@ -1,4 +1,4 @@
-import { GetAll /*, Create, Update, Delete*/ } from '../../../wailsjs/go/bindings/ItemBinding'
+import { GetAll , Create, Update, Delete } from '../../../wailsjs/go/bindings/ItemBinding'
 import type { Result } from "..";
 import type { ItemRepository } from '../item';
 
@@ -15,9 +15,9 @@ export class WailsItemRepository implements ItemRepository {
     }
   }
 
-  async create(/*table: any*/): Promise<Result<void>> {
+  async create(item: any): Promise<Result<void>> {
     try {
-      // await Create(table)
+      await Create(item)
       return {
         ok: true, data: undefined
       }
@@ -28,9 +28,9 @@ export class WailsItemRepository implements ItemRepository {
     }
   }
 
-  async update(/*oldName: any*/): Promise<Result<void>> {
+  async update(item: any): Promise<Result<void>> {
     try {
-      // await Update(oldName, newName)
+      await Update(item)
       return {
         ok: true, data: undefined
       }
@@ -41,9 +41,9 @@ export class WailsItemRepository implements ItemRepository {
     }
   }
 
-  async delete(/*table: string*/): Promise<Result<void>> {
+  async delete(item: any): Promise<Result<void>> {
     try {
-      // await Delete(table)
+      await Delete(item)
       return {
         ok: true, data: undefined
       }

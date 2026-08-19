@@ -18,11 +18,11 @@ export class ApiItemRepository implements ItemRepository {
     }
   }
 
-  async create(table: any): Promise<Result<void>> {
-    const response = await fetch(`${API_URL}/api/table`, {
+  async create(item: any): Promise<Result<void>> {
+    const response = await fetch(`${API_URL}/api/table/item`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(table),
+      body: JSON.stringify(item)
     })
 
     if (!response.ok) {
@@ -37,10 +37,11 @@ export class ApiItemRepository implements ItemRepository {
     }
   }
 
-  async update(oldName: any): Promise<Result<void>> {
-    const response = await fetch(`${API_URL}/api/table/${oldName}`, {
+  async update(item: any): Promise<Result<void>> {
+    const response = await fetch(`${API_URL}/api/table/item`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(item)
     })
 
     if (!response.ok) {
@@ -55,10 +56,11 @@ export class ApiItemRepository implements ItemRepository {
     }
   }
 
-  async delete(table: string): Promise<Result<void>> {
-    const response = await fetch(`${API_URL}/api/table/${table}`, {
+  async delete(item: any): Promise<Result<void>> {
+    const response = await fetch(`${API_URL}/api/table/item`, {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(item)
     })
 
     if (!response.ok) {

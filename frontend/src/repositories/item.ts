@@ -4,9 +4,9 @@ import { WailsItemRepository } from "./wails/item";
 
 export interface ItemRepository {
   getAll(table: string): Promise<Result<any>>
-  create(con: any): Promise<Result<void>>
-  update(con: any): Promise<Result<void>>
-  delete(id: string): Promise<Result<void>>
+  create(item: any): Promise<Result<void>>
+  update(item: any): Promise<Result<void>>
+  delete(item: any): Promise<Result<void>>
 }
 
 export function createItemRepository(): ItemRepository {
