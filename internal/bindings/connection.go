@@ -24,3 +24,7 @@ func (a *ConnectionBinding) Create(con models.ConnectionConfig) error {
 func (a *ConnectionBinding) Update(id string, con models.ConnectionConfig) error {
 	return a.service.Update(id, con)
 }
+
+func (a *ConnectionBinding) Delete(id string) error {
+	return a.service.Delete(id)
+}

@@ -22,8 +22,8 @@
     "databases": null
   },
   {
-    "id": "d8qtrao1h5a9tkp6o4t0",
-    "name": "MySql super-api",
+    "id": "da2rr0ov54bjpsem4iu0",
+    "name": "super-api",
     "driver": "mysql",
     "host": "localhost",
     "port": 9906,

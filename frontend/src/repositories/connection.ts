@@ -15,4 +15,5 @@ export interface ConnectionRepository {
   getAll(): Promise<Result<Connection[]>>
   create(con: any): Promise<Result<void>>
   update(id: string, con: any): Promise<Result<void>>
+  delete(id: string): Promise<Result<void>>
 }

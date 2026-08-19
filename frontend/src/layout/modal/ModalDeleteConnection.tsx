@@ -1,4 +1,3 @@
-import { API_URL } from "@/api"
 import { Button } from "@/components/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/card"
 import { Label } from "@/components/label"
@@ -6,6 +5,7 @@ import ModalBase from "@/components/modalBase"
 import { useConnection } from "@/contexts/ConectionContext";
 import { useConnections } from "@/contexts/ConnectionsContext"
 import type { Connection } from "@/models"
+import { repositories } from "@/repositories"
 import { useEffect } from "react"
 
 type Props = {
@@ -20,21 +20,16 @@ export function ModalDeleteConnection({ open, onClose, data }: Props) {
   const id = data.id
 
   async function saveConnection() {
-    try {
-      const res = await fetch(`${API_URL}/api/connection/${id}`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" }
-      })
+    const res = await repositories.connection.delete(id)
 
-      if (res.ok) {
-        removeConnection(id)
-        setActiveConnection({ ...data, name: "" })
-      }
-    } catch (err) {
-      console.error(err)
-    } finally {
-      onClose()
+    if (res.ok) {
+      removeConnection(id)
+      setActiveConnection({ ...data, name: "" })
+    } else {
+      console.error(res.error)
     }
+
+    onClose()
   }
 
   useEffect(() => {

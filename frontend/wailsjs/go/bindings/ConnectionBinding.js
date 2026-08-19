@@ -6,6 +6,10 @@ export function Create(arg1) {
   return window['go']['bindings']['ConnectionBinding']['Create'](arg1);
 }
 
+export function Delete(arg1) {
+  return window['go']['bindings']['ConnectionBinding']['Delete'](arg1);
+}
+
 export function GetAll() {
   return window['go']['bindings']['ConnectionBinding']['GetAll']();
 }

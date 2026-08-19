@@ -36,7 +36,7 @@ export class ApiConnectionRepository implements ConnectionRepository {
     }
 
     return {
-      ok: true, data: await response.json()
+      ok: true, data: undefined
     }
   }
 
@@ -55,7 +55,25 @@ export class ApiConnectionRepository implements ConnectionRepository {
     }
 
     return {
-      ok: true, data: await response.json()
+      ok: true, data: undefined
+    }
+  }
+
+  async delete(id: string): Promise<Result<void>> {
+    const response = await fetch(`${API_URL}/api/connection/${id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" }
+    })
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => null)
+      return {
+        ok: false, error: error?.message ?? "Erro ao apagar conexão"
+      }
+    }
+
+    return {
+      ok: true, data: undefined
     }
   }
 }
