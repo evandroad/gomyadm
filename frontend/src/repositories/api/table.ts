@@ -36,4 +36,22 @@ export class ApiTableRepository implements TableRepository {
       ok: true, data: undefined
     }
   }
+
+  async update(oldName: string, newName: string): Promise<Result<void>> {
+    const response = await fetch(`${API_URL}/api/table/${oldName}/${newName}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" }
+    })
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => null)
+      return {
+        ok: false, error: error?.error ?? "Erro ao buscar versão"
+      }
+    }
+
+    return {
+      ok: true, data: undefined
+    }
+  }
 }

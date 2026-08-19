@@ -9,3 +9,7 @@ export function Create(arg1) {
 export function GetAll() {
   return window['go']['bindings']['TableBinding']['GetAll']();
 }
+
+export function Update(arg1, arg2) {
+  return window['go']['bindings']['TableBinding']['Update'](arg1, arg2);
+}
