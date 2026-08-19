@@ -10,15 +10,17 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function checkActiveConnection() {
       setLoading(true)
-      try {
-        const data = await repositories.session.active()
-        if (data) setActiveConnection(data)
-      } catch (err) {
+      
+      const res = await repositories.session.active()
+      
+      if (res.ok) {
+        setActiveConnection(res.data)
+      } else {
         setActiveConnection(null)
-        console.error(err)
-      } finally {
-        setLoading(false)
+        console.error(res.error)
       }
+
+      setLoading(false)
     }
 
     checkActiveConnection()

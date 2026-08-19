@@ -12,15 +12,17 @@ export function SidebarDisconnect() {
   const navigate = useNavigate()
 
   async function disconnect() {
-    try {
-      await repositories.session.disconnect()
-      setActiveConnection(null)
-      setActiveDatabase(null)
-      setActiveTable(null)
-      navigate("/connect", { replace: true })
-    } catch (error) {
-      console.error(error)
+    const res = await repositories.session.disconnect()
+
+    if (!res.ok) {
+      console.error(res.error)
+      return
     }
+
+    setActiveConnection(null)
+    setActiveDatabase(null)
+    setActiveTable(null)
+    navigate("/connect", { replace: true })
   }
 
   return (

@@ -1,5 +1,6 @@
 import { ApiSessionRepository } from "./api/session";
 import { WailsSessionRepository } from "./wails/session";
+import type { Result } from ".";
 
 export function createSessionRepository(): SessionRepository {
   if (import.meta.env.VITE_RUNTIME === "wails") {
@@ -10,7 +11,7 @@ export function createSessionRepository(): SessionRepository {
 }
 
 export interface SessionRepository {
-  active(): Promise<any>
-  connect(con: any): Promise<any>
-  disconnect(): Promise<any>
+  active(): Promise<Result<any>>
+  connect(con: any): Promise<Result<any>>
+  disconnect(): Promise<Result<void>>
 }

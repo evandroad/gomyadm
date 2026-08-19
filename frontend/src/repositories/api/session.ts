@@ -1,48 +1,57 @@
 import { API_URL } from "@/api";
 import type { SessionRepository } from "../session";
+import type { Result } from "..";
 
 export class ApiSessionRepository implements SessionRepository {
-  async active(): Promise<string> {
+  async active(): Promise<Result<string>> {
     const response = await fetch(`${API_URL}/api/session`)
 
     if (!response.ok) {
-      console.error("Erro ao buscar session")
-      return ''
+      const error = await response.json().catch(() => null)
+      return {
+        ok: false, error: error?.message ?? "Erro ao buscar session"
+      }
     }
 
-    return await response.json()
+    return {
+      ok: true, data: await response.json()
+    } 
   }
 
-  async connect(conn: any): Promise<any> {
+  async connect(conn: any): Promise<Result<any>> {
     const response = await fetch( API_URL + "/api/session", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(conn),
     })
 
     if (!response.ok) {
-      console.error("Erro ao conectar session")
-      return null
+      const error = await response.json().catch(() => null)
+      return {
+        ok: false, error: error?.message ?? "Erro ao conectar session"
+      }
     }
 
-    return await response.json()
+    return {
+      ok: true, data: await response.json()
+    }
   }
 
-  async disconnect(): Promise<any> {
+  async disconnect(): Promise<Result<void>> {
     const response = await fetch( API_URL + "/api/session", {
       method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      }
+      headers: { "Content-Type": "application/json" }
     })
 
     if (!response.ok) {
-      console.error("Erro ao desconectar session")
-      return null
+      const error = await response.json().catch(() => null)
+      return {
+        ok: false, error: error?.message ?? "Erro ao desconectar session"
+      }
     }
 
-    return await response.json()
+    return {
+      ok: true, data: undefined
+    }
   }
 }

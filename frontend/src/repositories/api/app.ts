@@ -7,8 +7,9 @@ export class ApiAppRepository implements AppRepository {
     const response = await fetch(`${API_URL}/api/version`)
 
     if (!response.ok) {
+      const error = await response.json().catch(() => null)
       return {
-        ok: false, error: "Erro ao buscar versão"
+        ok: false, error: error?.message ?? "Erro ao buscar versão"
       }
     }
 

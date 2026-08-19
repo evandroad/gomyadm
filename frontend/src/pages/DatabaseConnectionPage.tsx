@@ -30,24 +30,24 @@ export default function DatabaseConnectionPage() {
     setLoading(true)
     setError(null)
 
-    try {
-      const conn = connArg || {
-        ...connection,
-        port: parseInt(connection.port as string, 10),
-      }
+    const conn = connArg || {
+      ...connection,
+      port: parseInt(connection.port as string, 10),
+    }
 
-      const data = await repositories.session.connect(conn)
+    const res = await repositories.session.connect(conn)
 
-      data.username = conn.username
-      data.password = conn.password
-      setActiveConnection(data)
+    if (!res.ok) {
+      setError(res.error)
+    } else {
+      res.data.username = conn.username
+      res.data.password = conn.password
+      setActiveConnection(res.data)
       getDatabases()
       navigate("/app", { replace: true })
-    } catch (err: any) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
     }
+
+    setLoading(false)
   }
 
   function connectFromSaved(conn: Connection) {

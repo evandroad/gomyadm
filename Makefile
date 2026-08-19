@@ -6,7 +6,7 @@ LDFLAGS := -s -w -X gomyadm/internal/services.Version=$(VERSION)
 all: api deb
 
 frontend:
-	cd frontend/ && npm install && npm run build -- --mode web
+	cd frontend/ && bun install && bun run build -- --mode web
 
 api: frontend
 	swag init -g cmd/server/main.go 

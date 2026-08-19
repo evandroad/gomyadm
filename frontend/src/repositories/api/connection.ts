@@ -8,8 +8,9 @@ export class ApiConnectionRepository implements ConnectionRepository {
     const response = await fetch(`${API_URL}/api/connection`)
 
     if (!response.ok) {
+      const error = await response.json().catch(() => null)
       return {
-        ok: false, error: "Erro ao buscar conexões"
+        ok: false, error: error?.message ?? "Erro ao buscar conexões"
       }
     }
 
@@ -28,11 +29,11 @@ export class ApiConnectionRepository implements ConnectionRepository {
     })
 
     if (!response.ok) {
+      const error = await response.json().catch(() => null)
       return {
-        ok: false, error: "Erro ao criar conexão"
+        ok: false, error: error?.message ?? "Erro ao criar conexão"
       }
     }
-
 
     return {
       ok: true, data: await response.json()

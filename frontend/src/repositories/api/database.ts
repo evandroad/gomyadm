@@ -7,15 +7,14 @@ export class ApiDatabaseRepository implements DatabaseRepository {
     const response = await fetch(`${API_URL}/api/database`)
 
     if (!response.ok) {
+      const error = await response.json().catch(() => null)
       return {
-        ok: false, error: "Erro ao buscar databases"
+        ok: false, error: error?.message ?? "Erro ao buscar databases"
       }
     }
 
-
-    const data = await response.json()
     return {
-      ok: true, data
+      ok: true, data: await response.json()
     }
   }
 }
