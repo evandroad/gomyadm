@@ -29,9 +29,9 @@ export class WailsConnectionRepository implements ConnectionRepository {
     }
   }
 
-  async update(id: string, con: any): Promise<Result<void>> {
+  async update(con: any): Promise<Result<void>> {
     try {
-      await Update(id, con)
+      await Update(con)
       return {
         ok: true, data: undefined
       }

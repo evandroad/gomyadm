@@ -23,7 +23,7 @@ export function ModalFormConnection({ open, onClose, data, edit }: Props) {
 
   async function saveConnection() {
     const res = edit ? 
-      await repositories.connection.update(connection.id, connection) : 
+      await repositories.connection.update(connection) : 
       await repositories.connection.create(connection)
 
     if (res.ok) {

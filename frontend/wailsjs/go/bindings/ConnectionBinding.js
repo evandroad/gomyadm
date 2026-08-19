@@ -14,6 +14,6 @@ export function GetAll() {
   return window['go']['bindings']['ConnectionBinding']['GetAll']();
 }
 
-export function Update(arg1, arg2) {
-  return window['go']['bindings']['ConnectionBinding']['Update'](arg1, arg2);
+export function Update(arg1) {
+  return window['go']['bindings']['ConnectionBinding']['Update'](arg1);
 }
