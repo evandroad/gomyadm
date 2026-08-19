@@ -9,7 +9,7 @@ export class ApiSessionRepository implements SessionRepository {
     if (!response.ok) {
       const error = await response.json().catch(() => null)
       return {
-        ok: false, error: error?.message ?? "Erro ao buscar session"
+        ok: false, error: error?.error ?? "Erro ao buscar session"
       }
     }
 
@@ -28,7 +28,7 @@ export class ApiSessionRepository implements SessionRepository {
     if (!response.ok) {
       const error = await response.json().catch(() => null)
       return {
-        ok: false, error: error?.message ?? "Erro ao conectar session"
+        ok: false, error: error?.error ?? "Erro ao conectar session"
       }
     }
 
@@ -46,7 +46,7 @@ export class ApiSessionRepository implements SessionRepository {
     if (!response.ok) {
       const error = await response.json().catch(() => null)
       return {
-        ok: false, error: error?.message ?? "Erro ao desconectar session"
+        ok: false, error: error?.error ?? "Erro ao desconectar session"
       }
     }
 

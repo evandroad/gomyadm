@@ -10,7 +10,7 @@ export class ApiConnectionRepository implements ConnectionRepository {
     if (!response.ok) {
       const error = await response.json().catch(() => null)
       return {
-        ok: false, error: error?.message ?? "Erro ao buscar conexões"
+        ok: false, error: error?.error ?? "Erro ao buscar conexões"
       }
     }
 
@@ -31,7 +31,7 @@ export class ApiConnectionRepository implements ConnectionRepository {
     if (!response.ok) {
       const error = await response.json().catch(() => null)
       return {
-        ok: false, error: error?.message ?? "Erro ao criar conexão"
+        ok: false, error: error?.error ?? "Erro ao criar conexão"
       }
     }
 
@@ -50,7 +50,7 @@ export class ApiConnectionRepository implements ConnectionRepository {
     if (!response.ok) {
       const error = await response.json().catch(() => null)
       return {
-        ok: false, error: error?.message ?? "Erro ao editar conexão"
+        ok: false, error: error?.error ?? "Erro ao editar conexão"
       }
     }
 
@@ -68,7 +68,7 @@ export class ApiConnectionRepository implements ConnectionRepository {
     if (!response.ok) {
       const error = await response.json().catch(() => null)
       return {
-        ok: false, error: error?.message ?? "Erro ao apagar conexão"
+        ok: false, error: error?.error ?? "Erro ao apagar conexão"
       }
     }
 

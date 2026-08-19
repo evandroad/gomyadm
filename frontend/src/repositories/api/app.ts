@@ -9,7 +9,7 @@ export class ApiAppRepository implements AppRepository {
     if (!response.ok) {
       const error = await response.json().catch(() => null)
       return {
-        ok: false, error: error?.message ?? "Erro ao buscar versão"
+        ok: false, error: error?.error ?? "Erro ao buscar versão"
       }
     }
 

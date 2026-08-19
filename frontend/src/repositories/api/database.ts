@@ -9,7 +9,7 @@ export class ApiDatabaseRepository implements DatabaseRepository {
     if (!response.ok) {
       const error = await response.json().catch(() => null)
       return {
-        ok: false, error: error?.message ?? "Erro ao buscar databases"
+        ok: false, error: error?.error ?? "Erro ao buscar databases"
       }
     }
 
@@ -28,7 +28,7 @@ export class ApiDatabaseRepository implements DatabaseRepository {
     if (!response.ok) {
       const error = await response.json().catch(() => null)
       return {
-        ok: false, error: error?.message ?? "Erro ao selecionar database"
+        ok: false, error: error?.error ?? "Erro ao selecionar database"
       }
     }
 
@@ -47,7 +47,7 @@ export class ApiDatabaseRepository implements DatabaseRepository {
     if (!response.ok) {
       const error = await response.json().catch(() => null)
       return {
-        ok: false, error: error?.message ?? "Erro ao criar database"
+        ok: false, error: error?.error ?? "Erro ao criar database"
       }
     }
 
@@ -66,7 +66,7 @@ export class ApiDatabaseRepository implements DatabaseRepository {
     if (!response.ok) {
       const error = await response.json().catch(() => null)
       return {
-        ok: false, error: error?.message ?? "Erro ao editar database"
+        ok: false, error: error?.error ?? "Erro ao editar database"
       }
     }
 
@@ -84,7 +84,7 @@ export class ApiDatabaseRepository implements DatabaseRepository {
     if (!response.ok) {
       const error = await response.json().catch(() => null)
       return {
-        ok: false, error: error?.message ?? "Erro ao editar database"
+        ok: false, error: error?.error ?? "Erro ao editar database"
       }
     }
 
