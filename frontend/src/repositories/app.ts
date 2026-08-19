@@ -1,3 +1,4 @@
+import type { Result } from ".";
 import { ApiAppRepository } from "./api/app";
 import { WailsAppRepository } from "./wails/app";
 
@@ -10,5 +11,5 @@ export function createAppRepository(): AppRepository {
 }
 
 export interface AppRepository {
-  version(): Promise<string>
+  version(): Promise<Result<string>>
 }

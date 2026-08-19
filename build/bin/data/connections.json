@@ -1,0 +1,16 @@
+[
+  {
+    "id": "da2qi78v54bl1vti1h50",
+    "name": "super",
+    "driver": "mysql",
+    "host": "localhost",
+    "port": 9906,
+    "username": "evandro",
+    "password": "evandro",
+    "database": "",
+    "databases": [
+      "2804618_contas",
+      "information_schema"
+    ]
+  }
+]

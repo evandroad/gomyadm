@@ -20,11 +20,11 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
   }
 
   const getDatabases = useCallback(async () => {
-    const data = await repositories.database.getAll()
+    const res = await repositories.database.getAll()
 
-    if (data) {
-      setActiveDatabase(data.active)
-      setDatabases(data.databases)
+    if (res.ok) {
+      setActiveDatabase(res.data.active)
+      setDatabases(res.data.databases)
     }
   }, [])
 

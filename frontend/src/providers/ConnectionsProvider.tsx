@@ -10,8 +10,8 @@ export function ConnectionsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function loadConnections() {
       try {
-        const data = await repositories.connection.getAll()
-        if (data) setConnections(data)
+        const res = await repositories.connection.getAll()
+        if (res.ok) setConnections(res.data)
       } catch (err) {
         console.error(err)
       } finally {

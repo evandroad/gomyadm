@@ -13,3 +13,5 @@ export const repositories = {
   // item: createItemRepository(),
   // query: createQueryRepository(),
 }
+
+export type Result<T> = | { ok: true; data: T } | { ok: false; error: string }

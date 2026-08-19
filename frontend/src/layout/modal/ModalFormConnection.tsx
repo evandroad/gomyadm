@@ -1,4 +1,3 @@
-import { API_URL } from "@/api"
 import { Button } from "@/components/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/card"
 import { Input } from "@/components/input"
@@ -7,6 +6,7 @@ import ModalBase from "@/components/modalBase"
 import { useConnection } from "@/contexts/ConectionContext";
 import { useConnections } from "@/contexts/ConnectionsContext"
 import type { Connection } from "@/models"
+import { repositories } from "@/repositories";
 import { useEffect, useState } from "react"
 
 type Props = {
@@ -20,19 +20,14 @@ export function ModalFormConnection({ open, onClose, data, edit }: Props) {
   const { setActiveConnection } = useConnection()
   const { insertConnection, updateConnection } = useConnections()
   const [connection, setConnection] = useState<Connection>(data)
-  const method = edit ? "PUT" : "POST"
 
   async function saveConnection() {
     try {
-      const res = await fetch(`${API_URL}/api/connection`, {
-        method: method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(connection)
-      })
+      const res = edit ? { ok: false } : await repositories.connection.create(connection)
 
       if (res.ok) {
         setActiveConnection(connection)
-        method === "POST" ? insertConnection(connection) : updateConnection(connection.id, connection)
+        if (edit) { updateConnection(connection.id, connection) } else { insertConnection(connection) }
       }
     } catch (err) {
       console.error(err)

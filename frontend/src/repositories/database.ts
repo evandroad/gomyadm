@@ -1,5 +1,6 @@
 import { WailsDatabaseRepository } from "./wails/database";
 import { ApiDatabaseRepository } from "./api/database";
+import type { Result } from ".";
 
 export function createDatabaseRepository(): DatabaseRepository {
   if (import.meta.env.VITE_RUNTIME === "wails") {
@@ -10,5 +11,5 @@ export function createDatabaseRepository(): DatabaseRepository {
 }
 
 export interface DatabaseRepository {
-  getAll(): Promise<any>
+  getAll(): Promise<Result<any>>
 }

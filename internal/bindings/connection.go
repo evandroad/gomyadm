@@ -16,3 +16,7 @@ func NewConnection(s *services.ConnectionsStore) *ConnectionBinding {
 func (a *ConnectionBinding) GetAll() []models.ConnectionConfig {
 	return a.service.GetAll()
 }
+
+func (a *ConnectionBinding) Create(con models.ConnectionConfig) error {
+	return a.service.Create(con)
+}

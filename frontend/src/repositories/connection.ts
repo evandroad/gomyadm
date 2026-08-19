@@ -1,6 +1,7 @@
 import type { Connection } from "@/models";
 import { WailsConnectionRepository } from "./wails/connection";
 import { ApiConnectionRepository } from "./api/connection";
+import type { Result } from ".";
 
 export function createConnectionRepository(): ConnectionRepository {
   if (import.meta.env.VITE_RUNTIME === "wails") {
@@ -11,5 +12,6 @@ export function createConnectionRepository(): ConnectionRepository {
 }
 
 export interface ConnectionRepository {
-  getAll(): Promise<Connection[]>
+  getAll(): Promise<Result<Connection[]>>
+  create(con: any): Promise<Result<void>>
 }

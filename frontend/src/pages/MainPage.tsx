@@ -34,7 +34,7 @@ export default function MainPage() {
   useEffect(() => {
     async function fetchVersion() {
       const res = await repositories.app.version()
-      setVersion(res)
+      if (res.ok) setVersion(res.data)
     }
 
     fetchVersion()
