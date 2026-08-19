@@ -30,6 +30,7 @@ func NewApp() *App {
 	databaseService   := services.NewDatabaseService(manager)
 	sessionService    := services.NewSessionService(manager)
 	tableService      := services.NewTableService(manager)
+	itemService       := services.NewItemService(manager)
 
 	return &App{
 		binds: []any{
@@ -38,6 +39,7 @@ func NewApp() *App {
 			bindings.NewDatabase(databaseService),
 			bindings.NewSession(sessionService),
 			bindings.NewTable(tableService),
+			bindings.NewItem(itemService),
 		},
 	}
 }

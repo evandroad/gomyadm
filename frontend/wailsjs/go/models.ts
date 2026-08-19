@@ -140,6 +140,20 @@ export namespace models {
 		    return a;
 		}
 	}
+	export class TableData {
+	    columns: string[];
+	    rows: any[];
+	
+	    static createFrom(source: any = {}) {
+	        return new TableData(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.columns = source["columns"];
+	        this.rows = source["rows"];
+	    }
+	}
 
 }
 

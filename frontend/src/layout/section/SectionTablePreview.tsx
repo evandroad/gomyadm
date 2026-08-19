@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useCallback, useEffect, useState } from "react"
-import { API_URL } from "@/api";
 import { Th } from "@/components/th";
 import { Td } from "@/components/td";
 import { Button } from "@/components/button";
@@ -9,6 +8,7 @@ import { ModalFormItem } from "../modal/ModalFormItem";
 import type { TableData, Values } from "@/models";
 import { ModalDeleteItem } from "../modal/ModalDeleteItem";
 import { useDatabase } from "@/contexts/DatabaseContext";
+import { repositories } from "@/repositories";
 
 export default function SectionTablePreview({ table }: { table: string }) {
   const [tableData, setTableData] = useState<TableData | null>(null)
@@ -19,13 +19,15 @@ export default function SectionTablePreview({ table }: { table: string }) {
 
   const loadTableData = useCallback(async () => {
     if (!activeDatabase) return
-    const res = await fetch(`${API_URL}/api/table/item/${table}`)
+
+    const res = await repositories.item.getAll(table)
+    
     if (!res.ok) {
       setTableData(null)
       return
     }
-    const data = await res.json()
-    setTableData(data)
+
+    setTableData(res.data)
   }, [activeDatabase, table])
 
   useEffect(() => {loadTableData()}, [table, loadTableData])

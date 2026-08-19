@@ -3,6 +3,7 @@ import { createAppRepository } from "./app";
 import { createDatabaseRepository } from "./database";
 import { createSessionRepository } from "./session";
 import { createTableRepository } from "./table";
+import { createItemRepository } from "./item";
 
 export const repositories = {
   app: createAppRepository(),
@@ -11,7 +12,7 @@ export const repositories = {
   database: createDatabaseRepository(),
   table: createTableRepository(),
   // column: createColumnRepository(),
-  // item: createItemRepository(),
+  item: createItemRepository(),
   // query: createQueryRepository(),
 }
 
