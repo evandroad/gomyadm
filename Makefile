@@ -3,12 +3,14 @@
 VERSION := $(shell git describe --tags --always)
 LDFLAGS := -s -w -X gomyadm/internal/services.Version=$(VERSION)
 
+all: api deb
+
 frontend:
 	cd frontend/ && npm install && npm run build -- --mode web
 
 api: frontend
 	swag init -g cmd/server/main.go 
-	sudo cp -r frontend/web cmd/server
+	cp -r frontend/web cmd/server
 	go build -ldflags="$(LDFLAGS)" -o build/api/gomyadm ./cmd/server
 
 run: api
