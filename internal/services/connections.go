@@ -50,6 +50,19 @@ func (s *ConnectionsStore) GetAll() []models.ConnectionConfig {
 	return result
 }
 
+func (s *ConnectionsStore) GetByID(id string) (models.ConnectionConfig, bool) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	for _, connection := range s.connections {
+		if connection.ID == id {
+			return connection, true
+		}
+	}
+
+	return models.ConnectionConfig{}, false
+}
+
 func (s *ConnectionsStore) Create(conn models.ConnectionConfig) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()

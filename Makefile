@@ -1,9 +1,9 @@
-.PHONY: frontend swagger api version run wails wails-dev deb
+.PHONY: frontend swagger api version run wails wails-dev deb cli
 
 VERSION := $(shell git describe --tags --always)
 LDFLAGS := -s -w -X gomyadm/internal/services.Version=$(VERSION)
 
-all: api deb
+all: api deb cli
 
 frontend:
 	cd frontend/ && bun install && bun run build -- --mode web
@@ -24,6 +24,9 @@ wails:
 
 wails-dev:
 	wails dev -ldflags="$(LDFLAGS)" -tags webkit2_41
+
+cli:
+	go build -ldflags="$(LDFLAGS)" -o build/cli/gomyadm ./cmd/cli
 
 version:
 	sed -i 's/^Version:.*/Version: $(VERSION)/' deb-pkg/DEBIAN/control
