@@ -1,5 +1,5 @@
-import { API_URL } from "@/api"
 import { Button } from "@/components/button"
+import { repositories } from "@/repositories"
 import { useState } from "react"
 
 export function SectionContentSQL() {
@@ -7,16 +7,12 @@ export function SectionContentSQL() {
   const [result, setResult] = useState("")
 
   async function executeQuery() {
-    try {
-      const res = await fetch(`${API_URL}/api/query`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query }),
-      })
-      const data = await res.json()
-      setResult(JSON.stringify(data, null, 2))
-    } catch (error) {
-      setResult("Erro ao executar consulta: " + error)
+    const res = await repositories.query.query(query)
+    
+    if (res.ok) {
+      setResult(JSON.stringify(res.data, null, 2))
+    } else {
+      setResult("Erro ao executar consulta: " + res.error)
     }
   }
 

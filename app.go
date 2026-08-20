@@ -32,6 +32,7 @@ func NewApp() *App {
 	tableService      := services.NewTableService(manager)
 	itemService       := services.NewItemService(manager)
 	columnService     := services.NewColumnService(manager)
+	queryService      := services.NewQueryService(manager)
 
 	return &App{
 		binds: []any{
@@ -42,6 +43,7 @@ func NewApp() *App {
 			bindings.NewTable(tableService),
 			bindings.NewItem(itemService),
 			bindings.NewColumn(columnService),
+			bindings.NewQuery(queryService),
 		},
 	}
 }

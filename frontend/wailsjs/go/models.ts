@@ -158,6 +158,24 @@ export namespace models {
 	        this.values = source["values"];
 	    }
 	}
+	export class QueryResult {
+	    type: string;
+	    columns?: string[];
+	    rows?: any[];
+	    rowsAffected?: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new QueryResult(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.type = source["type"];
+	        this.columns = source["columns"];
+	        this.rows = source["rows"];
+	        this.rowsAffected = source["rowsAffected"];
+	    }
+	}
 	export class Table {
 	    name: string;
 	    columns: Column[];

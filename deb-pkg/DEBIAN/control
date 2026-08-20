@@ -1,5 +1,5 @@
 Package: gomyadm
-Version: 1.3.0-1-g87f100f
+Version: 1.4.0
 Section: utils
 Priority: optional
 Architecture: amd64
