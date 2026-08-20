@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"bufio"
 	"fmt"
 	"gomyadm/internal/models"
 	"strings"
@@ -85,4 +86,35 @@ func connectSelected() error {
 
 	_, err = app.Session.Connect(connection)
 	return err
+}
+
+func promptBool(reader *bufio.Reader, label string, current bool) (bool, error) {
+	defaultValue := "N"
+	otherValue := "s"
+	if current {
+		defaultValue = "S"
+		otherValue = "n"
+	}
+
+	fmt.Printf("%s [%s/%s]: ", label, defaultValue, otherValue)
+
+	value, err := reader.ReadString('\n')
+	if err != nil {
+		return false, err
+	}
+
+	value = strings.ToLower(strings.TrimSpace(value))
+
+	if value == "" {
+		return current, nil
+	}
+
+	switch value {
+	case "s", "S", "sim", "y", "yes":
+		return true, nil
+	case "n", "N", "nao", "não", "no":
+		return false, nil
+	default:
+		return false, fmt.Errorf("valor inválido: %s", value)
+	}
 }

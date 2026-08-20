@@ -11,7 +11,6 @@ import (
 type Context struct {
 	ConnectionID string `json:"connection,omitempty"`
 	Database     string `json:"database,omitempty"`
-	Table        string `json:"table,omitempty"`
 }
 
 type Store struct {
@@ -89,7 +88,6 @@ func (s *Store) SetConnection(id string) error {
 
 	// Ao trocar conexão, database e table deixam de ser válidos.
 	s.context.Database = ""
-	s.context.Table = ""
 
 	return s.save()
 }
@@ -99,16 +97,6 @@ func (s *Store) SetDatabase(database string) error {
 	defer s.mu.Unlock()
 
 	s.context.Database = database
-	s.context.Table = ""
-
-	return s.save()
-}
-
-func (s *Store) SetTable(table string) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	s.context.Table = table
 
 	return s.save()
 }

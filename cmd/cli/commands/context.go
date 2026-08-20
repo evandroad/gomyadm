@@ -20,7 +20,6 @@ var contextCmd = &cobra.Command{
 			fmt.Println("  Connection: -")
 			fmt.Println("  Id: -")
 			fmt.Println("  Database:   -")
-			fmt.Println("  Table:      -")
 			return nil
 		}
 
@@ -37,12 +36,6 @@ var contextCmd = &cobra.Command{
 			fmt.Println("  Database:   -")
 		} else {
 			fmt.Printf("  Database:   %s\n", ctx.Database)
-		}
-
-		if ctx.Table == "" {
-			fmt.Println("  Table:      -")
-		} else {
-			fmt.Printf("  Table:      %s\n", ctx.Table)
 		}
 
 		return nil
