@@ -16,7 +16,6 @@ import (
 	"gomyadm/internal/services"
 
 	_ "gomyadm/docs"
-	"github.com/swaggo/http-swagger"
 )
 
 //go:embed all:web
@@ -59,7 +58,7 @@ func main() {
 	appHandler        := api.NewAppHandler(appService)
 
 	r.Get("/health", health)
-	r.Get("/swagger/*", httpSwagger.WrapHandler)
+	setupSwagger(r)
 	
 	r.Route("/api", func(r chi.Router) {
 		r.Get("/version", appHandler.Version)
