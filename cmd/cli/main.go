@@ -4,6 +4,7 @@ import (
 	"gomyadm/cmd/cli/commands"
 	"gomyadm/cmd/cli/context"
 	"gomyadm/internal/db"
+	"gomyadm/internal/logger"
 	"gomyadm/internal/services"
 	"log"
 )
@@ -14,6 +15,7 @@ func main() {
 	}
 
 	manager := db.NewConnectionManager()
+	logger.SetActive(false)
 
 	contextStore, err := context.NewStore()
 	if err != nil {
@@ -21,9 +23,10 @@ func main() {
 	}
 
 	app := &commands.App{
-		Connections: services.NewConnectionStore(),
-		Session:     services.NewSessionService(manager),
-		Context:     contextStore,
+		Context:    contextStore,
+		Connection: services.NewConnectionStore(),
+		Session:    services.NewSessionService(manager),
+		Database:   services.NewDatabaseService(manager),
 	}
 
 	commands.Execute(app)

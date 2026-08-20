@@ -7,8 +7,8 @@ import (
 )
 
 var contextCmd = &cobra.Command{
-	Use:   "ctx",
-	Short: "Mostra o contexto atual",
+	Use:   "status",
+	Short: "Mostra o status contexto atual",
 	Args:  cobra.NoArgs,
 
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -24,7 +24,7 @@ var contextCmd = &cobra.Command{
 			return nil
 		}
 
-		connection, ok := app.Connections.GetByID(ctx.ConnectionID)
+		connection, ok := app.Connection.GetByID(ctx.ConnectionID)
 		if !ok {
 			fmt.Printf("  Connection: %s (não encontrada)\n", ctx.ConnectionID)
 			fmt.Printf("  Id:         %s (não encontrada)\n", ctx.ConnectionID)

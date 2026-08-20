@@ -15,6 +15,12 @@ const (
 	red    = "\033[31m"
 )
 
+var active = true
+
+func SetActive(act bool) {
+	active = act
+}
+
 func Info(format string, args ...any) {
 	print(green, "INFO", format, args...)
 }
@@ -28,6 +34,10 @@ func Error(format string, args ...any) {
 }
 
 func print(color, level, format string, args ...any) {
+	if !active {
+		return
+	}
+
 	pc, file, line, ok := runtime.Caller(2)
 
 	context := "unknown"

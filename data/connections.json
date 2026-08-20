@@ -34,5 +34,16 @@
       "2804618_contas",
       "information_schema"
     ]
+  },
+  {
+    "id": "da3ipt8v54bpqv11qv6g",
+    "name": "Root",
+    "driver": "mysql",
+    "host": "localhost",
+    "port": 9906,
+    "username": "root",
+    "password": "root",
+    "database": "",
+    "databases": null
   }
 ]

@@ -22,7 +22,7 @@ var connectionListCmd = &cobra.Command{
 	Use:   "ls",
 	Short: "Lista as conexões",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		connections := app.Connections.GetAll()
+		connections := app.Connection.GetAll()
 		rows := [][]string{}
 
 		for _, connection := range connections {
@@ -51,7 +51,7 @@ var connectionGetCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		id := args[0]
 
-		connection, ok := app.Connections.GetByID(id)
+		connection, ok := app.Connection.GetByID(id)
 		if !ok {
 			return fmt.Errorf("conexão não encontrada: %s", args[0])
 		}
@@ -139,7 +139,7 @@ var connectionCreateCmd = &cobra.Command{
 			return fmt.Errorf("não foi possível desconectar: %w", err)
 		}
 
-		if err := app.Connections.Create(connection); err != nil {
+		if err := app.Connection.Create(connection); err != nil {
 			return err
 		}
 
@@ -157,7 +157,7 @@ var connectionUpdateCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		id := args[0]
 
-		connection, ok := app.Connections.GetByID(id)
+		connection, ok := app.Connection.GetByID(id)
 		if !ok {
 			return fmt.Errorf("conexão não encontrada: %s", id)
 		}
@@ -167,38 +167,22 @@ var connectionUpdateCmd = &cobra.Command{
 		fmt.Printf("\nEditando conexão: %s\n\n", connection.Name)
 		var err error
 
-		connection.Name, err = promptDefault(
-			reader,
-			"Nome",
-			connection.Name,
-		)
+		connection.Name, err = promptDefault(reader, "Nome", connection.Name)
 		if err != nil {
 			return err
 		}
 
-		connection.Driver, err = promptDefault(
-			reader,
-			"Driver",
-			connection.Driver,
-		)
+		connection.Driver, err = promptDefault(reader, "Driver", connection.Driver)
 		if err != nil {
 			return err
 		}
 
-		connection.Host, err = promptDefault(
-			reader,
-			"Host",
-			connection.Host,
-		)
+		connection.Host, err = promptDefault(reader, "Host", connection.Host)
 		if err != nil {
 			return err
 		}
 
-		port, err := promptDefault(
-			reader,
-			"Porta",
-			strconv.Itoa(connection.Port),
-		)
+		port, err := promptDefault(reader, "Porta", strconv.Itoa(connection.Port))
 		if err != nil {
 			return err
 		}
@@ -208,11 +192,7 @@ var connectionUpdateCmd = &cobra.Command{
 			return fmt.Errorf("porta inválida: %s", port)
 		}
 
-		connection.Username, err = promptDefault(
-			reader,
-			"Usuário",
-			connection.Username,
-		)
+		connection.Username, err = promptDefault(reader, "Usuário", connection.Username)
 		if err != nil {
 			return err
 		}
@@ -230,16 +210,12 @@ var connectionUpdateCmd = &cobra.Command{
 			connection.Password = string(passwordBytes)
 		}
 
-		connection.Database, err = promptDefault(
-			reader,
-			"Database",
-			connection.Database,
-		)
+		connection.Database, err = promptDefault(reader, "Database", connection.Database)
 		if err != nil {
 			return err
 		}
 
-		if err := app.Connections.Update(id, connection); err != nil {
+		if err := app.Connection.Update(id, connection); err != nil {
 			return fmt.Errorf("não foi possível atualizar a conexão: %w", err)
 		}
 
@@ -257,12 +233,12 @@ var connectionDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		id := args[0]
 
-		connection, ok := app.Connections.GetByID(id)
+		connection, ok := app.Connection.GetByID(id)
 		if !ok {
 			return fmt.Errorf("conexão não encontrada: %s", args[0])
 		}
 
-		err := app.Connections.Delete(args[0])
+		err := app.Connection.Delete(args[0])
 		if err != nil {
 			return fmt.Errorf("não foi possível remover a conxão: %w", err)
 		}
@@ -287,7 +263,7 @@ var connectionSelectCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 
 	RunE: func(cmd *cobra.Command, args []string) error {
-		connection, ok := app.Connections.GetByID(args[0])
+		connection, ok := app.Connection.GetByID(args[0])
 		if !ok {
 			return fmt.Errorf("conexão não encontrada: %s", args[0])
 		}
