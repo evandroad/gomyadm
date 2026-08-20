@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"gomyadm/internal/models"
 	"strings"
 )
 
@@ -54,4 +55,34 @@ func printTable(headers []string, rows [][]string) {
 
 		fmt.Println()
 	}
+}
+
+func getSelectedConnection() (models.ConnectionConfig, error) {
+	ctx := app.Context.Get()
+
+	if ctx.ConnectionID == "" {
+		return models.ConnectionConfig{}, fmt.Errorf(
+			"nenhuma conexão selecionada; use 'gomyadm connection use <id>'",
+		)
+	}
+
+	connection, ok := app.Connection.GetByID(ctx.ConnectionID)
+	if !ok {
+		return models.ConnectionConfig{}, fmt.Errorf(
+			"conexão selecionada não encontrada: %s",
+			ctx.ConnectionID,
+		)
+	}
+
+	return connection, nil
+}
+
+func connectSelected() error {
+	connection, err := getSelectedConnection()
+	if err != nil {
+		return err
+	}
+
+	_, err = app.Session.Connect(connection)
+	return err
 }

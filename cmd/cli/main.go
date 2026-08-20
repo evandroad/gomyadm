@@ -27,8 +27,10 @@ func main() {
 		Connection: services.NewConnectionStore(),
 		Session:    services.NewSessionService(manager),
 		Database:   services.NewDatabaseService(manager),
+		Table:      services.NewTableService(manager),
+		Item:       services.NewItemService(manager),
+		Column:     services.NewColumnService(manager),
 	}
 
 	commands.Execute(app)
 }
-

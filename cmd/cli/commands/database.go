@@ -46,7 +46,7 @@ var databaseSelectCmd = &cobra.Command{
 			return err
 		}
 		defer app.Session.Disconnect()
-
+		
 		if err := app.Database.Select(name); err != nil {
 			return fmt.Errorf("não foi possível usar: %w", err)
 		}
