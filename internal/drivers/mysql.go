@@ -254,6 +254,67 @@ func (d MySQLDriver) GetAllItem(db *sql.DB, table string) (*models.TableData, er
 	}, nil
 }
 
+func (d MySQLDriver) GetOneItem(db *sql.DB, table string, key map[string]any) (map[string]any, error) {
+
+	if len(key) == 0 {
+		return nil, fmt.Errorf("nenhuma chave informada")
+	}
+
+	where := make([]string, 0, len(key))
+	args := make([]any, 0, len(key))
+
+	for column, value := range key {
+		where = append(where, fmt.Sprintf("`%s` = ?", column))
+		args = append(args, value)
+	}
+
+	query := fmt.Sprintf(
+		"SELECT * FROM `%s` WHERE %s LIMIT 1",
+		table,
+		strings.Join(where, " AND "),
+	)
+
+	rows, err := db.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return nil, err
+	}
+
+	if !rows.Next() {
+		return nil, fmt.Errorf("item não encontrado")
+	}
+
+	values := make([]any, len(columns))
+	scanArgs := make([]any, len(columns))
+
+	for i := range values {
+		scanArgs[i] = &values[i]
+	}
+
+	if err := rows.Scan(scanArgs...); err != nil {
+		return nil, err
+	}
+
+	result := make(map[string]any, len(columns))
+
+	for i, column := range columns {
+		value := values[i]
+
+		if bytes, ok := value.([]byte); ok {
+			value = string(bytes)
+		}
+
+		result[column] = value
+	}
+
+	return result, nil
+}
+
 func (d MySQLDriver) CreateItem(db *sql.DB, table string, data map[string]any) error {
 	columns := make([]string, 0, len(data))
 	placeholders := make([]string, 0, len(data))

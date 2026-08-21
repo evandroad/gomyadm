@@ -44,7 +44,7 @@ var tableListCmd = &cobra.Command{
 }
 
 var tableCreateCmd = &cobra.Command{
-	Use:   "add <name>",
+	Use:   "add",
 	Short: "Cria uma nova tabela",
 
 	RunE: func(cmd *cobra.Command, args []string) error {

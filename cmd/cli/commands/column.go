@@ -172,7 +172,7 @@ var columnCreateCmd = &cobra.Command{
 
 var columnUpdateCmd = &cobra.Command{
 	Use:   "edit",
-	Short: "Editaa uma coluna numa tabela",
+	Short: "Edita uma coluna numa tabela",
 
 	RunE: func(cmd *cobra.Command, args []string) error {
 		reader := bufio.NewReader(os.Stdin)

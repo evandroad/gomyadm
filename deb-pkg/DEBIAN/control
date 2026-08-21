@@ -1,5 +1,5 @@
 Package: gomyadm
-Version: 1.5.0
+Version: 1.5.0-7-g565dc1a
 Section: utils
 Priority: optional
 Architecture: amd64

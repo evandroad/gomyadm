@@ -39,6 +39,27 @@ func (s *ItemService) GetAll(table string) (*models.TableData, error) {
 	return rows, nil
 }
 
+func (s *ItemService) GetOne(req models.ItemRequest) (map[string]any, error) {
+	driver, conn, err := s.Connection.GetDriverAndConnection()
+	if err != nil {
+		logger.Error("Failed to get driver and connection: %v", err)
+		return nil, err
+	}
+
+	if s.Connection.GetDatabase() == "" {
+		logger.Error("No database selected.")
+		return nil, fmt.Errorf("No database selected.")
+	}
+
+	rows, err := driver.GetOneItem(conn.DB, req.Table, req.Key)
+	if err != nil {
+		logger.Error("Failed to select table: %v", err)
+		return nil, err
+	}
+
+	return rows, nil
+}
+
 func (s *ItemService) Create(req models.ItemRequest) error {
 	driver, conn, err := s.Connection.GetDriverAndConnection()
 	if err != nil {

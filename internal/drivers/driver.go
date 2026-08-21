@@ -21,6 +21,7 @@ type Driver interface {
 	DeleteTable(db *sql.DB, table string) error
 
 	GetAllItem(db *sql.DB, table string) (*models.TableData, error)
+	GetOneItem(db *sql.DB, table string, key map[string]any) (map[string]any, error)
 	CreateItem(db *sql.DB, table string, data map[string]any) error
 	UpdateItem(db *sql.DB, table string, key map[string]any, data map[string]any) error
 	DeleteItem(db *sql.DB, table string, key map[string]any) error
