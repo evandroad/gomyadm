@@ -27,9 +27,20 @@ var (
 )
 
 func LoadConnections() error {
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		return err
+	}
+
+	dir := filepath.Join(configDir, "gomyadm")
+
+	if err := os.MkdirAll(dir, 0700); err != nil {
+		return err
+	}
+
 	once.Do(func() {
 		store = &ConnectionsStore{
-			filePath: filepath.Join("data", "connections.json"),
+			filePath: filepath.Join(dir, "connections.json"),
 		}
 	})
 

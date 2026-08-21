@@ -42,7 +42,7 @@ func (s *DatabaseService) GetAll() (models.DatabaseResponse, error) {
 }
 
 func (s *DatabaseService) Create(req models.DatabaseRequest) error {
-	driver, conn, err := s.Connection.GetDriverAndConnection()
+	driver, conn, err := s.Connection.GetDriverAndConnection(false)
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
 		return err
@@ -60,7 +60,7 @@ func (s *DatabaseService) Create(req models.DatabaseRequest) error {
 }
 
 func (s *DatabaseService) Update(req models.DatabaseRequest) error {
-	driver, conn, err := s.Connection.GetDriverAndConnection()
+	driver, conn, err := s.Connection.GetDriverAndConnection(false)
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
 		return err
@@ -78,7 +78,7 @@ func (s *DatabaseService) Update(req models.DatabaseRequest) error {
 }
 
 func (s *DatabaseService) Delete(name string) error {
-	driver, conn, err := s.Connection.GetDriverAndConnection()
+	driver, conn, err := s.Connection.GetDriverAndConnection(false)
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
 		return err

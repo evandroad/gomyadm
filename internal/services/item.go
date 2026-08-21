@@ -1,8 +1,6 @@
 package services
 
 import (
-	"fmt"
-
 	"gomyadm/internal/db"
 	"gomyadm/internal/logger"
 	"gomyadm/internal/models"
@@ -19,15 +17,10 @@ func NewItemService(conn *db.ConnectionManager) *ItemService {
 }
 
 func (s *ItemService) GetAll(table string) (*models.TableData, error) {
-	driver, conn, err := s.Connection.GetDriverAndConnection()
+	driver, conn, err := s.Connection.GetDriverAndConnection(true)
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
 		return nil, err
-	}
-
-	if s.Connection.GetDatabase() == "" {
-		logger.Error("No database selected.")
-		return nil, fmt.Errorf("No database selected.")
 	}
 
 	rows, err := driver.GetAllItem(conn.DB, table)
@@ -40,15 +33,10 @@ func (s *ItemService) GetAll(table string) (*models.TableData, error) {
 }
 
 func (s *ItemService) GetOne(req models.ItemRequest) (map[string]any, error) {
-	driver, conn, err := s.Connection.GetDriverAndConnection()
+	driver, conn, err := s.Connection.GetDriverAndConnection(true)
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
 		return nil, err
-	}
-
-	if s.Connection.GetDatabase() == "" {
-		logger.Error("No database selected.")
-		return nil, fmt.Errorf("No database selected.")
 	}
 
 	rows, err := driver.GetOneItem(conn.DB, req.Table, req.Key)
@@ -61,15 +49,10 @@ func (s *ItemService) GetOne(req models.ItemRequest) (map[string]any, error) {
 }
 
 func (s *ItemService) Create(req models.ItemRequest) error {
-	driver, conn, err := s.Connection.GetDriverAndConnection()
+	driver, conn, err := s.Connection.GetDriverAndConnection(true)
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
 		return err
-	}
-
-	if s.Connection.GetDatabase() == "" {
-		logger.Error("No database selected.")
-		return fmt.Errorf("No database selected.")
 	}
 
 	err = driver.CreateItem(conn.DB, req.Table, req.Values)
@@ -82,15 +65,10 @@ func (s *ItemService) Create(req models.ItemRequest) error {
 }
 
 func (s *ItemService) Update(req models.ItemRequest) error {
-	driver, conn, err := s.Connection.GetDriverAndConnection()
+	driver, conn, err := s.Connection.GetDriverAndConnection(true)
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
 		return err
-	}
-
-	if s.Connection.GetDatabase() == "" {
-		logger.Error("No database selected.")
-		return fmt.Errorf("No database selected.")
 	}
 
 	err = driver.UpdateItem(conn.DB, req.Table, req.Key, req.Values)
@@ -103,15 +81,10 @@ func (s *ItemService) Update(req models.ItemRequest) error {
 }
 
 func (s *ItemService) Delete(req models.ItemRequest) error {
-	driver, conn, err := s.Connection.GetDriverAndConnection()
+	driver, conn, err := s.Connection.GetDriverAndConnection(true)
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
 		return err
-	}
-
-	if s.Connection.GetDatabase() == "" {
-		logger.Error("No database selected.")
-		return fmt.Errorf("No database selected.")
 	}
 
 	err = driver.DeleteItem(conn.DB, req.Table, req.Key)

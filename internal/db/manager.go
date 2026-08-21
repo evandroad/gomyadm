@@ -174,7 +174,7 @@ func (m *ConnectionManager) DeleteDatabase(name string) {
 	}
 }
 
-func (m *ConnectionManager) GetDriverAndConnection() (drivers.Driver, *models.Connection, error) {
+func (m *ConnectionManager) GetDriverAndConnection(database bool) (drivers.Driver, *models.Connection, error) {
 	conn, err := m.Get()
 	if err != nil {
 		logger.Error("Failed to get connection: %v", err)
@@ -184,6 +184,13 @@ func (m *ConnectionManager) GetDriverAndConnection() (drivers.Driver, *models.Co
 	driver, ok := drivers.GetDriver(conn.Config.Driver)
 	if !ok {
 		return nil, nil, fmt.Errorf("unsupported driver: %s", conn.Config.Driver)
+	}
+
+	if database {
+		if m.GetDatabase() == "" {
+			logger.Error("No database selected.")
+			return nil, nil, fmt.Errorf("No database selected.")
+		}
 	}
 
 	return driver, conn, nil

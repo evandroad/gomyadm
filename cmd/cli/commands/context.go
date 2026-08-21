@@ -42,6 +42,18 @@ var contextCmd = &cobra.Command{
 	},
 }
 
+var contextCleanCmd = &cobra.Command{
+	Use:   "clean",
+	Short: "Apaga a conexão e o banco de dados do contexto",
+
+	RunE: func(cmd *cobra.Command, args []string) error {
+		app.Context.Clear()
+		fmt.Println("Contexto limpo com sucesso")
+		return nil
+	},
+}
+
 func init() {
+	contextCmd.AddCommand(contextCleanCmd)
 	rootCmd.AddCommand(contextCmd)
 }

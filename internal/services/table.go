@@ -1,8 +1,6 @@
 package services
 
 import (
-	"fmt"
-
 	"gomyadm/internal/db"
 	"gomyadm/internal/logger"
 	"gomyadm/internal/models"
@@ -19,36 +17,26 @@ func NewTableService(conn *db.ConnectionManager) *TableService {
 }
 
 func (s *TableService) GetAll() ([]string, error) {
-	driver, conn, err := s.Connection.GetDriverAndConnection()
+	driver, conn, err := s.Connection.GetDriverAndConnection(true)
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
-		return []string{}, fmt.Errorf("Failed to get driver and connection")
-	}
-
-	if s.Connection.GetDatabase() == "" {
-		logger.Error("No database selected.")
-		return []string{}, fmt.Errorf("No database selected.")
+		return []string{}, err
 	}
 
 	tables, err := driver.GetAllTable(conn.DB)
 	if err != nil {
 		logger.Error("Failed to list tables: %v", err)
-		return []string{}, fmt.Errorf("Failed to list tables")
+		return []string{}, err
 	}
 
 	return tables, nil
 }
 
 func (s *TableService) Create(req models.Table) error {
-	driver, conn, err := s.Connection.GetDriverAndConnection()
+	driver, conn, err := s.Connection.GetDriverAndConnection(true)
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
 		return err
-	}
-
-	if s.Connection.GetDatabase() == "" {
-		logger.Error("No database selected.")
-		return fmt.Errorf("No database selected.")
 	}
 
 	err = driver.CreateTable(conn.DB, req)
@@ -61,15 +49,10 @@ func (s *TableService) Create(req models.Table) error {
 }
 
 func (s *TableService) Update(oldName, newName string) error {
-	driver, conn, err := s.Connection.GetDriverAndConnection()
+	driver, conn, err := s.Connection.GetDriverAndConnection(true)
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
 		return err
-	}
-
-	if s.Connection.GetDatabase() == "" {
-		logger.Error("No database selected.")
-		return fmt.Errorf("No database selected.")
 	}
 
 	err = driver.UpdateTable(conn.DB, oldName, newName)
@@ -82,15 +65,10 @@ func (s *TableService) Update(oldName, newName string) error {
 }
 
 func (s *TableService) Delete(table string) error {
-	driver, conn, err := s.Connection.GetDriverAndConnection()
+	driver, conn, err := s.Connection.GetDriverAndConnection(true)
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
 		return err
-	}
-
-	if s.Connection.GetDatabase() == "" {
-		logger.Error("No database selected.")
-		return fmt.Errorf("No database selected.")
 	}
 
 	err = driver.DeleteTable(conn.DB, table)

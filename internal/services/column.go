@@ -1,8 +1,6 @@
 package services
 
 import (
-	"fmt"
-
 	"gomyadm/internal/db"
 	"gomyadm/internal/logger"
 	"gomyadm/internal/models"
@@ -19,15 +17,10 @@ func NewColumnService(conn *db.ConnectionManager) *ColumnService {
 }
 
 func (s *ColumnService) GetAll(table string) (*models.Table, error) {
-	driver, conn, err := s.Connection.GetDriverAndConnection()
+	driver, conn, err := s.Connection.GetDriverAndConnection(true)
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
 		return nil, err
-	}
-
-	if s.Connection.GetDatabase() == "" {
-		logger.Error("No database selected.")
-		return nil, fmt.Errorf("No database selected.")
 	}
 
 	schema, err := driver.GetAllColumn(conn.DB, table)
@@ -40,15 +33,10 @@ func (s *ColumnService) GetAll(table string) (*models.Table, error) {
 }
 
 func (s *ColumnService) Create(req models.ColumnRequest) error {
-	driver, conn, err := s.Connection.GetDriverAndConnection()
+	driver, conn, err := s.Connection.GetDriverAndConnection(true)
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
 		return err
-	}
-
-	if s.Connection.GetDatabase() == "" {
-		logger.Error("No database selected.")
-		return fmt.Errorf("No database selected.")
 	}
 
 	err = driver.CreateColumn(conn.DB, req.Table, req.Column)
@@ -61,15 +49,10 @@ func (s *ColumnService) Create(req models.ColumnRequest) error {
 }
 
 func (s *ColumnService) Update(req models.ColumnRequest) error {
-	driver, conn, err := s.Connection.GetDriverAndConnection()
+	driver, conn, err := s.Connection.GetDriverAndConnection(true)
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
 		return err
-	}
-
-	if s.Connection.GetDatabase() == "" {
-		logger.Error("No database selected.")
-		return fmt.Errorf("No database selected.")
 	}
 
 	err = driver.UpdateColumn(conn.DB, req.Table, req.OldName, req.Column)
@@ -82,15 +65,10 @@ func (s *ColumnService) Update(req models.ColumnRequest) error {
 }
 
 func (s *ColumnService) Delete(table, column string) error {
-	driver, conn, err := s.Connection.GetDriverAndConnection()
+	driver, conn, err := s.Connection.GetDriverAndConnection(true)
 	if err != nil {
 		logger.Error("Failed to get driver and connection: %v", err)
 		return err
-	}
-
-	if s.Connection.GetDatabase() == "" {
-		logger.Error("No database selected.")
-		return fmt.Errorf("No database selected.")
 	}
 
 	err = driver.DeleteColumn(conn.DB, table, column)
