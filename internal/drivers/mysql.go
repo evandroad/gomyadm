@@ -362,7 +362,7 @@ func (d MySQLDriver) GetAllColumn(db *sql.DB, table string) (*models.Table, erro
 		col.Unique = key == "UNI"
 		col.AutoIncrement = strings.Contains(extra, "auto_increment")
 		if defaultValue.Valid {
-			col.DefaultValue = defaultValue.String
+			col.DefaultValue = normalizeDefault(defaultValue.String)
 		}
 
 		schema.Columns = append(schema.Columns, col)
@@ -426,18 +426,23 @@ func buildColumnDefinitionMySql(column models.Column) string {
 	}
 
 	if column.DefaultValue != "" {
-		def += fmt.Sprintf(" DEFAULT '%s'", column.DefaultValue)
+		defaultValue := column.DefaultValue
+
+		switch strings.ToUpper(defaultValue) {
+		case "NULL", "CURRENT_TIMESTAMP", "CURRENT_DATE", "CURRENT_TIME":
+			def += fmt.Sprintf(" DEFAULT %s", defaultValue)
+		default:
+			escaped := strings.ReplaceAll(defaultValue, "'", "''")
+			def += fmt.Sprintf(" DEFAULT '%s'", escaped)
+		}
 	}
 
 	return def
 }
 
 func extractBaseType(columnType string) string {
-	if idx := strings.Index(columnType, "("); idx != -1 {
-		return strings.ToUpper(columnType[:idx])
-	}
-
-	return strings.ToUpper(columnType)
+	baseType, _, _ := strings.Cut(columnType, "(")
+	return strings.ToUpper(baseType)
 }
 
 func extractLength(columnType string) *int {
@@ -454,4 +459,12 @@ func extractLength(columnType string) *int {
 	}
 
 	return &n
+}
+
+func normalizeDefault(value string) string {
+	if len(value) >= 2 && value[0] == '\'' && value[len(value)-1] == '\'' {
+		return value[1 : len(value)-1]
+	}
+
+	return value
 }
