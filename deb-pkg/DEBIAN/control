@@ -1,5 +1,5 @@
 Package: gomyadm
-Version: 1.6.0
+Version: 0.0.0
 Section: utils
 Priority: optional
 Architecture: amd64
