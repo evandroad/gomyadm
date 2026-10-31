@@ -3,6 +3,9 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -28,6 +31,14 @@ func NewConnectionManager() *ConnectionManager {
 func (m *ConnectionManager) Connect(cfg models.ConnectionConfig) (models.ConnectionResponse, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
+
+	if cfg.Driver == "sqlite" {
+		var err error
+		cfg, err = normalizeSQLiteConfig(cfg)
+		if err != nil {
+			return models.ConnectionResponse{}, err
+		}
+	}
 
 	if m.connection != nil {
 		if m.connection.Matches(cfg) {
@@ -118,6 +129,13 @@ func (m *ConnectionManager) SelectDatabase(name string) error {
 
 	if m.connection == nil {
 		return fmt.Errorf("no active connection")
+	}
+
+	if m.connection.Config.Driver == "sqlite" {
+		if name != "main" {
+			return fmt.Errorf("sqlite database %q is not available; select main", name)
+		}
+		return nil
 	}
 
 	err := m.connection.DB.Close()
@@ -214,11 +232,13 @@ func (m *ConnectionManager) createConnection(cfg models.ConnectionConfig) error 
 	db.SetMaxIdleConns(5)
 
 	if err := db.Ping(); err != nil {
+		_ = db.Close()
 		return fmt.Errorf("failed to ping database: %w", err)
 	}
 
 	databases, err := driver.GetAllDatabase(db)
 	if err != nil {
+		_ = db.Close()
 		return fmt.Errorf("failed to list databases: %w", err)
 	}
 
@@ -229,6 +249,33 @@ func (m *ConnectionManager) createConnection(cfg models.ConnectionConfig) error 
 	}
 
 	return nil
+}
+
+func normalizeSQLiteConfig(cfg models.ConnectionConfig) (models.ConnectionConfig, error) {
+	if strings.TrimSpace(cfg.FilePath) == "" {
+		return cfg, fmt.Errorf("sqlite file path is required")
+	}
+
+	path, err := filepath.Abs(cfg.FilePath)
+	if err != nil {
+		return cfg, fmt.Errorf("resolve sqlite file path: %w", err)
+	}
+
+	info, err := os.Stat(path)
+	if err != nil {
+		return cfg, fmt.Errorf("sqlite file is not accessible: %w", err)
+	}
+	if !info.Mode().IsRegular() {
+		return cfg, fmt.Errorf("sqlite path must refer to an existing regular file")
+	}
+
+	cfg.FilePath = path
+	cfg.Database = "main"
+	cfg.Host = ""
+	cfg.Port = 0
+	cfg.Username = ""
+	cfg.Password = ""
+	return cfg, nil
 }
 
 func (m *ConnectionManager) getConnection() models.ConnectionResponse {

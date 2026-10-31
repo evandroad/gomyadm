@@ -8,6 +8,7 @@ import type { Values } from "@/models";
 import { ModalDeleteItem } from "../modal/ModalDeleteItem";
 import { useDatabase } from "@/contexts/DatabaseContext";
 import { useTable } from "@/contexts/TableContext";
+import { useConnection } from "@/contexts/ConectionContext";
 
 export default function SectionTablePreview() {
   const [selectedRow, setSelectedRow] = useState<Values | null>(null)
@@ -15,6 +16,7 @@ export default function SectionTablePreview() {
   const [openDelete, setOpenDelete] = useState(false)
   const { activeDatabase } = useDatabase()
   const { tableData } = useTable()
+  const canModifyRows = useConnection().activeConnection?.driver !== "sqlite"
 
   if (!tableData) {
     return <div className="text-zinc-500">{ activeDatabase ? 'Carregando schema...' : 'Selecione uma base de dados' }</div>
@@ -29,7 +31,7 @@ export default function SectionTablePreview() {
         <thead className="bg-zinc-900 border-b border-zinc-800">
           <tr>
             {tableData.columns.map((column: string) => <Th key={column}>{column}</Th>)}
-            <Th>Ações</Th>
+            {canModifyRows && <Th>Ações</Th>}
           </tr>
         </thead>
 
@@ -37,16 +39,18 @@ export default function SectionTablePreview() {
           {tableData.rows.map((row: Values, index: number) => (
               <tr key={index} className="border-b border-zinc-800 hover:bg-zinc-900/50">
                 {tableData.columns.map((column: string) => <Td key={column}>{String(row[column])}</Td>)}
-                <Td>
-                  <div className="space-x-2">
-                    <Button variant="primary" sm onClick={() => { setSelectedRow(row); setOpenForm(true) }}>
-                      <Pencil size={16} />
-                    </Button>
-                    <Button variant="danger" sm onClick={() => { setSelectedRow(row); setOpenDelete(true) }}>
-                      <Trash size={16} />
-                    </Button>
-                  </div>
-                </Td>
+                {canModifyRows && (
+                  <Td>
+                    <div className="space-x-2">
+                      <Button variant="primary" sm onClick={() => { setSelectedRow(row); setOpenForm(true) }}>
+                        <Pencil size={16} />
+                      </Button>
+                      <Button variant="danger" sm onClick={() => { setSelectedRow(row); setOpenDelete(true) }}>
+                        <Trash size={16} />
+                      </Button>
+                    </div>
+                  </Td>
+                )}
               </tr>
           ))}
         </tbody>

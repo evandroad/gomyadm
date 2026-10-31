@@ -17,6 +17,7 @@ type Props = {
 export function SidebarTables({ selectedTable, setSelectedTable, setView }: Props) {
   const { activeDatabase } = useDatabase()
   const { activeConnection } = useConnection()
+  const canManageTables = activeConnection?.driver !== "sqlite"
   const [tables, setTables] = useState<string[]>([])
   const [tableToUpdate, setTableToUpdate] = useState<string | null>(null)
   const [tableToDelete, setTableToDelete] = useState<string | null>(null)
@@ -60,7 +61,7 @@ export function SidebarTables({ selectedTable, setSelectedTable, setView }: Prop
           <div className="flex flex-row justify-between mb-3">
             <span className="font-bold">Tabelas</span>
             <div className="space-x-1">
-              <Button sm variant="success" onClick={showFormNewTable}><Plus size={16}/></Button>
+              {canManageTables && <Button sm variant="success" onClick={showFormNewTable}><Plus size={16}/></Button>}
               <Button sm onClick={loadTables}><RefreshCcw size={16}/></Button>
             </div>
           </div>
@@ -74,10 +75,12 @@ export function SidebarTables({ selectedTable, setSelectedTable, setView }: Prop
                 >
                   {table}
                 </button>
-                <div className="space-x-1">
-                  <Button sm variant="primary" onClick={() => setTableToUpdate(table)}><Pencil size={16} /></Button>
-                  <Button sm variant="danger" onClick={() => setTableToDelete(table)}><Trash size={16} /></Button>
-                </div>
+                {canManageTables && (
+                  <div className="space-x-1">
+                    <Button sm variant="primary" onClick={() => setTableToUpdate(table)}><Pencil size={16} /></Button>
+                    <Button sm variant="danger" onClick={() => setTableToDelete(table)}><Trash size={16} /></Button>
+                  </div>
+                )}
               </div>
             ))
           ) : (

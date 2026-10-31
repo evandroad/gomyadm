@@ -9,10 +9,12 @@ import { ModalDeleteColumn } from "../modal/ModalDeleteColumn";
 import { COLUMNS_LABEL, getStatus } from "@/utils";
 import { useDatabase } from "@/contexts/DatabaseContext";
 import { useTable } from "@/contexts/TableContext";
+import { useConnection } from "@/contexts/ConectionContext";
 
 export default function SectionTableSchema() {
   const { activeDatabase } = useDatabase()
   const { activeTable } = useTable()
+  const canModifyColumns = useConnection().activeConnection?.driver !== "sqlite"
   const [selectedRow, setSelectedRow] = useState<Column | null>(null)
   const [openForm, setOpenForm] = useState(false)
   const [openDelete, setOpenDelete] = useState(false)
@@ -20,6 +22,8 @@ export default function SectionTableSchema() {
   if (!activeTable) {
     return <div className="text-zinc-500">{ activeDatabase ? 'Carregando schema...' : 'Selecione uma base de dados' }</div>
   }
+
+  const columnLabels = canModifyColumns ? COLUMNS_LABEL : COLUMNS_LABEL.slice(0, -1)
 
   return (
     <>
@@ -30,7 +34,7 @@ export default function SectionTableSchema() {
         <table className="w-full text-sm text-left">
           <thead className="bg-zinc-900 border-b border-zinc-800">
             <tr>
-              {COLUMNS_LABEL.map((column, index) => <Th key={String(index)}>{column}</Th>)}
+              {columnLabels.map((column, index) => <Th key={String(index)}>{column}</Th>)}
             </tr>
           </thead>
           <tbody>
@@ -44,16 +48,18 @@ export default function SectionTableSchema() {
                 <Td>{getStatus(row.unique)}</Td>
                 <Td>{getStatus(row.autoIncrement)}</Td>
                 <Td>{row.defaultValue}</Td>
-                <Td>
-                  <div className="space-x-2">
-                    <Button variant="primary" sm onClick={() => { setSelectedRow(row); setOpenForm(true) }}>
-                      <Pencil size={16} />
-                    </Button>
-                    <Button variant="danger" sm onClick={() => { setSelectedRow(row); setOpenDelete(true) }}>
-                      <Trash size={16} />
-                    </Button>
-                  </div>
-                </Td>
+                {canModifyColumns && (
+                  <Td>
+                    <div className="space-x-2">
+                      <Button variant="primary" sm onClick={() => { setSelectedRow(row); setOpenForm(true) }}>
+                        <Pencil size={16} />
+                      </Button>
+                      <Button variant="danger" sm onClick={() => { setSelectedRow(row); setOpenDelete(true) }}>
+                        <Trash size={16} />
+                      </Button>
+                    </div>
+                  </Td>
+                )}
               </tr>
             ))}
           </tbody>

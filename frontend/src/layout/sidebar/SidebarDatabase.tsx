@@ -5,9 +5,12 @@ import { useState } from "react";
 import { ModalFormDatabase } from "../modal/ModalFormDatabase";
 import { ModalDeleteDatabase } from "../modal/ModalDeleteDatabase";
 import { useDatabase } from "@/contexts/DatabaseContext";
+import { useConnection } from "@/contexts/ConectionContext";
 
 export function SidebarDatabase() {
   const { activeDatabase, databases, changeDatabase, getDatabases } = useDatabase()
+  const { activeConnection } = useConnection()
+  const canManageDatabases = activeConnection?.driver !== "sqlite"
   const [openForm, setOpenForm] = useState<boolean>(false)
   const [openDelete, setopenDelete] = useState<boolean>(false)
   const [oldName, setOldName] = useState<string | undefined>(undefined)
@@ -36,18 +39,21 @@ export function SidebarDatabase() {
         <div className="flex flex-row justify-between">
           <span className="font-bold">Banco de dados</span>
           <div className="space-x-1">
-            {activeDatabase &&
+            {activeDatabase && canManageDatabases &&
               <>
                 <Button sm variant="primary" onClick={handleEdit}><Pencil size={16} /></Button>
                 <Button sm variant="danger"  onClick={() => setopenDelete(true)}><Trash size={16} /></Button>
               </>
             }
-            <Button sm variant="success" onClick={handleCreate}><Plus size={16} /></Button>
+            {canManageDatabases && <Button sm variant="success" onClick={handleCreate}><Plus size={16} /></Button>}
             <Button sm onClick={getDatabases}><RefreshCcw size={16} /></Button>
           </div>
         </div>
         <div className="space-y-4 mt-2">
           <Select value={activeDatabase || ''} onChange={(e) => changeDatabase(e.target.value)} options={databases}/>
+          {activeConnection?.driver === "sqlite" && (
+            <p className="text-xs text-zinc-500">Conectado em modo somente leitura</p>
+          )}
         </div>
       </div>
     </>
