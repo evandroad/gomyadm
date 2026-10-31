@@ -1,296 +1,80 @@
 # Gomyadm
 
-O Gomyadm é uma GUI web para gerenciamento de bancos de dados, desenvolvida em Go e distribuída como um único binário executável.
-O projeto nasceu inspirado em ferramentas como Adminer e phpMyAdmin, buscando uma alternativa com visual moderno, menor complexidade de instalação e melhor experiência de uso.
-Diferente de aplicações desktop como DBeaver ou MySQL Workbench, o Gomyadm roda diretamente no navegador, sem depender de Java ou instalações pesadas.
+O Gomyadm é uma aplicação para gerenciamento de bancos de dados, desenvolvida em Go e React/TypeScript. O projeto oferece uma interface desktop com Wails, uma API HTTP que serve a interface web e uma CLI.
 
-## Objetivos do projeto
-- Interface moderna e leve
-- Distribuição em binário único
-- Execução local sem dependências complexas
-- Frontend embutido no executável
-- Fácil instalação e compartilhamento
-- Suporte a múltiplos bancos de dados
-- API simples e extensível
+## Estado atual
 
-## Instalar swagger
-```
-go install github.com/swaggo/swag/cmd/swag@latest
-```
+### Bancos suportados
 
-## Stack inicial
+- MySQL/MariaDB
+- PostgreSQL
+
+O backend usa `database/sql` com drivers específicos para esses bancos. **SQLite ainda não está funcional**: a interface apresenta a opção SQLite e um seletor de arquivo que mostra o nome escolhido, mas o caminho não é enviado ao backend e não existe driver SQLite registrado.
+
+### Funcionalidades disponíveis
+
+- Criar, editar, listar e remover conexões salvas.
+- Conectar e desconectar de uma sessão de banco de dados.
+- Listar e selecionar bancos de dados.
+- Listar tabelas e visualizar dados e estrutura.
+- Criar, editar e remover registros.
+- Criar, editar e remover colunas.
+- Executar SQL pela interface.
+- Usar a API HTTP e a CLI para operações de gerenciamento.
+
+As conexões são salvas em `gomyadm/connections.json`, dentro do diretório de configuração do usuário definido pelo sistema operacional.
+
+## Tecnologias e arquitetura
 
 ### Backend
 
-* Go
-* router [Chi](https://github.com/go-chi/chi)
-* Bibliotecas Go
-  * MySQL: [go-sql-driver/mysql](https://github.com/go-sql-driver/mysql?utm_source=chatgpt.com)
-  * PostgreSQL: [pgx](https://github.com/jackc/pgx?utm_source=chatgpt.com)
+- Go
+- Chi para roteamento HTTP
+- `database/sql`
+- MySQL: [go-sql-driver/mysql](https://github.com/go-sql-driver/mysql)
+- PostgreSQL: [pgx](https://github.com/jackc/pgx)
+- Wails para a aplicação desktop
+- Cobra para a CLI
+
+O gerenciamento de conexões fica em `internal/db`; os drivers implementam o contrato em `internal/drivers`; API, serviços e modelos estão organizados em `internal/`.
 
 ### Frontend
 
-* React + Vite
-* TypeScript
-* UI
-  * [Tailwind CSS](https://tailwindcss.com)
-  * [Shadcn](https://ui.shadcn.com/)
+- React
+- TypeScript
+- Vite
+- Tailwind CSS e componentes inspirados no Shadcn
 
-### Banco de Dados
-* MySQL/MariaDB
-* PostgreSQL
+A aplicação web compilada é embutida no binário Go. O mesmo frontend é usado na aplicação Wails e no servidor HTTP.
 
----
+### Executáveis e API
 
-# A arquitetura
-O frontend será compilado e embutido diretamente no binário Go utilizando embed, permitindo que toda a aplicação seja distribuída como um único executável.
+- **Desktop:** aplicação Wails.
+- **Web/API:** servidor HTTP na porta `8181`, com interface web e endpoints sob `/api`.
+- **CLI:** comandos de gerenciamento de conexões e bancos.
+- **Swagger:** documentação da API disponível em `/swagger/index.html` no servidor.
 
-## Estrutura
+## Desenvolvimento
 
-```txt
-/backend
-  /internal
-    /db
-    /drivers
-    /api
-    /services
-/frontend
+O projeto usa Go e Bun. Alvos comuns estão definidos no `Makefile`:
+
+```sh
+make frontend   # instala dependências e compila o frontend
+make run        # gera documentação Swagger e inicia o servidor
+make wails-dev  # inicia a aplicação desktop em modo de desenvolvimento
+make cli        # compila a CLI
 ```
 
----
+Para gerar a documentação Swagger, instale a ferramenta:
 
-# Modelagem de conexão
-
-Exemplo:
-
-```go
-type Driver interface {
-  Connect(config ConnectionConfig) error
-  Disconnect() error
-
-  ListDatabases() ([]Database, error)
-  ListTables(database string) ([]Table, error)
-  DescribeTable(database, table string) ([]Column, error)
-
-  Query(query string, limit int) (*QueryResult, error)
-
-  BeginTx() error
-}
+```sh
+go install github.com/swaggo/swag/cmd/swag@latest
 ```
 
-Depois:
-
-```go
-type MySQLDriver struct {}
-type PostgresDriver struct {}
-```
-
----
-
-## Connection Manager
-
-Tipo:
-
-```txt
-[ Nova conexão ]
-
-Nome: Local MySQL
-Host:
-Porta:
-Usuário:
-Senha:
-SSL:
-Testar conexão
-Salvar
-```
-
----
-
-# Como salvar conexões
-
-No início:
-
-```json
-~/.gomyadm/connections.json
-```
-
----
-
-# Modelo de conexão
-
-```go
-type ConnectionConfig struct {
-  ID       string
-  Name     string
-  Driver   string
-
-  Host     string
-  Port     int
-
-  Username string
-  Password string
-
-  Database string
-  SSLMode  string
-}
-```
-
----
-
-## Sessão — manter pool vivo
-
-```txt
-ConnectionManager
-    -> mantém pools vivos
-    -> cacheados por ID
-```
-
-Algo assim:
-
-```go
-map[string]*sql.DB
-```
-
----
-
-# API inicialmente
-
-## Conexões
-
-```http
-GET    /api/connections
-POST   /api/connections
-DELETE /api/connections/:id
-POST   /api/connections/:id/test
-```
-
-## Schema
-
-```http
-GET /api/connections/:id/databases
-GET /api/connections/:id/tables
-GET /api/connections/:id/table/:name
-```
-
-## Query
-
-```http
-POST /api/query
-```
-
-Body:
-
-```json
-{
-  "connectionId": "abc",
-  "query": "SELECT * FROM users LIMIT 100"
-}
-```
-
----
-
-# Query execution
-
-No início:
-
-## suporte SOMENTE:
-
-* SELECT
-* INSERT
-* UPDATE
-* DELETE
-
----
-
-# Uma arquitetura MUITO boa
-
-## Driver Registry
-
-Exemplo:
-
-```go
-var drivers = map[string]DriverFactory{}
-```
-
-Registro:
-
-```go
-Register("mysql", NewMySQLDriver)
-Register("postgres", NewPostgresDriver)
-```
-
----
-
-# Frontend
-
-## Layout
-
-```txt
-Sidebar esquerda
-    Conexões
-    Databases
-    Tables
-
-Centro
-    SQL Editor
-
-Bottom
-    Results Grid
-```
-
----
-
-# Para o editor SQL
-* textarea simples
----
-
-# Feature roadmap
-
-## Fase 1
-
-* conexões
-* listar schema
-* executar queries
-* grid de resultados
-
-## Fase 2
-
-* tabs
-* histórico SQL
-* favoritos
-* export CSV
-
-## Fase 3
-
-* autocomplete
-* explain analyze
-* schema diff
-* snippets
-
-## Fase 4
-
-* SSH tunnel
-* Redis
-* Mongo
-* migrations
-* users/roles
-
----
-
-# MVP
-
-## Features
-
-- [x] salvar conexão
-- [x] conectar
-- [x] listar tabelas
-- [x] executar SELECT
-- [x] mostrar grid
-- [] Criar tabela
-- [] Renomear tabela
-- [] Excluir tabela
-- [x] Criar coluna
-- [x] Editar coluna
-- [x] Excluir coluna
-- [] Visualizar índices
-- [x] Executar SQL livre
+## Próximos passos: suporte SQLite no backend
+
+1. **Representar o caminho do arquivo:** adicionar um campo `FilePath` à configuração da conexão em Go e no tipo correspondente do frontend. Para a primeira versão, aceitar apenas arquivos existentes, evitando criar acidentalmente um banco vazio.
+2. **Abrir o diálogo nativo de arquivo:** criar uma binding Wails para selecionar o arquivo e disponibilizar o caminho escolhido à tela de conexão. O seletor HTML atual não fornece o caminho local ao backend; se a seleção também for necessária no modo web/API, será preciso definir um fluxo separado, como upload do arquivo.
+3. **Implementar o driver SQLite:** adicionar a dependência Go, registrar o driver e implementar primeiro conexão, listagem de tabelas e leitura de dados. Incluir testes com um arquivo SQLite temporário.
+4. **Adaptar o gerenciador de conexão:** usar o caminho do arquivo na abertura e na comparação de conexões. Definir o banco ativo como `main` ou equivalente e não simular operações de criar, renomear ou excluir bancos — no SQLite, o próprio arquivo representa o banco.
+5. **Conectar o fluxo completo e validar:** enviar o caminho selecionado junto à conexão, testar conexão, navegação e desconexão e exibir erros claros para arquivos inexistentes ou inválidos.

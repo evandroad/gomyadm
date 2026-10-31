@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/button"
 import { Card, CardContent, CardTitle } from "@/components/card"
@@ -19,8 +19,10 @@ const DB_DRIVERS = [
 
 export default function DatabaseConnectionPage() {
   const [connection, setConnection] = useState<Connection>(createConnection())
+  const [sqliteFileName, setSqliteFileName] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const sqliteFileInput = useRef<HTMLInputElement>(null)
   const navigate = useNavigate()
   const { setActiveConnection } = useConnection()
   const { connections } = useConnections()
@@ -55,6 +57,11 @@ export default function DatabaseConnectionPage() {
     handleConnect(conn)
   }
 
+  function handleDriverChange(driver: string) {
+    setConnection({ ...connection, driver })
+    setSqliteFileName("")
+  }
+
   return (
     <div className="min-h-screen flex flex-col items-center bg-zinc-950 p-2">
       <Card className="w-full max-w-md bg-zinc-900 border-zinc-800 mt-6">
@@ -84,19 +91,37 @@ export default function DatabaseConnectionPage() {
       <Card className="w-full max-w-md bg-zinc-900 border-zinc-800 text-white mt-6" title="Conectar ao banco de dados" collapsible>
         <CardContent>
           <Label>Banco de dados</Label>
-          <Select value={connection.driver} onChange={(e) => setConnection({...connection, driver: e.target.value})} options={DB_DRIVERS}/>
+          <Select value={connection.driver} onChange={(e) => handleDriverChange(e.target.value)} options={DB_DRIVERS}/>
 
-          <Label>Host</Label>
-          <Input value={connection.host} onChange={(e) => setConnection({...connection, host: e.target.value})} />
+          {connection.driver === "sqlite" ? (
+            <div className="space-y-2">
+              <input
+                ref={sqliteFileInput}
+                type="file"
+                accept=".db,.sqlite,.sqlite3,.db3"
+                className="hidden"
+                onChange={(e) => setSqliteFileName(e.target.files?.[0]?.name ?? "")}
+              />
+              <Button type="button" className="w-full" onClick={() => sqliteFileInput.current?.click()}>
+                Selecionar arquivo SQLite
+              </Button>
+              {sqliteFileName && <p className="text-sm text-zinc-400 break-all">{sqliteFileName}</p>}
+            </div>
+          ) : (
+            <>
+              <Label>Host</Label>
+              <Input value={connection.host} onChange={(e) => setConnection({...connection, host: e.target.value})} />
 
-          <Label>Porta</Label>
-          <Input value={connection.port} onChange={(e) => setConnection({...connection, port: e.target.value})} />
+              <Label>Porta</Label>
+              <Input value={connection.port} onChange={(e) => setConnection({...connection, port: e.target.value})} />
 
-          <Label>Usuário</Label>
-          <Input value={connection.username} onChange={(e) => setConnection({...connection, username: e.target.value})} />
+              <Label>Usuário</Label>
+              <Input value={connection.username} onChange={(e) => setConnection({...connection, username: e.target.value})} />
 
-          <Label>Senha</Label>
-          <Input value={connection.password} onChange={(e) => setConnection({...connection, password: e.target.value})} type="password" />
+              <Label>Senha</Label>
+              <Input value={connection.password} onChange={(e) => setConnection({...connection, password: e.target.value})} type="password" />
+            </>
+          )}
 
           {error && <div className="text-red-400 text-sm bg-red-950 p-2 rounded-md">{error}</div>}
 
