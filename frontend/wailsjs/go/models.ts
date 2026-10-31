@@ -64,6 +64,7 @@ export namespace models {
 	    id: string;
 	    name: string;
 	    driver: string;
+	    filePath: string;
 	    host: string;
 	    port: number;
 	    username: string;
@@ -80,6 +81,7 @@ export namespace models {
 	        this.id = source["id"];
 	        this.name = source["name"];
 	        this.driver = source["driver"];
+	        this.filePath = source["filePath"];
 	        this.host = source["host"];
 	        this.port = source["port"];
 	        this.username = source["username"];
@@ -92,6 +94,7 @@ export namespace models {
 	    id: string;
 	    name: string;
 	    driver: string;
+	    filePath: string;
 	    host: string;
 	    port: number;
 	    database: string;
@@ -106,6 +109,7 @@ export namespace models {
 	        this.id = source["id"];
 	        this.name = source["name"];
 	        this.driver = source["driver"];
+	        this.filePath = source["filePath"];
 	        this.host = source["host"];
 	        this.port = source["port"];
 	        this.database = source["database"];

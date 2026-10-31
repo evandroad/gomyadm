@@ -25,14 +25,14 @@ func NewApp() *App {
 
 	manager := db.NewConnectionManager()
 
-	appService        := services.NewAppService()
+	appService := services.NewAppService()
 	connectionService := services.NewConnectionStore()
-	databaseService   := services.NewDatabaseService(manager)
-	sessionService    := services.NewSessionService(manager)
-	tableService      := services.NewTableService(manager)
-	itemService       := services.NewItemService(manager)
-	columnService     := services.NewColumnService(manager)
-	queryService      := services.NewQueryService(manager)
+	databaseService := services.NewDatabaseService(manager)
+	sessionService := services.NewSessionService(manager)
+	tableService := services.NewTableService(manager)
+	itemService := services.NewItemService(manager)
+	columnService := services.NewColumnService(manager)
+	queryService := services.NewQueryService(manager)
 
 	return &App{
 		binds: []any{
@@ -44,6 +44,7 @@ func NewApp() *App {
 			bindings.NewItem(itemService),
 			bindings.NewColumn(columnService),
 			bindings.NewQuery(queryService),
+			bindings.NewFileDialog(),
 		},
 	}
 }

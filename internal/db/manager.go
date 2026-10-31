@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"gomyadm/internal/drivers"
-	"gomyadm/internal/models"
 	"gomyadm/internal/logger"
+	"gomyadm/internal/models"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -236,6 +236,7 @@ func (m *ConnectionManager) getConnection() models.ConnectionResponse {
 		ID:        m.connection.Config.ID,
 		Name:      m.connection.Config.Name,
 		Driver:    m.connection.Config.Driver,
+		FilePath:  m.connection.Config.FilePath,
 		Host:      m.connection.Config.Host,
 		Port:      m.connection.Config.Port,
 		Database:  m.connection.Config.Database,

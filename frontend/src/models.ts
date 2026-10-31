@@ -5,6 +5,7 @@ export type Connection = {
   id:        string
   name:      string
   driver:    string
+  filePath:  string
   host:      string
   port:      number | string
   username:  string
@@ -18,6 +19,7 @@ export function createConnection(data?: Partial<Connection>): Connection {
     id: "",
     name: "",
     driver: "",
+    filePath: "",
     host: "",
     port: "",
     username: "",

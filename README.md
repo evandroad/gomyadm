@@ -9,7 +9,7 @@ O Gomyadm é uma aplicação para gerenciamento de bancos de dados, desenvolvida
 - MySQL/MariaDB
 - PostgreSQL
 
-O backend usa `database/sql` com drivers específicos para esses bancos. **SQLite ainda não está funcional**: a interface apresenta a opção SQLite e um seletor de arquivo que mostra o nome escolhido, mas o caminho não é enviado ao backend e não existe driver SQLite registrado.
+O backend usa `database/sql` com drivers específicos para esses bancos. **SQLite ainda não está funcional**: a interface desktop já permite selecionar um arquivo local e envia o caminho na configuração da conexão, mas o backend ainda não tem driver SQLite registrado.
 
 ### Funcionalidades disponíveis
 
@@ -73,8 +73,16 @@ go install github.com/swaggo/swag/cmd/swag@latest
 
 ## Próximos passos: suporte SQLite no backend
 
-1. **Representar o caminho do arquivo:** adicionar um campo `FilePath` à configuração da conexão em Go e no tipo correspondente do frontend. Para a primeira versão, aceitar apenas arquivos existentes, evitando criar acidentalmente um banco vazio.
-2. **Abrir o diálogo nativo de arquivo:** criar uma binding Wails para selecionar o arquivo e disponibilizar o caminho escolhido à tela de conexão. O seletor HTML atual não fornece o caminho local ao backend; se a seleção também for necessária no modo web/API, será preciso definir um fluxo separado, como upload do arquivo.
+1. **Representar o caminho do arquivo:** concluído com o campo `FilePath` na configuração Go e nos tipos do frontend. A validação do arquivo ainda faz parte da implementação do driver.
+2. **Abrir o diálogo nativo de arquivo:** concluído na aplicação desktop com uma binding Wails. A seleção no modo web/API requer um fluxo separado, como upload do arquivo.
 3. **Implementar o driver SQLite:** adicionar a dependência Go, registrar o driver e implementar primeiro conexão, listagem de tabelas e leitura de dados. Incluir testes com um arquivo SQLite temporário.
-4. **Adaptar o gerenciador de conexão:** usar o caminho do arquivo na abertura e na comparação de conexões. Definir o banco ativo como `main` ou equivalente e não simular operações de criar, renomear ou excluir bancos — no SQLite, o próprio arquivo representa o banco.
-5. **Conectar o fluxo completo e validar:** enviar o caminho selecionado junto à conexão, testar conexão, navegação e desconexão e exibir erros claros para arquivos inexistentes ou inválidos.
+4. **Adaptar o gerenciador de conexão:** a comparação já considera o caminho; falta usar esse caminho para abrir o SQLite. Definir o banco ativo como `main` ou equivalente e não simular operações de criar, renomear ou excluir bancos — no SQLite, o próprio arquivo representa o banco.
+5. **Conectar o fluxo completo e validar:** abrir no gerenciador o caminho já recebido, testar conexão, navegação e desconexão e exibir erros claros para arquivos inexistentes ou inválidos.
+
+## Status do suporte SQLite
+
+- [x] Adicionar `FilePath` aos modelos Go e TypeScript.
+- [x] Permitir selecionar um arquivo SQLite pelo diálogo nativo da aplicação Wails.
+- [ ] Implementar o driver SQLite e as operações iniciais de conexão e leitura.
+- [ ] Integrar a abertura do arquivo ao gerenciador e validar o fluxo completo.
+- [ ] Definir um fluxo de seleção para o modo web/API, se necessário.

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/button"
 import { Card, CardContent, CardTitle } from "@/components/card"
@@ -10,6 +10,7 @@ import { useConnections } from "@/contexts/ConnectionsContext"
 import { useDatabase } from "@/contexts/DatabaseContext";
 import { useConnection } from "@/contexts/ConectionContext";
 import { repositories } from "@/repositories";
+import { OpenSQLiteFile } from "../../wailsjs/go/bindings/FileDialogBinding"
 
 const DB_DRIVERS = [
   { value: "mysql", text: "MySQL" },
@@ -22,7 +23,6 @@ export default function DatabaseConnectionPage() {
   const [sqliteFileName, setSqliteFileName] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const sqliteFileInput = useRef<HTMLInputElement>(null)
   const navigate = useNavigate()
   const { setActiveConnection } = useConnection()
   const { connections } = useConnections()
@@ -54,12 +54,30 @@ export default function DatabaseConnectionPage() {
 
   function connectFromSaved(conn: Connection) {
     setConnection(conn)
+    setSqliteFileName(conn.filePath.split(/[\\/]/).pop() ?? "")
     handleConnect(conn)
   }
 
   function handleDriverChange(driver: string) {
-    setConnection({ ...connection, driver })
-    setSqliteFileName("")
+    setConnection({
+      ...connection,
+      driver,
+      filePath: driver === "sqlite" ? connection.filePath : "",
+    })
+    if (driver !== "sqlite") setSqliteFileName("")
+  }
+
+  async function selectSQLiteFile() {
+    setError(null)
+    try {
+      const filePath = await OpenSQLiteFile()
+      if (!filePath) return
+
+      setConnection({ ...connection, filePath })
+      setSqliteFileName(filePath.split(/[\\/]/).pop() ?? filePath)
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Erro ao selecionar arquivo SQLite")
+    }
   }
 
   return (
@@ -73,7 +91,7 @@ export default function DatabaseConnectionPage() {
               {connections.map((conn, index) => (
                 <div key={index} className="p-2 bg-zinc-950 rounded-md flex justify-between items-center">
                   <span>
-                    <strong className="text-base">{conn.name}</strong> - {conn.host}:{conn.port} - {conn.driver.toUpperCase()}
+                    <strong className="text-base">{conn.name}</strong> - {conn.driver === "sqlite" ? conn.filePath : `${conn.host}:${conn.port}`} - {conn.driver.toUpperCase()}
                   </span>
                   <Button onClick={() => connectFromSaved(conn)}>Conectar</Button>
                 </div>
@@ -95,17 +113,18 @@ export default function DatabaseConnectionPage() {
 
           {connection.driver === "sqlite" ? (
             <div className="space-y-2">
-              <input
-                ref={sqliteFileInput}
-                type="file"
-                accept=".db,.sqlite,.sqlite3,.db3"
-                className="hidden"
-                onChange={(e) => setSqliteFileName(e.target.files?.[0]?.name ?? "")}
-              />
-              <Button type="button" className="w-full" onClick={() => sqliteFileInput.current?.click()}>
-                Selecionar arquivo SQLite
-              </Button>
-              {sqliteFileName && <p className="text-sm text-zinc-400 break-all">{sqliteFileName}</p>}
+              {import.meta.env.VITE_RUNTIME === "wails" ? (
+                <>
+                  <Button type="button" className="w-full" onClick={selectSQLiteFile}>
+                    Selecionar arquivo SQLite
+                  </Button>
+                  {sqliteFileName && <p className="text-sm text-zinc-400 break-all">{sqliteFileName}</p>}
+                </>
+              ) : (
+                <p className="text-sm text-zinc-400">
+                  A seleção de arquivos locais está disponível apenas na versão desktop.
+                </p>
+              )}
             </div>
           ) : (
             <>
