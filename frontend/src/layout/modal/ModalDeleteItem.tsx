@@ -22,11 +22,12 @@ export function ModalDeleteItem({ open, onClose, data }: Props) {
     if (!activeTable) return
 
     const primaryKeys = activeTable.columns.filter((col: Column) => col.primary)
+    const key = primaryKeys.length > 0
+      ? Object.fromEntries(primaryKeys.map((column: Column) => [column.name, castValue(data[column.name], column.type)]))
+      : data.__gomyadm_rowid != null ? { __gomyadm_rowid: data.__gomyadm_rowid } : {}
     const payload = {
       table: activeTable.name,
-      key: Object.fromEntries(
-        primaryKeys.map((column: any) => [column.name, castValue(data[column.name], column.type)])
-      )
+      key
     }
 
     const res = await repositories.item.delete(payload)
@@ -53,7 +54,7 @@ export function ModalDeleteItem({ open, onClose, data }: Props) {
           <CardTitle onClose={onClose}>Excluir Item</CardTitle>
         </CardHeader>
         <CardContent>
-          {Object.entries(data).map(([key, value]) => <Label key={key}><span>{key}</span><span>{value}</span></Label>)}
+          {Object.entries(data).filter(([key]) => key !== "__gomyadm_rowid").map(([key, value]) => <Label key={key}><span>{key}</span><span>{value}</span></Label>)}
         </CardContent>
         <CardFooter>
           <Button onClick={onClose}>Cancelar</Button>

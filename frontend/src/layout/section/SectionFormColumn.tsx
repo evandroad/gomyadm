@@ -8,10 +8,12 @@ import { ColumnTypes, createColumn, type Column } from "@/models";
 import { useDatabase } from "@/contexts/DatabaseContext";
 import { useTable } from "@/contexts/TableContext";
 import { repositories } from "@/repositories";
+import { useConnection } from "@/contexts/ConectionContext";
 
 export default function SectionFormColumn() {
   const { activeDatabase } = useDatabase()
   const { activeTable } = useTable()
+  const isSQLite = useConnection().activeConnection?.driver === "sqlite"
   const [column, setColumn] = useState<Column>(createColumn())
 
   async function handleSubmit() {
@@ -66,6 +68,7 @@ export default function SectionFormColumn() {
             type="checkbox"
             id="primary"
             className="scale-115 cursor-pointer"
+            disabled={isSQLite}
             checked={!!column.primary}
             onChange={(e) => setColumn({ ...column, primary: e.target.checked })}
           />
@@ -89,6 +92,7 @@ export default function SectionFormColumn() {
             type="checkbox"
             id="autoIncrement"
             className="scale-115 cursor-pointer"
+            disabled={isSQLite}
             checked={!!column.autoIncrement}
             onChange={(e) => setColumn({ ...column, autoIncrement: e.target.checked })}
           />

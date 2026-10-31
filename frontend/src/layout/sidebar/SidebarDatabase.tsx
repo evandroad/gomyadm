@@ -51,9 +51,6 @@ export function SidebarDatabase() {
         </div>
         <div className="space-y-4 mt-2">
           <Select value={activeDatabase || ''} onChange={(e) => changeDatabase(e.target.value)} options={databases}/>
-          {activeConnection?.driver === "sqlite" && (
-            <p className="text-xs text-zinc-500">Conectado em modo somente leitura</p>
-          )}
         </div>
       </div>
     </>

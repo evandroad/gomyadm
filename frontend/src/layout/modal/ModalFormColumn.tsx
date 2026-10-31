@@ -9,6 +9,7 @@ import { ColumnTypes, createColumn, type Column } from "@/models"
 import { repositories } from "@/repositories"
 import { notify } from "@/utils"
 import { useEffect, useState } from "react"
+import { useConnection } from "@/contexts/ConectionContext";
 
 type Props = {
   open: boolean
@@ -20,8 +21,10 @@ type Props = {
 
 export function ModalFormColumn({ open, toApi, onClose, onSave, data }: Props) {
   const { activeTable } = useTable()
+  const { activeConnection } = useConnection()
   const [column, setColumn] = useState<Column>(createColumn())
   const [oldName, setOldName] = useState<string>('')
+  const sqliteRenameOnly = toApi && activeConnection?.driver === "sqlite"
 
   async function handleSubmit() {
     if (!activeTable) return
@@ -66,13 +69,17 @@ export function ModalFormColumn({ open, toApi, onClose, onSave, data }: Props) {
             <Input value={column.name} onChange={(e) => setColumn({ ...column, name: e.target.value })} />
       
             <Label>Tipo</Label>
-            <Select value={column.type} onChange={(e) => setColumn({...column, type: e.target.value})} options={ColumnTypes}/>
+            <Select disabled={sqliteRenameOnly} value={column.type} onChange={(e) => setColumn({...column, type: e.target.value})} options={ColumnTypes}/>
       
             <Label>Tamanho</Label>
-            <Input value={column.length} onChange={(e) => setColumn({ ...column, length: e.target.value })} />
+            <Input disabled={sqliteRenameOnly} value={column.length} onChange={(e) => setColumn({ ...column, length: e.target.value })} />
       
             <Label>Padrão</Label>
-            <Input value={column.defaultValue} onChange={(e) => setColumn({ ...column, defaultValue: e.target.value })} />
+            <Input disabled={sqliteRenameOnly} value={column.defaultValue} onChange={(e) => setColumn({ ...column, defaultValue: e.target.value })} />
+
+            {sqliteRenameOnly && (
+              <p className="text-sm text-zinc-400">No SQLite, esta ação renomeia a coluna. Para alterar tipo ou restrições será necessário reconstruir a tabela.</p>
+            )}
       
             <div className="flex justify-between">
               <div>
@@ -81,6 +88,7 @@ export function ModalFormColumn({ open, toApi, onClose, onSave, data }: Props) {
                   type="checkbox"
                   id="nullable"
                   className="scale-115 cursor-pointer"
+                  disabled={sqliteRenameOnly}
                   checked={!!column.nullable}
                   onChange={(e) => setColumn({ ...column, nullable: e.target.checked })}
                 />
@@ -92,6 +100,7 @@ export function ModalFormColumn({ open, toApi, onClose, onSave, data }: Props) {
                   type="checkbox"
                   id="primary"
                   className="scale-115 cursor-pointer"
+                  disabled={sqliteRenameOnly}
                   checked={!!column.primary}
                   onChange={(e) => setColumn({ ...column, primary: e.target.checked })}
                 />
@@ -105,6 +114,7 @@ export function ModalFormColumn({ open, toApi, onClose, onSave, data }: Props) {
                   type="checkbox"
                   id="unique"
                   className="scale-115 cursor-pointer"
+                  disabled={sqliteRenameOnly}
                   checked={!!column.unique}
                   onChange={(e) => setColumn({ ...column, unique: e.target.checked })}
                 />
@@ -115,6 +125,7 @@ export function ModalFormColumn({ open, toApi, onClose, onSave, data }: Props) {
                   type="checkbox"
                   id="autoIncrement"
                   className="scale-115 cursor-pointer"
+                  disabled={sqliteRenameOnly}
                   checked={!!column.autoIncrement}
                   onChange={(e) => setColumn({ ...column, autoIncrement: e.target.checked })}
                 />

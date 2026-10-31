@@ -20,7 +20,7 @@ import { useConnection } from "@/contexts/ConectionContext";
 export type View = "data" | "struct" | "formColumn" | "formTable" | "sql"
 
 export default function MainPage() {
-  const { activeConnection, loading } = useConnection()
+  const { loading } = useConnection()
   const { activeDatabase } = useDatabase()
   const { load, loadTableData } = useTable()
   const [selectedTable, setSelectedTable] = useState<string | null>(null)
@@ -77,20 +77,20 @@ export default function MainPage() {
         <div className="flex w-fit border-b border-zinc-800 mb-2">
           <button onClick={() => setView("data")} className={getTabClass("data")}>Dados</button>
           <button onClick={() => setView("struct")} className={getTabClass("structure")}>Estrutura</button>
-          {(view == 'struct' || view == 'formColumn') && activeConnection?.driver !== "sqlite" &&
+          {(view == 'struct' || view == 'formColumn') &&
             <button onClick={() => setView("formColumn")} className={getTabClass("formColumn")}>Nova Coluna</button>
           }
         </div>
         <div className="space-x-1">
           {view == 'data' &&
             <>
-              {activeConnection?.driver !== "sqlite" && <Button variant="success" onClick={() => setOpenFormItem(true)}><Plus size={16}/></Button>}
+              <Button variant="success" onClick={() => setOpenFormItem(true)}><Plus size={16}/></Button>
               <Button onClick={() => loadTableData(selectedTable)}><RefreshCcw size={16}/></Button>
             </>
           }
           {view == 'struct' &&
             <>
-              {activeConnection?.driver !== "sqlite" && <Button variant="success" onClick={() => setView("struct")}><Plus size={16}/></Button>}
+              <Button variant="success" onClick={() => setView("formColumn")}><Plus size={16}/></Button>
               <Button><RefreshCcw size={16}/></Button>
             </>
           }

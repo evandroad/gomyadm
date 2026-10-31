@@ -23,9 +23,12 @@ export function ModalFormItem({ open, onClose, data }: Props) {
   async function handleSubmit() {
     if (!activeTable) return
     const primaryKeys = activeTable.columns.filter((col: Column) => col.primary)
+    const key = primaryKeys.length > 0
+      ? Object.fromEntries(primaryKeys.map((column: Column) => [column.name, castValue(formData?.[column.name], column.type)]))
+      : data?.__gomyadm_rowid != null ? { __gomyadm_rowid: data.__gomyadm_rowid } : {}
     const payload = {
       table: activeTable.name,
-      key: Object.fromEntries(primaryKeys.map((column: Column) => [column.name, castValue(formData?.[column.name], column.type)])),
+      key,
       values: Object.fromEntries(
         activeTable.columns
           .filter((col: any) => col.key !== "PRI")
